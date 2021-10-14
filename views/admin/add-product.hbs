@@ -1,3 +1,5 @@
+
+
 <section class="m-5">
     <div class="container">
         <div class="row mt-5">
@@ -58,32 +60,46 @@
                       <label for="exampleInputEmail1" class="form-label ">Description</label>
                       <input type="text"  name="description" class="form-control " id="enputEmail1" aria-describedby="emailHelp">
                     </div>
+
+                    <div class="col-12">
+                      <div style="width: 300px; height: 300px; display: none;"  id="image-box"></div>
+                      <button style="display: none;" class="btn btn-primary mt-4" type="button" id="crop-btn">Crop</button>
+                    </div>
                     
 
                    
                     <div class="mb-3 ">
-                      <label for="exampleInputEmail1" class="form-label ">Product image 1</label>
-                      <div id="imgview1" class="pb-4"></div>
-                     
-                      <input type="file" name="image1" class="form-control " onchange="return fileValidation1()" id="ImageInput1" aria-describedby="emailHelp">
+                       <label for="">IMAGE 1</label>
+                                <img src="" alt="" style="width: 100px; height:auto" id="imgview1">
+                                <div id="errMess1" ></div>
+                                {{!-- <div id="preview1"></div> --}}
+                                <input type="file" name="image1" id="file1" class="form-control"
+                                    onchange="return fileValidation1()">
+                                    
                     </div>
 
 
                    
 
                     <div class="mb-3 ">
-                      <label for="exampleInputEmail1" class="form-label ">Product image 2</label>
-                      <div id="imgview2" class="pb-4"></div>
-                      <input type="file" name="image2" class="form-control " onchange="return fileValidation2()" id="ImageInput2" aria-describedby="emailHelp">
+                       <label for="">IMAGE 2</label>
+                                <img src="" alt="" style="width: 100px; height:auto" id="imgview2">
+                                <div id="errMess2"></div>
+                                {{!-- <div id="preview2"></div> --}}
+                                <input type="file" name="image2" id="file2" class="form-control"
+                                    onchange="return fileValidation2()">
                     </div>
 
                     <div class="mb-3 ">
-                      <label for="exampleInputEmail1" class="form-label ">Product image 3</label>
-                     <div id="imgview3" class="pb-4"></div>
-                      <input type="file" name="image3" class="form-control " onchange="return fileValidation3()" id="ImageInput3" aria-describedby="emailHelp">
+                       <label for="">IMAGE 3</label>
+                                <img src="" alt="" style="width: 100px; height:auto" id="imgview3">
+                                <div id="errMess3"></div>
+                                {{!-- <div id="preview3"></div> --}}
+                                <input type="file" name="image3" id="file3" class="form-control"
+                                    onchange="return fileValidation3()">
                     </div>
                    
-                    <button type="submit" class="btn btn-primary">Add product</button>
+                    <button id="confirm-btn" type="submit" class="btn btn-primary">Add product</button>
                  </form>
            </div>
            </center>
@@ -91,104 +107,181 @@
     </div>
 </section>
 
+
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.js"></script>
+
+
 <script>
 
   //image input 1
 
    function fileValidation1() {
-            
-            
-            var fileInput = document.getElementById('ImageInput1');
-                
-              console.log(fileInput)
-            var filePath = fileInput.value;
-          
-            // Allowing file type
-            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i; 
-              
-            if (!allowedExtensions.exec(filePath)) {
-                document.getElementById('imgview1').innerHTML = '<p style="color:red">Invalid File type</p>';
-                fileInput.value = '';
-                return false;
-            } 
-            else 
-            {
-              
-                // Image preview
-                if (fileInput.files && fileInput.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('imgview1').innerHTML = '<img src="' + e.target.result+ '"style="width: 100px; height: auto; " />';
-                    };
-                      
-                    reader.readAsDataURL(fileInput.files[0]);
-                }
-            }
-        }  
+        const imagebox = document.getElementById('image-box')
+        const crop_btn = document.getElementById('crop-btn')
+        var fileInput = document.getElementById('file1');
+        
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.jpg)$/i;
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('errMess1').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
+            fileInput.value = '';
+            return false;
+        } else {
+          document.getElementById('errMess1').innerHTML=''
+            //Image preview
+            const img_data = fileInput.files[0]
+            const url = URL.createObjectURL(img_data)
+            imagebox.innerHTML = `<img src="${url}" id="image" style="width:100%">`
+            const image = document.getElementById('image')
+            document.getElementById('image-box').style.display = 'block'
+            document.getElementById('crop-btn').style.display = 'block'
+            document.getElementById('confirm-btn').style.display = 'none'
+           
+            const cropper = new Cropper(image, {
+                autoCropArea: 1,
+                viewMode: 1,
+                scalable: false,
+                zoomable: false,
+                movable: false,
+                aspectRatio: 16 / 19,
+              //  preview: '.preview',
+                minCropBoxWidth: 180,
+                minCropBoxHeight: 240,
+            })
+            crop_btn.addEventListener('click', () => {
+                cropper.getCroppedCanvas().toBlob((blob) => {
+                    let fileInputElement = document.getElementById('file1');
+                    let file = new File([blob], img_data.name, { type: "image/*", lastModified: new Date().getTime() });
+                    let container = new DataTransfer();
+                   
+                    container.items.add(file);
+                     const img = container.files[0]
+                     var url =URL.createObjectURL(img)                    
+                     fileInputElement.files = container.files;
+                     document.getElementById('imgview1').src=url
+                    document.getElementById('image-box').style.display = 'none'
+                    document.getElementById('crop-btn').style.display = 'none'
+                    document.getElementById('confirm-btn').style.display = 'block'
+                });
+            });
+        }
+    }
         
 
         //image input 2
 
-   function fileValidation2() {
-            var fileInput = document.getElementById('ImageInput2');
-                
-              console.log(fileInput)
-            var filePath = fileInput.value;
-          
-            // Allowing file type
-            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-              
-            if (!allowedExtensions.exec(filePath)) {
-               document.getElementById('imgview2').innerHTML = '<p style="color:red">Invalid File type</p>';
-                fileInput.value = '';
-                return false;
-            } 
-            else 
-            {
-              
-                // Image preview
-                if (fileInput.files && fileInput.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('imgview2').innerHTML = '<img src="' + e.target.result+ '"style="width: 100px; height: auto; " />';
-                    };
-                      
-                    reader.readAsDataURL(fileInput.files[0]);
-                }
-            }
+        function fileValidation2() {
+        const imagebox = document.getElementById('image-box')
+        const crop_btn = document.getElementById('crop-btn')
+        var fileInput = document.getElementById('file2');
+        
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.jpg)$/i;
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('errMess2').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
+            fileInput.value = '';
+            return false;
+        } else {
+          document.getElementById('errMess2').innerHTML=''
+            //Image preview
+            const img_data = fileInput.files[0]
+            const url = URL.createObjectURL(img_data)
+            imagebox.innerHTML = `<img src="${url}" id="image" style="width:100%">`
+            const image = document.getElementById('image')
+            document.getElementById('image-box').style.display = 'block'
+            document.getElementById('crop-btn').style.display = 'block'
+            document.getElementById('confirm-btn').style.display = 'none'
+           
+            const cropper = new Cropper(image, {
+                autoCropArea: 1,
+                viewMode: 1,
+                scalable: false,
+                zoomable: false,
+                movable: false,
+                aspectRatio: 16 / 19,
+               // preview: '.preview',
+                minCropBoxWidth: 180,
+                minCropBoxHeight: 240,
+            })
+            crop_btn.addEventListener('click', () => {
+                cropper.getCroppedCanvas().toBlob((blob) => {
+                    let fileInputElement = document.getElementById('file2');
+                    let file = new File([blob], img_data.name, { type: "image/*", lastModified: new Date().getTime() });
+                    let container = new DataTransfer();
+                   
+                    container.items.add(file);
+                     console.log(container.files[0])
+                     const img = container.files[0]
+                     var url =URL.createObjectURL(img)                    
+                     fileInputElement.files = container.files;
+                     document.getElementById('imgview2').src=url
+                    document.getElementById('image-box').style.display = 'none'
+                    document.getElementById('crop-btn').style.display = 'none'
+                    document.getElementById('confirm-btn').style.display = 'block'
+                });
+            });
         }
+    }
 
 
         //image input 3
 
-        function fileValidation3() {
-            var fileInput = document.getElementById('ImageInput3');
-                
-              console.log(fileInput)
-            var filePath = fileInput.value;
-          
-            // Allowing file type
-            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-              
-            if (!allowedExtensions.exec(filePath)) {
-                document.getElementById('imgview3').innerHTML = '<p style="color:red">Invalid File type</p>';
-                fileInput.value = '';
-                return false;
-            } 
-            else 
-            {
-              
-                // Image preview
-                if (fileInput.files && fileInput.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('imgview3').innerHTML = '<img src="' + e.target.result+ '"style="width: 100px; height: auto; " />';
-                    };
-                      
-                    reader.readAsDataURL(fileInput.files[0]);
-                }
-            }
+         function fileValidation3() {
+        const imagebox = document.getElementById('image-box')
+        const crop_btn = document.getElementById('crop-btn')
+        var fileInput = document.getElementById('file3');
+        
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.jpg)$/i;
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('errMess3').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
+            fileInput.value = '';
+            return false;
+        } else {
+          document.getElementById('errMess3').innerHTML=''
+            //Image preview
+            const img_data = fileInput.files[0]
+            const url = URL.createObjectURL(img_data)
+            imagebox.innerHTML = `<img src="${url}" id="image" style="width:100%">`
+            const image = document.getElementById('image')
+            document.getElementById('image-box').style.display = 'block'
+            document.getElementById('crop-btn').style.display = 'block'
+            document.getElementById('confirm-btn').style.display = 'none'
+           
+            const cropper = new Cropper(image, {
+                autoCropArea: 1,
+                viewMode: 1,
+                scalable: false,
+                zoomable: false,
+                movable: false,
+                aspectRatio: 16 / 19,
+               // preview: '.preview',
+                minCropBoxWidth: 180,
+                minCropBoxHeight: 240,
+            })
+            crop_btn.addEventListener('click', () => {
+                cropper.getCroppedCanvas().toBlob((blob) => {
+                    let fileInputElement = document.getElementById('file3');
+                    let file = new File([blob], img_data.name, { type: "image/*", lastModified: new Date().getTime() });
+                    let container = new DataTransfer();
+                   
+                    container.items.add(file);
+                     console.log(container.files[0])
+                     const img = container.files[0]
+                     var url =URL.createObjectURL(img)                    
+                     fileInputElement.files = container.files;
+                     document.getElementById('imgview3').src=url
+                    document.getElementById('image-box').style.display = 'none'
+                    document.getElementById('crop-btn').style.display = 'none'
+                    document.getElementById('confirm-btn').style.display = 'block'
+                });
+            });
         }
+    }
 
   
 </script>
