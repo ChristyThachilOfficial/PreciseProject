@@ -1,0 +1,260 @@
+<section class="m-5">
+    <div class="container">
+        <div class="row mt-5">
+          <center>
+          <div style="width: 50%;">
+                  <form class="mt-5" id="addproduct" action="/admin/addproduct" method="POST" enctype="multipart/form-data">
+
+                     <div class="mb-3 ">
+                       <h2>Add product</h2>
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Product name</label>
+                      <input type="text" name="productname" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp">
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="exampleInputPassword1" class="form-label ">Quantity</label>
+                      <input type="number" name="quantity" class="form-control " id="exampIntPsword1">
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Brand</label><br>
+                      {{!-- <input type="text" name="brand" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp"> --}}
+                      <select name="brand" class="form-control text-center" id="exInpuEmail1" aria-describedby="emailHelp">
+                        <option value="">Select brand</option>
+                        <option value="rolex">Rolex</option>
+                        <option value="titan">Titan</option>
+                        <option value="fastrack">Fastrack</option>
+
+                      </select>
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Price</label>
+                      <input type="number" name="price" class="form-control " id="ampleInputmail1" aria-describedby="emailHelp">
+                      
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Offer Price</label>
+                      <input type="number" name="offerprice" class="form-control " id="exampleIssputEmil1" aria-describedby="emailHelp">
+                      
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Category</label><br>
+                      <input type="radio" id="html" name="gender" value="men">
+                      <label for="men" class="pr-2">Men's watches</label>
+                      <input type="radio" id="css" name="gender" value="women">
+                      <label for="css">Women's watches</label>
+                     
+                                              
+                    </div>
+
+
+                     <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Description</label>
+                      <input type="text"  name="description" class="form-control " id="enputEmail1" aria-describedby="emailHelp">
+                    </div>
+                    
+
+                   
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Product image 1</label>
+                      <div id="imgview1" class="pb-4"></div>
+                     
+                      <input type="file" name="image1" class="form-control " onchange="return fileValidation1()" id="ImageInput1" aria-describedby="emailHelp">
+                    </div>
+
+
+                    {{!-- image modal adding as per rahul --}}
+
+                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                                aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLongTitle">Crop Image</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="result"></div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Close</button>
+                                            <button type="button" id="load" class="btn btn-primary save">Save
+                                                changes</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Product image 2</label>
+                      <div id="imgview2" class="pb-4"></div>
+                      <input type="file" name="image2" class="form-control " onchange="return fileValidation2()" id="ImageInput2" aria-describedby="emailHelp">
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Product image 3</label>
+                     <div id="imgview3" class="pb-4"></div>
+                      <input type="file" name="image3" class="form-control " onchange="return fileValidation3()" id="ImageInput3" aria-describedby="emailHelp">
+                    </div>
+                   
+                    <button type="submit" class="btn btn-primary">Add product</button>
+                 </form>
+           </div>
+           </center>
+        </div>
+    </div>
+</section>
+
+<script>
+
+  //image input 1
+
+   function fileValidation1() {
+            var fileInput = document.getElementById('ImageInput1');
+                
+              console.log(fileInput)
+            var filePath = fileInput.value;
+          
+            // Allowing file type
+            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i; 
+              
+            if (!allowedExtensions.exec(filePath)) {
+                document.getElementById('imgview1').innerHTML = '<p style="color:red">Invalid File type</p>';
+                fileInput.value = '';
+                return false;
+            } 
+            else 
+            {
+              
+                // Image preview
+                if (fileInput.files && fileInput.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('imgview1').innerHTML = '<img src="' + e.target.result+ '"style="width: 100px; height: auto; " />';
+                    };
+                      
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
+            }
+        }  
+        
+
+        //image input 2
+
+   function fileValidation2() {
+            var fileInput = document.getElementById('ImageInput2');
+                
+              console.log(fileInput)
+            var filePath = fileInput.value;
+          
+            // Allowing file type
+            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+              
+            if (!allowedExtensions.exec(filePath)) {
+               document.getElementById('imgview2').innerHTML = '<p style="color:red">Invalid File type</p>';
+                fileInput.value = '';
+                return false;
+            } 
+            else 
+            {
+              
+                // Image preview
+                if (fileInput.files && fileInput.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('imgview2').innerHTML = '<img src="' + e.target.result+ '"style="width: 100px; height: auto; " />';
+                    };
+                      
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
+            }
+        }
+
+
+        //image input 3
+
+        function fileValidation3() {
+            var fileInput = document.getElementById('ImageInput3');
+                
+              console.log(fileInput)
+            var filePath = fileInput.value;
+          
+            // Allowing file type
+            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+              
+            if (!allowedExtensions.exec(filePath)) {
+                document.getElementById('imgview3').innerHTML = '<p style="color:red">Invalid File type</p>';
+                fileInput.value = '';
+                return false;
+            } 
+            else 
+            {
+              
+                // Image preview
+                if (fileInput.files && fileInput.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('imgview3').innerHTML = '<img src="' + e.target.result+ '"style="width: 100px; height: auto; " />';
+                    };
+                      
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
+            }
+        }
+
+  
+</script>
+ {{!-- adddddddddddddddmmmmmmmmmmmminnnnnnnnnnn file validation --}}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+<script>
+  $(document).ready(function(){
+    $('#addproduct').validate({
+      rules:{
+        productname:{
+          required:true,
+          minlength:3
+        },
+        quantity:{
+          required:true
+        },
+        brand:{
+          required:true
+        },
+        price:{
+          required:true
+        },
+        offerprice:{
+          required:true
+        },
+        gender:{
+          required:true
+        },
+        description:{
+          required:true
+        },
+        image1:{
+          required:true
+        },
+        image2:{
+          required:true
+        },
+        image3:{
+          required:true
+        }
+
+
+      }
+    })
+  })
+</script>
+ 

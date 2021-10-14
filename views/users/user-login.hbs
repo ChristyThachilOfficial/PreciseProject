@@ -1,0 +1,40 @@
+<section style="margin-top: 150px;">
+    <div class="container ">
+        <div class="row ">
+            <div class="col-md-6 m-auto " style="margin-top: 150px; display: inline:  !important;;">
+                <form action="/login" method="POST">
+                    <div>
+                        <h4 style="text-align: center; text-align: center;
+    font-weight: bold;
+    padding: 10px;">LOGIN</h4>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                            placeholder="Enter email">
+                        
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                    </div>
+                    {{#if userblock}}
+                    <span class="text-danger">Access denied</span>
+                    {{/if}}
+                    {{#if loginError}}
+                    <span class="text-danger">Invalid username or password</span>
+                        
+                    {{/if}}
+                    <div >
+                        <a href="/forgotpassword" style="text-decoration: none;">Forgot password?</a><br><br>
+                        
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary">Login</button> <br>
+                    <div class="text-center"> 
+                        <p>Don't have an account? <a href="/signup" style="text-decoration: none;">Signup</a> now</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

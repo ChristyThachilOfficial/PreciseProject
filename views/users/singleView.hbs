@@ -1,0 +1,138 @@
+
+<section>
+   
+	<!-- page -->
+	<div class="services-breadcrumb">
+		<div class="agile_inner_breadcrumb">
+			<div class="container">
+				<ul class="w3_short">
+					
+					
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- //page -->
+
+	<!-- Single Page -->
+	<div class="banner-bootom-w3-agileits py-5">
+		<div class="container py-xl-4 py-lg-2">
+			
+			<div class="row">
+				<div class="col-lg-5 col-md-8 single-right-left ">
+					<div class="grid images_3_of_2">
+						<div class="flexslider">
+							<ul  class="slides">
+								<li data-thumb="/productImages/{{productDetails._id}}__1.jpg">
+									<div class="thumb-image">
+										<img src="/productImages/{{productDetails._id}}__1.jpg"  style="width: 300px; height: 400px;" class="big-image" alt="" id="preview">
+										 </div>
+								</li>
+								
+							</ul>
+							<ul class="pt-3">
+								<li data-thumb="/productImages/{{productDetails._id}}__2.jpg">
+									<div class="thumb-image">
+										<img src="/productImages/{{productDetails._id}}__2.jpg" class="small-image" style="height: 80px; width: 80px; float: left; border-style: ridge;"  class="img-fluid" id="navitem1"  alt="" > 
+									</div>
+										
+								</li>
+								<li data-thumb="/productImages/{{productDetails._id}}__3.jpg">
+									<div class="thumb-image">
+										<img src="/productImages/{{productDetails._id}}__3.jpg" class="small-image" style="height: 80px; width: 80px; float: left; border-style: ridge;" class="img-fluid"  id="navitem2" alt="">
+										
+										 </div>
+								</li>
+								<li data-thumb="/productImages/{{productDetails._id}}__1.jpg">
+									<div class="thumb-image">
+										<img src="/productImages/{{productDetails._id}}__1.jpg" class="small-image" style="height: 80px; width: 80px; float: left; border-style: ridge;"  class="img-fluid" alt="" id="navitem3" >
+										
+										 </div>
+								</li>
+							</ul>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-7 single-right-left simpleCart_shelfItem">
+					<h3 class="mb-3">{{productDetails.productname}}</h3>
+					<p class="mb-3">
+						<span class="item_price">₹{{productDetails.offerprice}}</span>
+						<del class="mx-2 font-weight-light">₹{{productDetails.price}}</del>
+						<label>Free delivery</label>
+					</p>
+					<div class="single-infoagile">
+						<ul>
+							<li class="mb-3">
+							100% Original Products
+							</li>
+							<li class="mb-3">
+								Pay on delivery might be available
+							</li>
+							<li class="mb-3">
+								Easy 30 days returns
+							</li>
+							<li class="mb-3">
+								This item is only returnable and not exchangeable
+							</li>
+						</ul>
+					</div>
+					<div class="product-single-w3l">
+						<p class="my-3">
+							<i class="far fa-hand-point-right mr-2"></i>
+							<label>1 Year</label>Manufacturer Warranty</p>
+						<ul>
+							<li class="mb-1">
+								Display: Analogue
+							</li>
+							<li class="mb-1">
+								Power source: Battery
+							</li>
+							<li class="mb-1">
+								Dial style: Printed round stainless steel dial
+							</li>
+							<li class="mb-1">
+								Features: Reset Time, Chronograph, Date Aperture
+							</li>
+							<li class="mb-1">
+								Water resistance: 50 m
+							</li>
+						</ul>
+						<p class="my-sm-4 my-3">
+							<i class="fas fa-retweet mr-3"></i>Net banking & Credit/ Debit/ ATM card
+						</p>
+					</div>
+					<div class="occasion-cart">
+						<div class="snipcart-details top_brand_home_details item_add single-item hvr-outline-out">
+							<div>
+												<button onclick="addToCart('{{productDetails._id}}','{{productDetails.price}}')" class="btn btn-primary mt-3" style="width: 80%;" >Add to cart</button>
+											</div>
+											<div>
+												<a href="" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
+											</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- //Single Page -->
+    
+</section>
+{{!-- 
+<script>
+	function displayimg1(){
+		var image = document.getElementById('navitem1').src
+		document.getElementById('preview').src = image
+	}
+	function displayimg2(){
+		var image = document.getElementById('navitem2').src
+		document.getElementById('preview').src = image
+	}
+	function displayimg3(){
+		var image = document.getElementById('navitem3').src
+		document.getElementById('preview').src = image
+	}
+	
+</script> --}}

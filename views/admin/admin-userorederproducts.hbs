@@ -1,0 +1,90 @@
+<div class="wrapper ">
+  
+    <div class="main-panel ">
+        
+        <div class="content d-flex justify-content-center">
+            <div class="container-fluid">
+                
+
+                <div class="row">
+                    <div class="col-md-12" >
+                        <div class="card text-center">
+                            <div class="card-header card-header-primary">
+                                <h4 class="card-title " style="font-weight: bold;">Ordered Products</h4>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead class=" text-primary">
+                                            <th style="font-weight: bold;">
+                                                Sl.No
+                                            </th>
+                                            <th style="font-weight: bold;">
+                                                Product Image
+                                            </th>
+                                            <th style="font-weight: bold;">
+                                                Product Name
+                                            </th>
+                                            <th style="font-weight: bold;">
+                                                Price (₹)
+                                            </th>
+                                            <th style="font-weight: bold;">
+                                                Quantity
+                                            </th>
+
+                                            <th style="font-weight: bold;">
+                                                Status
+                                            </th>
+                                            <th style="font-weight: bold;">
+
+                                            </th>
+
+                                        </thead>
+                                        <tbody>
+                                            {{#each products}}
+                                            <tr>
+                                                <td>
+                                                    {{add @index '1'}}
+                                                </td>
+                                                <td>
+                                                    <img style="width:50px;height:50px"
+                                                        src="/productImages/{{this.product._id}}__1.jpg" alt="">
+                                                </td>
+                                                <td>
+
+                                                    {{this.product.Productname}}
+                                                </td>
+                                                <td>
+                                                    ₹<span>{{this.totalprice}}</span>
+                                                </td>
+                                                <td>
+                                                    {{this.product.Quantity}}
+                                                </td>
+
+                                                <td>
+                                                    {{this.status}}
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-danger btn-sm" href="">Update order</a>
+                                                </td>
+                                            </tr>
+                                            {{/each}}
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+        <script>
+            const x = new Date().getFullYear();
+            let date = document.getElementById('date');
+            date.innerHTML = '&copy; ' + x + date.innerHTML;
+        </script>
+    </div>
+</div>

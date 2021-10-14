@@ -1,0 +1,29 @@
+<section>
+    <div class="container mt-5">
+        <center><h1 class="m-auto">MY ORDERS</h1></center>
+        <a href="/" class="btn">Continue shopping</a>
+        <div class="row">
+            
+                {{#each products}}
+                    
+                
+            
+            <div class="col-md-3 p-3">
+                <div class="card" style="width: 13rem;">
+                    <img class="card-img-top m-auto" src="/productImages/{{this.product._id}}__1.jpg" style="width: 150px;height: 200px;" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.product.productname}}</h5>
+                        <p class="card-text">₹<span>{{this.product.price}}</span></p>
+                        
+                        <p class="card-text">{{this.product.brand}} </p>
+                        <p class="card-text">{{this.product.description}} </p>
+                        {{!-- <a href="#" class="btn btn-primary">Go somewhere</a> --}}
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+            
+        </div>
+         
+    </div>
+</section>

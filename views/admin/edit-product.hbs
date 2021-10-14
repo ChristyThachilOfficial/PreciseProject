@@ -1,0 +1,166 @@
+<section class="m-5">
+    <div class="container">
+        <div class="row mt-5">
+          <center>
+          <div style="width: 50%;">
+                  <form class="mt-5" action="/admin/editproducts/{{product._id}}" method="POST" enctype="multipart/form-data">
+
+                  <div class="mb-3 ">
+                       <h2>Edit product</h2>
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Product name</label>
+                      <input type="text" name="productname" value="{{product.productname}}" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp">
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="exampleInputPassword1" class="form-label ">Quantity</label>
+                      <input type="number" name="quantity" value="{{product.quantity}}" class="form-control " id="exampleInputPassword1">
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Brand</label><br>
+                      {{!-- <input type="text" name="brand" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp"> --}}
+                      <select name="brand"  class="form-control text-center" value="{{product.brand}}" id="exampleInputEmail1" aria-describedby="emailHelp">
+                        <option value="">Select brand</option>
+                        <option value="rolex">Rolex</option>
+                        <option value="titan">Titan</option>
+                        <option value="fastrack">Fastrack</option>
+
+                      </select>
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Price</label>
+                      <input type="number" name="price" value="{{product.price}}" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp">
+                      
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Offer Price</label>
+                      <input type="number" name="offerprice" value="{{product.offerprice}}" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp">
+                      
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Category</label><br>
+                      <input type="radio" id="html" value="{{product.gender}}" name="gender" value="men">
+                      <label for="men" class="pr-2">Men's watches</label>
+                      <input type="radio" id="css" name="gender" value="{{product.gender}}" value="women">
+                      <label for="css">Women's watches</label>
+                     
+                                              
+                    </div>
+
+
+                     <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Description</label>
+                      <input type="text"  name="description" value="{{product.description}}" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp">
+                    </div>
+                    
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Date</label>
+                      <input type="date" name="date" value="{{product.date}}" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp">
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Product image 1</label>
+                      <img src="/productImages/{{product._id}}__1.jpg" class="mt-2 pb-4" alt="" id="imgview1" style="width: 100px; height: auto;">
+                       <div id="errMess1" >
+
+                      </div>
+                      <input type="file" name="image1" class="form-control " onchange="fileValidation1(event)"  id="ImageInput1" aria-describedby="emailHelp">
+                     
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Product image 2</label>
+                      <img src="/productImages/{{product._id}}__2.jpg" class="mt-2 pb-4" id="imgview2" alt="" style="width: 100px; height: auto;">
+                      <div id="errMess2" ></div>
+                      <input type="file" name="image2"  class="form-control " onchange="fileValidation2(event)" id="ImageInput2" aria-describedby="emailHelp">
+                    </div>
+
+                    <div class="mb-3 ">
+                      <label for="exampleInputEmail1" class="form-label ">Product image 3</label>
+                      <img src="/productImages/{{product._id}}__3.jpg" class="mt-2 pb-4" alt="" id="imgview3" style="width: 100px; height: auto;">
+                      <input type="file" name="image3" class="form-control " onchange="fileValidation3(event)" id="ImageInput3" aria-describedby="emailHelp">
+                      <div id="errMess3" ></div>
+                    </div>
+                   
+                    <button type="submit" class="btn btn-primary" >Edit product</button>
+                 </form>
+           </div>
+           </center>
+        </div>
+    </div>
+</section>
+
+<script>
+ 
+  //image1
+  function fileValidation1(event) {
+            var fileInput = document.getElementById('ImageInput1');
+                
+              console.log(fileInput)
+            var filePath = fileInput.value;
+          
+            // Allowing file type
+            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+              
+            if (!allowedExtensions.exec(filePath)) {
+               document.getElementById('errMess1').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
+                fileInput.value = '';
+                return false;
+            } 
+            else 
+            {
+              document.getElementById('errMess1').innerHTML = ''
+                // Image preview
+               document.getElementById('imgview1').src=URL.createObjectURL(event.target.files[0])
+            }
+        }
+
+   function fileValidation2(event) {
+            var fileInput = document.getElementById('ImageInput2');
+             var filePath = fileInput.value;
+          
+            // Allowing file type
+            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+              
+            if (!allowedExtensions.exec(filePath)) {
+               document.getElementById('errMess2').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
+                fileInput.value = '';
+                return false;
+            } 
+            else 
+            {
+              document.getElementById('errMess2').innerHTML = ''
+                // Image preview
+               document.getElementById('imgview2').src=URL.createObjectURL(event.target.files[0])
+            }
+        }
+
+  function fileValidation3(event) {
+            var fileInput = document.getElementById('ImageInput3');
+             var filePath = fileInput.value;
+          
+            // Allowing file type
+            var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+              
+            if (!allowedExtensions.exec(filePath)) {
+               document.getElementById('errMess3').innerHTML='<p style="color:red; display: block;" >Invalid file type</p>'
+                fileInput.value = '';
+                return false;
+            } 
+            else 
+            {
+              document.getElementById('errMess3').innerHTML = ''
+                // Image preview
+               document.getElementById('imgview3').src=URL.createObjectURL(event.target.files[0])
+            }
+        }
+</script>
+
+ 

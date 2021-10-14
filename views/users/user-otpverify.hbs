@@ -1,0 +1,30 @@
+<section style="margin-top: 150px;">
+    <div class="container ">
+        <div class="row ">
+            <div class="col-md-6 m-auto " style="margin-top: 150px; display: inline:  !important;;">
+                <form action="/otpverify" method="POST">
+                    <div>
+                        <h4 style="text-align: center; text-align: center;
+    font-weight: bold;
+    padding: 10px;">CHANGE PASSWORD</h4><br>
+                    </div>
+                    {{#if otpError}}
+                        <p style="color: red;">Invalid OTP</p>
+                    {{/if}}
+                     <div class="form-group">
+                         
+                        <label for="exampleInputEmail1" class="p-2"> OTP</label>
+                        <input type="tel" name="otp" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter otp number">
+                        <input type="hidden" name="num" value="{{mobile}}">
+                        
+                    </div>
+                   
+                   
+                   
+                    <button style="width:100%;" type="submit" class="btn btn-primary mt-3">Submit</button> <br>
+                   
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

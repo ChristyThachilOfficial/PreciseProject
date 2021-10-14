@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)http://127.0.0.1:5501/docs/examples/cropper-in-modal.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Cropper.js</title>
+  <link rel="stylesheet" href="./Cropper.js_files/bootstrap.min.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="./Cropper.js_files/cropper.css">
+  <style>
+    .img-container img {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body class="modal-open">
+  <div class="container">
+    <h1>Cropper in a Bootstrap modal</h1>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-target="#modal" data-toggle="modal">
+      Launch the demo
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade show" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-modal="true" style="display: block;">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">Cropper</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="img-container">
+              <img id="image" src="./Cropper.js_files/picture.jpg" alt="Picture" class="cropper-hidden"><div class="cropper-container cropper-bg" touch-action="none" style="width: 466px; height: 262px;"><div class="cropper-wrap-box"><div class="cropper-canvas" style="width: 465.778px; height: 262px; transform: translateX(0.111111px);"><img src="./Cropper.js_files/picture.jpg" alt="Picture" class="cropper-hide" style="width: 465.778px; height: 262px; transform: none;"></div></div><div class="cropper-drag-box cropper-crop cropper-modal" data-cropper-action="crop"></div><div class="cropper-crop-box" style="width: 232.889px; height: 131px; transform: translateX(203.756px) translateY(24.8px);"><span class="cropper-view-box"><img src="./Cropper.js_files/picture.jpg" alt="Picture" style="width: 465.778px; height: 262px; transform: translateX(-203.644px) translateY(-24.8px);"></span><span class="cropper-dashed dashed-h"></span><span class="cropper-dashed dashed-v"></span><span class="cropper-center"></span><span class="cropper-face cropper-move" data-cropper-action="all"></span><span class="cropper-line line-e" data-cropper-action="e"></span><span class="cropper-line line-n" data-cropper-action="n"></span><span class="cropper-line line-w" data-cropper-action="w"></span><span class="cropper-line line-s" data-cropper-action="s"></span><span class="cropper-point point-e" data-cropper-action="e"></span><span class="cropper-point point-n" data-cropper-action="n"></span><span class="cropper-point point-w" data-cropper-action="w"></span><span class="cropper-point point-s" data-cropper-action="s"></span><span class="cropper-point point-ne" data-cropper-action="ne"></span><span class="cropper-point point-nw" data-cropper-action="nw"></span><span class="cropper-point point-sw" data-cropper-action="sw"></span><span class="cropper-point point-se" data-cropper-action="se"></span></div></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./Cropper.js_files/jquery.slim.min.js.download" crossorigin="anonymous"></script>
+  <script src="./Cropper.js_files/bootstrap.bundle.min.js.download" crossorigin="anonymous"></script>
+  <script src="./Cropper.js_files/cropper.js.download"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      var image = document.getElementById('image');
+      var cropBoxData;
+      var canvasData;
+      var cropper;
+
+      $('#modal').on('shown.bs.modal', function () {
+        cropper = new Cropper(image, {
+          autoCropArea: 0.5,
+          ready: function () {
+            //Should set crop box data first here
+            cropper.setCropBoxData(cropBoxData).setCanvasData(canvasData);
+          }
+        });
+      }).on('hidden.bs.modal', function () {
+        cropBoxData = cropper.getCropBoxData();
+        canvasData = cropper.getCanvasData();
+        cropper.destroy();
+      });
+    });
+  </script>
+<!-- Code injected by live-server -->
+<script type="text/javascript">
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+<div class="modal-backdrop fade show"></div></body></html>

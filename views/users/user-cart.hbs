@@ -1,0 +1,191 @@
+<section>
+    <div class="container">
+        {{#if products}}
+        <div class="table-responsive">
+            <table class="table mt-5">
+            <thead>
+
+                <tr>
+
+                    <th scope="col">Item</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Sub total</th>
+                    <th scope="col">Action</th>
+
+                </tr>
+                
+
+                <tbody id="myTable">
+                    
+                        
+                    
+
+
+                     {{#each products}}
+
+ 
+                    <tr>
+
+                        
+
+                       
+
+                        <td>{{this.product.productname}}<br/>₹<span>{{this.price}}</span></td>
+                        <td><img src="/productImages/{{this.product._id}}__1.jpg" style="width: 70px; height: 70px;" alt=""></td>
+                        <td>{{this.Quantity}}</td>
+                        <td>
+                            <button class="btn "  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}',-1)">-</button>
+                            <span class="btn btn-light" id="{{this.product._id}}">{{this.Quantity}}</span>
+                            <button class="btn"  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}',1)">+</button>
+                        </td>
+                        
+                        <td>₹<span id="{{this.product._id}}1">
+                            {{this.totalprice}}
+                        </span></td>    
+
+                        <td>
+                          <!-- Button trigger modal -->
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{this.product.productname}}">
+                            Remove
+                          </button>
+
+                          <!-- Modal -->
+                          <div class="modal" id="{{this.product.productname}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Remove from cart</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                  Are you sure you want to remove this product from cart?
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  <button type="button" onclick="removeCartProduct('{{this._id}}','{{this.product._id}}')" class="deletebtn btn btn-danger">Remove</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        {{!-- taking adventure --}}
+
+                        
+
+                       
+
+                    </tr>
+
+                     {{/each}}
+
+                     
+
+                </tbody>
+
+               
+
+            </thead>
+
+        </table>
+
+        </div>
+        
+        <hr>
+        {{else}}
+
+                     <h2 class="text-center text-danger mt-5">your cart is empty</h2>
+                     
+                     <center>
+                       <img class="m-auto" src="/coverImages/emptyCart.jpg" alt="">
+                       <div>
+                         <a href="/" class="btn btn-success " >Continue shopping</a>
+                       </div>
+                
+            </center>
+
+        {{/if}}
+        {{#if products}}
+           
+                
+            
+        
+        {{!-- this is payment card --}}
+        <div class="card mt-5 m-auto" style="width: 50%;">
+		<div class="card-body">
+			<dl class="dlist-align">
+			  <dt>Total price:</dt>
+			  <dd class="text-right">₹<span>{{totalCartPrice}}</span></dd>
+			</dl>
+			
+			<hr>
+			
+			<a href="/checkout" style="background-color: #79B4B7;" class="btn btn-primary btn-block">Proceed to Checkout </a>
+			
+		</div> <!-- card-body.// -->
+		</div>
+        
+
+        {{/if}}
+
+
+    </div>
+</section>
+
+
+
+<script>
+    function changeQuantity(cartId,proId,proPrice,count){
+        console.log('Price of : ',proPrice)
+        let Quantity=parseInt(document.getElementById(proId).innerHTML)
+        count=parseInt(count)
+       id = proId+'1'
+
+        $.ajax({
+            url:'/changeproductquantity',
+            data:{
+                cart:cartId,
+                product:proId,
+                price:proPrice,
+                count:count,
+                Quantity:Quantity
+                
+            },
+            method:'post',
+            success:(response)=>{
+                if(response.removeProduct){
+                    
+                    
+                    location.reload()
+                }else{
+                    document.getElementById(proId).innerHTML=Quantity+count
+                    
+                    location.reload()
+                    
+                }
+               
+            }
+        })
+    }
+
+    //remove from cart
+    function removeCartProduct(cartId,proId){
+        $.ajax({
+            url:'/removeproductcart',
+            data:{
+                cart:cartId,
+                product:proId
+            },
+            method:'post',
+            success:(response)=>{
+                if(response.removedProduct){
+                    
+                location.reload()
+                }
+               
+            }
+        })
+    }
+</script>
