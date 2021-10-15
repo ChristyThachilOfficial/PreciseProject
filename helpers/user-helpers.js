@@ -14,14 +14,18 @@ module.exports={
         return new Promise(async(resolve,reject)=>{
 
             let userEmail= await db.get().collection(collection.USER_COLLECTIONS).findOne({email:userData.email})
-            if(userEmail==null){
-                userData.password= await bcrypt.hash(userData.password,10)
-                userData.repassword=await bcrypt.hash(userData.repassword,10)
-               
-                
-                db.get().collection(collection.USER_COLLECTIONS).insertOne(userData).then((response)=>{
-                    resolve(response)
-                })
+            let userNum =await db.get().collection(collection.USER_COLLECTIONS).findOne({number:userData.number})
+
+            console.log('the console log of do sign up is' ,userEmail,userNum)
+            if(userEmail ==null && userNum == null){
+                console.log('is it entering the sigup null in database')
+            //     userData.password= await bcrypt.hash(userData.password,10)
+            //     userData.repassword=await bcrypt.hash(userData.repassword,10)
+            //    console.log('the userData comming here is',userData);
+                resolve()
+                // db.get().collection(collection.USER_COLLECTIONS).insertOne(userData).then((response)=>{
+                //     resolve(response)
+                // })
             }else{
                 resolve(false)
             }
@@ -29,6 +33,20 @@ module.exports={
         })
        
        
+    },
+    verifyUser:(userData)=>{
+        
+        return new Promise(async(resolve,reject)=>{
+
+                userData.password =await bcrypt.hash(userData.password,10)
+                userData.repassword=await bcrypt.hash(userData.repassword,10)
+                console.log('the userdata in verify user is ',userData)
+                db.get().collection(collection.USER_COLLECTIONS).insertOne(userData).then((response)=>{
+                    resolve(response)
+                })
+            
+           
+        })
     },
     blockUser:(userId)=>{
         

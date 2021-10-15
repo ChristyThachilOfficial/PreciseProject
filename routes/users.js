@@ -93,19 +93,61 @@ router.post('/removeproductcart',(req,res,next)=>{
 
 //POST signup page
 router.post('/signup',(req,res,next)=>{
+  console.log('the things in the body are',req.body)
+  let countrycode = req.body.countryCode
+  let mob =req.body.number
+  mobilenum=parseInt(countrycode+mob)
 
   
   userHelpers.doSignup(req.body).then((response)=>{
     if(response==false){
+      console.log('why it is coming here i have no idea')
       req.session.signupError=true
       res.redirect('/signup')
     }else{
-      res.redirect('/')
+
+      req.session.newUser=req.body
+      console.log('req.session.userRegnum',mobilenum)
+      twilio.verify.services(keys.ServiceID)
+          .verifications
+          .create({to: '+'+mobilenum, channel: 'sms'})
+          .then(verification => {
+            console.log(verification.status)
+            res.render('users/user-signupotp',{typeOfPersonUser:true,users:false})
+          }).catch((err)=>{
+            console.log('the error is',err)
+          })
+        
       
     }
     
   })
   
+})
+
+//post signup otp page
+router.post('/signupotp',(req,res,next)=>{
+  let userData =req.session.newUser
+  let mobileNum = parseInt(req.session.newUser.countryCode+req.session.newUser.number)
+  
+  console.log('userData and otp is :',mobileNum)
+  twilio.verify.services(keys.ServiceID)
+      .verificationChecks
+      .create({to: '+'+mobileNum, code: req.body.otp})
+      .then(verification_check =>{ 
+      console.log(verification_check.status)
+      if(verification_check.status == 'approved'){
+        console.log(userData)
+        userHelpers.verifyUser(userData).then((response)=>{
+          res.redirect('/')
+        })
+      }else{
+        otpError = true
+        res.render('users/user-signupotp',{typeOfPersonUser:true,otpError})
+        otpError = false
+      }
+      }
+      );
 })
 
 //GET signup page
@@ -337,7 +379,7 @@ router.post('/updateuserdetails',loginHelper,(req,res,next)=>{
   })
 })
 
-//buy now
+
 
 
 
