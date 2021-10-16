@@ -34,6 +34,14 @@ module.exports={
        
        
     },
+    findUser:(userMobile)=>{
+        console.log('userMobile is   sssssssssssssssssss',userMobile)
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.USER_COLLECTIONS).findOne({number:userMobile}).then((response)=>{
+                resolve(response)
+            })
+        })
+    },
     verifyUser:(userData)=>{
         
         return new Promise(async(resolve,reject)=>{

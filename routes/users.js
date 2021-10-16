@@ -52,6 +52,72 @@ router.get('/login',(req,res,next)=>{
   
 })
 
+//login with otp
+router.get('/loginwithotp',(req,res,next)=>{
+  if (req.session.loginErr) {
+    res.render('users/user-loginWithNumber',{typeOfPersonUser:true,users:false,loginError:req.session.loginErr})
+    req.session.loginErr=false
+  }else{
+    res.render('users/user-loginWithNumber',{typeOfPersonUser:true,users:false})
+  }
+  
+})
+
+//post login otp
+router.post('/loginwithotp',async(req,res,next)=>{
+  
+  mob=req.body.countryCode+req.body.mob
+  mobile=parseInt(mob)
+  console.log('mobile number after parse int is :',mobile)
+  let user=await userHelpers.findUser(req.body.mob)
+  
+  if (user) {
+    twilio.verify.services(keys.ServiceID)
+    .verifications
+    .create({to: '+'+mobile, channel: 'sms'})
+    .then(verification => {
+      console.log(verification.status)
+     res.render('users/user-loginWithOtpVerify',{typeOfPersonUser:true,users:false,mobilenum:req.body.mob,countryCode:req.body.countryCode})
+   }
+   
+    ).catch((err)=>{
+      console.log('the error is here',err)
+    })
+  }else{
+     req.session.loginErr=true
+      res.redirect('/loginwithotp')
+  }
+
+ 
+})
+
+//post otp verify
+router.post('/loginotp',(req,res,next)=>{
+  let otp =req.body.otp
+  let countryCode=req.body.countryCode
+  let number =req.body.num
+  let mobNum =parseInt(countryCode+number)
+  console.log('the number is ',number,countryCode)
+  twilio.verify.services(keys.ServiceID)
+      .verificationChecks
+      .create({to: '+'+mobNum, code: otp})
+      .then(verification_check => {console.log(verification_check.status)
+      if (verification_check.status=='approved') {
+        userHelpers.findUser(number).then((response)=>{
+          console.log('what is the response hereeeeeeeeeeeeeeeeeeeeeeeeee',response)
+          req.session.user=response
+          req.session.loggedIn=true
+          res.redirect('/')
+        })
+        
+      }else{
+        otpError=true
+        res.render('users/user-loginWithOtpVerify',{typeOfPersonUser:true,users:false,otpError})
+        otpError=false
+      }
+    })
+})
+
 //POST login page
 router.post('/login',async(req,res,next)=>{
   
