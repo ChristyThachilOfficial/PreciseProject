@@ -438,9 +438,12 @@ router.get('/profile',loginHelper,(req,res,next)=>{
 })
 
 //edit userprofile
-router.post('/updateuserdetails',loginHelper,(req,res,next)=>{
-  
-  userHelpers.updateUserProfile(req.body,req.session.user._id).then(()=>{
+router.post('/updateuserdetails',loginHelper,async(req,res,next)=>{
+  console.log('image 111111111111111111111111111111111111111 is',req.body)
+  await userHelpers.updateUserProfile(req.body,req.session.user._id).then((id)=>{
+    let image=req.files.image
+    console.log('what is this id coming here',id)
+    image.mv('../ProjectClone22/public/userImages/'+id+'.jpg')
     res.redirect('/profile')
   })
 })

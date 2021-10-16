@@ -554,12 +554,13 @@ module.exports={
         })
     },
     updateUserProfile:(userData,userId)=>{
-        return new Promise((resolve,reject)=>{
-            console.log('idddddddddddddddddddddd od ',userData)
-            db.get().collection(collection.USER_COLLECTIONS)
+        return new Promise(async(resolve,reject)=>{
+            
+           await db.get().collection(collection.USER_COLLECTIONS)
             .updateOne({_id:objectId(userId)},
             {
                 $set:{
+                   
                     surname:userData.surname,
                     address1:userData.address1,
                     address2:userData.address2,
@@ -570,8 +571,8 @@ module.exports={
                 }
             }
             ).then((response)=>{
-                
-                resolve()
+                console.log('the response after the updatinv the datas is here',userId);
+                resolve(userId)
             })
         })
     },

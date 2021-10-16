@@ -77,9 +77,9 @@ router.post('/addproduct',(req,res,next)=>{
     let image3=req.files.image3
 
 
-    image1.mv('../ProjectClone/public/productImages/'+id+'__1.jpg')
-    image2.mv('../ProjectClone/public/productImages/'+id+'__2.jpg')
-    image3.mv('../ProjectClone/public/productImages/'+id+'__3.jpg')
+    image1.mv('../ProjectClone22/public/productImages/'+id+'__1.jpg')
+    image2.mv('../ProjectClone22/public/productImages/'+id+'__2.jpg') 
+    image3.mv('../ProjectClone22/public/productImages/'+id+'__3.jpg')
     
     res.redirect('/admin/addproduct')
 

@@ -5,10 +5,18 @@
 
 
        
-
-
+        <div class="col-12">
+                      <div id="image-box" style="width: 300px; height: 300px; display: none;" > </div>
+                   
+               
+                      <button style="display: none;" class="btn btn-primary mt-4" type="button" id="crop-btn">Crop</button>
+                    </div>
+        
         <div class="col-md-3 border-right">
-            <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" src="https://st3.depositphotos.com/15648834/17930/v/600/depositphotos_179308454-stock-illustration-unknown-person-silhouette-glasses-profile.jpg"><span class="font-weight-bold">{{userData.name}}</span><span class="text-black-50">{{userData.email}}</span><span> </span></div>
+            <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" id="imgview1" width="150px" src="/userImages/{{userData._id}}.jpg"><span class="font-weight-bold">{{userData.name}}</span><span class="text-black-50">{{userData.email}}</span><span> </span></div>
+              <div id="errMess1" ></div>
+              <label for="image"><button class="btn btn-primary">Change photo</button></label>
+              <input type="file"  name="image" id="file1" class="form-control" onchange="return fileValidation1()" >
         </div>
         <div class="col-md-7 border-right">
                <div class="p-3 py-5">
@@ -33,7 +41,7 @@
                         <div class="col-md-6"><label class="labels">Country</label><input type="text" name="country" class="form-control" placeholder="country" value="{{userData.country}}"></div>
                         
                     </div>
-                    <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="submit">Save Profile</button></div>
+                    <div class="mt-5 text-center"><button class="btn btn-primary profile-button" id="confirm-btn" type="submit">Save Profile</button></div>
                 </div>
 
 
@@ -48,7 +56,63 @@
 </div>
 </div>
 </section>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.11/cropper.js"></script>
 
+<script>
+    function fileValidation1() {
+        const imagebox = document.getElementById('image-box')
+        const crop_btn = document.getElementById('crop-btn')
+        var fileInput = document.getElementById('file1');
+        
+        var filePath = fileInput.value;
+        var allowedExtensions = /(\.jpg)$/i;
+        if (!allowedExtensions.exec(filePath)) {
+            document.getElementById('errMess1').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
+            fileInput.value = '';
+            return false;
+        } else {
+            //Image preview
+             document.getElementById('errMess1').innerHTML = ''
+            const img_data = fileInput.files[0]
+            const url = URL.createObjectURL(img_data)
+            imagebox.innerHTML = `<img src="${url}" id="image" style="width:100%">`
+            const image = document.getElementById('image')
+            document.getElementById('image-box').style.display = 'block'
+            document.getElementById('crop-btn').style.display = 'block'
+            document.getElementById('confirm-btn').style.display = 'none'
+           
+            const cropper = new Cropper(image, {
+                autoCropArea: 1,
+                viewMode: 1,
+                scalable: false,
+                zoomable: false,
+                movable: false,
+                aspectRatio: 16 / 19,
+               // preview: '.preview',
+                minCropBoxWidth: 180,
+                minCropBoxHeight: 240,
+            })
+            crop_btn.addEventListener('click', () => {
+                cropper.getCroppedCanvas().toBlob((blob) => {
+                    let fileInputElement = document.getElementById('file1');
+                    let file = new File([blob], img_data.name, { type: "image/*", lastModified: new Date().getTime() });
+                    let container = new DataTransfer();
+                   
+                    container.items.add(file);
+                     console.log(container.files[0])
+                     const img = container.files[0]
+                     var url =URL.createObjectURL(img)                    
+                     fileInputElement.files = container.files;
+                     document.getElementById('imgview1').src=url
+                    document.getElementById('image-box').style.display = 'none'
+                    document.getElementById('crop-btn').style.display = 'none'
+                    document.getElementById('confirm-btn').style.display = 'block'
+                });
+            });
+        }
+    }
+</script>
 <style>
     body {
     background: rgb(217, 221, 243)
