@@ -44,7 +44,6 @@ router.get('/viewusers',(req,res,next)=>{
 //block users
 router.get('/blockusers/:id',(req,res,next)=>{
   let userId = req.params.id
-  console.log(userId)
   userHelpers.blockUser(userId).then((response)=>{
    res.redirect('/admin/viewusers')
    
@@ -69,7 +68,6 @@ router.get('/addproduct',(req,res,next)=>{
 
 // POST add products
 router.post('/addproduct',(req,res,next)=>{
-  console.log(" image  1: ",req.files.image1);
   productHelpers.addProduct(req.body).then((id)=>{
      
     let image1=req.files.image1
@@ -99,7 +97,6 @@ router.get('/deleteproducts/:id',(req,res,next)=>{
 //edit product
 router.get('/editproducts/:id',async(req,res,next)=>{
   let product=await productHelpers.getProductDetails(req.params.id)
-    console.log(product)
     res.render('admin/edit-product',{product,typeOfPersonAdmin:true,admin:true})
   
  
@@ -109,7 +106,6 @@ router.get('/editproducts/:id',async(req,res,next)=>{
 //edit product post
 router.post('/editproducts/:id',(req,res,next)=>{
   productHelpers.updateproductDetails(req.params.id,req.body).then(()=>{
-    console.log('not working')
     res.redirect('/admin')
     if(req.files.image1 || req.files.image2 || req.files.image3){
     let image1=req.files.image1
@@ -145,12 +141,10 @@ router.post('/login',(req,res,next)=>{
 })
 
 
-// router.get('/view-orderedproduct/:orderId',async(req,res,next)=>{
-//   console.log('the params in the user orderred product is',req.params.orderId)
-//   let products=await userHelpers.getOrderProducts(req.params.orderId)
-//   console.log('proddddddddddddduuuuuuuuuuuuuuccccccccccccttttttss areeeeeeee',products)
-//   res.render('admin/admin-userorederproducts',{typeOfPersonAdmin:true,admin:true,products})
-// })
+router.get('/view-orderedproduct/:orderId',async(req,res,next)=>{
+  let products=await userHelpers.getOrderProducts(req.params.orderId)
+  res.render('admin/admin-userorederproducts',{typeOfPersonAdmin:true,admin:true,products})
+})
 
 
 

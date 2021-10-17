@@ -121,7 +121,8 @@
 											</div>
 											<div>
 												{{!-- adding the product price --}}
-												<button onclick="addToCart('{{this._id}}','{{this.price}}')" class="btn btn-primary mt-3" style="width: 80%;" >Add to cart</button>
+												{{#hello ../cart this._id this.price}}
+												{{/hello}}
 											</div>
 											<div>
 												<a href="/buynow/{{this._id}}/{{this.price}}" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>

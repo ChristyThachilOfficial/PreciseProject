@@ -20,10 +20,11 @@ router.get('/',async function(req, res, next) {
 
 if(req.session.loggedIn){
   let user=req.session.user
-  console.log(user)
+  let cart= await userHelpers.getCartProductForChecking(req.session.user._id)  
   let cartCount=await userHelpers.getCartCount(req.session.user._id)
     productHelpers.getallProducts().then((productsData)=>{
-    res.render('users/user-home', {users:true,user:true,typeOfPersonUser:true,productsData,cartCount,userrr:req.session.user});
+      
+    res.render('users/user-home', {users:true,user:true,typeOfPersonUser:true,productsData,cartCount,userrr:req.session.user,cart});
   })
  
 }
@@ -68,7 +69,6 @@ router.post('/loginwithotp',async(req,res,next)=>{
   
   mob=req.body.countryCode+req.body.mob
   mobile=parseInt(mob)
-  console.log('mobile number after parse int is :',mobile)
   let user=await userHelpers.findUser(req.body.mob)
   
   if (user) {
@@ -76,12 +76,10 @@ router.post('/loginwithotp',async(req,res,next)=>{
     .verifications
     .create({to: '+'+mobile, channel: 'sms'})
     .then(verification => {
-      console.log(verification.status)
      res.render('users/user-loginWithOtpVerify',{typeOfPersonUser:true,users:false,mobilenum:req.body.mob,countryCode:req.body.countryCode})
    }
    
     ).catch((err)=>{
-      console.log('the error is here',err)
     })
   }else{
      req.session.loginErr=true
@@ -97,14 +95,12 @@ router.post('/loginotp',(req,res,next)=>{
   let countryCode=req.body.countryCode
   let number =req.body.num
   let mobNum =parseInt(countryCode+number)
-  console.log('the number is ',number,countryCode)
   twilio.verify.services(keys.ServiceID)
       .verificationChecks
       .create({to: '+'+mobNum, code: otp})
       .then(verification_check => {console.log(verification_check.status)
       if (verification_check.status=='approved') {
         userHelpers.findUser(number).then((response)=>{
-          console.log('what is the response hereeeeeeeeeeeeeeeeeeeeeeeeee',response)
           req.session.user=response
           req.session.loggedIn=true
           res.redirect('/')
@@ -146,7 +142,6 @@ router.post('/login',async(req,res,next)=>{
 
 //remove from cart
 router.post('/removeproductcart',(req,res,next)=>{
-  console.log('this is the request of body from teh ',req.body)
   userHelpers.removeFromCart(req.body).then((response)=>{
     if(response.removedProduct){
       res.json(response)
@@ -159,7 +154,6 @@ router.post('/removeproductcart',(req,res,next)=>{
 
 //POST signup page
 router.post('/signup',(req,res,next)=>{
-  console.log('the things in the body are',req.body)
   let countrycode = req.body.countryCode
   let mob =req.body.number
   mobilenum=parseInt(countrycode+mob)
@@ -167,7 +161,6 @@ router.post('/signup',(req,res,next)=>{
   
   userHelpers.doSignup(req.body).then((response)=>{
     if(response==false){
-      console.log('why it is coming here i have no idea')
       req.session.signupError=true
       res.redirect('/signup')
     }else{

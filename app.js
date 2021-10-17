@@ -1,4 +1,4 @@
-var createError = require('http-errors');
+ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -8,6 +8,8 @@ var db=require('./config/connection')
 var session=require('express-session')
 var fileUpload = require('express-fileupload')
 var helper= require('handlebars-helpers')()
+var Handlebars=require('handlebars')
+
 
 var usersRouter = require('./routes/users');
 var adminRouter = require('./routes/admin');
@@ -38,6 +40,26 @@ db.connect((err)=>{
 })
 app.use('/', usersRouter);
 app.use('/admin', adminRouter);
+Handlebars.registerHelper('hello',function(context,options,price){
+
+
+
+  for(key in context.products){
+ 
+    if(options.toString() === context.products[key].item.toString()){
+      var inp=true;
+      break;
+    }else{
+      var inp = false
+    }
+  }
+  if (inp===true) {
+    var data =`<a href="/cart" class="btn btn-primary mt-3" style="width: 80%;">View cart</a>`
+  }else{
+    var data=`<a onclick="addToCart('${options}','${price}')" class="btn btn-primary mt-3" style="width: 80%;">Add to cart</a>`
+  }
+  return data
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

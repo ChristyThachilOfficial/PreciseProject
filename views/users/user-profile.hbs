@@ -15,8 +15,11 @@
         <div class="col-md-3 border-right">
             <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" id="imgview1" width="150px" src="/userImages/{{userData._id}}.jpg"><span class="font-weight-bold">{{userData.name}}</span><span class="text-black-50">{{userData.email}}</span><span> </span></div>
               <div id="errMess1" ></div>
-              <label for="image"><button class="btn btn-primary">Change photo</button></label>
-              <input type="file"  name="image" id="file1" class="form-control" onchange="return fileValidation1()" >
+              <center>
+                  <label for="file1" class="btn btn-primary">Change photo</label>
+              <input type="file"  name="image" id="file1" class="form-control" onchange="return fileValidation1()" hidden>
+              </center>
+              
         </div>
         <div class="col-md-7 border-right">
                <div class="p-3 py-5">

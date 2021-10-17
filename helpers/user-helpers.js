@@ -16,16 +16,11 @@ module.exports={
             let userEmail= await db.get().collection(collection.USER_COLLECTIONS).findOne({email:userData.email})
             let userNum =await db.get().collection(collection.USER_COLLECTIONS).findOne({number:userData.number})
 
-            console.log('the console log of do sign up is' ,userEmail,userNum)
+           
             if(userEmail ==null && userNum == null){
-                console.log('is it entering the sigup null in database')
-            //     userData.password= await bcrypt.hash(userData.password,10)
-            //     userData.repassword=await bcrypt.hash(userData.repassword,10)
-            //    console.log('the userData comming here is',userData);
+
                 resolve()
-                // db.get().collection(collection.USER_COLLECTIONS).insertOne(userData).then((response)=>{
-                //     resolve(response)
-                // })
+                
             }else{
                 resolve(false)
             }
@@ -35,7 +30,6 @@ module.exports={
        
     },
     findUser:(userMobile)=>{
-        console.log('userMobile is   sssssssssssssssssss',userMobile)
         return new Promise((resolve,reject)=>{
             db.get().collection(collection.USER_COLLECTIONS).findOne({number:userMobile}).then((response)=>{
                 resolve(response)
@@ -48,7 +42,6 @@ module.exports={
 
                 userData.password =await bcrypt.hash(userData.password,10)
                 userData.repassword=await bcrypt.hash(userData.repassword,10)
-                console.log('the userdata in verify user is ',userData)
                 db.get().collection(collection.USER_COLLECTIONS).insertOne(userData).then((response)=>{
                     resolve(response)
                 })
@@ -96,7 +89,6 @@ module.exports={
         let response={}
         return new Promise(async(resolve,reject)=>{
             let user=await db.get().collection(collection.USER_COLLECTIONS).findOne({email:userData.email})
-            console.log('at database');
             if(user){
                 bcrypt.compare(userData.password,user.password).then((status)=>{
                     if (status){
@@ -105,12 +97,10 @@ module.exports={
                         resolve(response)
 
                     }else{
-                        console.log('login failed with user');
                         resolve({status:false})
                     }
                 })
             }else{
-                console.log('login failed');
                 resolve({status:false})
             }
            
@@ -128,7 +118,6 @@ module.exports={
             let userCart= await db.get().collection(collection.CART_COLLECTION).findOne({user:objectId(userId)})
             if(userCart){
                 let proExist = userCart.products.findIndex(product =>product.item ==proId)
-                console.log('proExist  at index',proExist)
                 if (proExist !=-1) {
                     db.get().collection(collection.CART_COLLECTION).updateOne({user:objectId(userId),'products.item':objectId(proId)},
                     {
@@ -198,25 +187,25 @@ module.exports={
            
            
            if(cartItems[0]){
-               console.log("sasi on fire",cartItems[0]);
 
             resolve(cartItems)
            }else{
-               console.log("thamarakshan pilla");
                resolve({emptyCart:true})
            }
           })
+    },getCartProductForChecking : (userId)=>{
+        return new Promise(async(resolve,reject)=>{
+            var cart = await db.get().collection(collection.CART_COLLECTION).findOne({user : objectId(userId)})
+      
+            resolve(cart)
+        })
     },
     findNumber:(userNum)=>{
-        console.log("yyyyyyy");
         return new Promise(async(resolve,reject)=>{
-            console.log(userNum);
            userNumber=await db.get().collection(collection.USER_COLLECTIONS).findOne({number:userNum.mob})
           if(userNumber){
-              console.log("at if");
               resolve(userNumber)
           }else{
-              console.log("at aelse");
               resolve(false)
           }
         })
@@ -324,7 +313,6 @@ module.exports={
     
                 //im putting an inserted id over here
                 db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response)=>{
-                   console.log('orrrrrrrrrrrrrrrrrrrrrrddddder object',response.insertedId);
                     db.get().collection(collection.CART_COLLECTION).deleteOne({user:objectId(order.userId)})
                     resolve(response.insertedId)
                 })
@@ -379,17 +367,14 @@ module.exports={
             
             
             if(totalCartPrice[0]){
-                console.log("sasi on fire",totalCartPrice[0].totalcartprice);
  
              resolve(totalCartPrice[0].totalcartprice)
             }else{
-                console.log("thamarakshan pilla");
                 resolve({emptyCart:true})
             }
            })
     },
     placeOrder:(order,products,total)=>{
-        console.log('orderrrrrrrrrrrrrrrrrrrrrrrr',order)
         return new Promise((resolve,reject)=>{
            
             let status=order.paymentMethod==='COD'?'placed':'pending'
@@ -423,8 +408,6 @@ module.exports={
 
             //im putting an inserted id over here
             db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response)=>{
-               console.log('orrrrrrrrrrrrrrrrrrrrrrddddder object',response.insertedId);
-                //heeeeeeeeeeeeeeeeeeeerrrrrrrrrreeeeeeeeeeeeee there was deleting the cart products moving it to get userOrders
                 db.get().collection(collection.CART_COLLECTION).deleteOne({user:objectId(order.userId)})
                 resolve(response.insertedId)
             })
@@ -436,13 +419,11 @@ module.exports={
         return new Promise(async(resolve,reject)=>{
             let cart=await db.get().collection(collection.CART_COLLECTION).findOne({user:objectId(userId)})
             
-            console.log('carttttttttt',cart.products)
             resolve(cart.products)
         })
     },
     getUserOrders:(userId)=>{
         return new Promise(async(resolve,reject)=>{
-            console.log(userId)
            
             let orders =await db.get().collection(collection.ORDER_COLLECTION).find({userId:objectId(userId)}).toArray()
               
@@ -493,7 +474,6 @@ module.exports={
             ]).toArray()
             
            
-                console.log('orddddddddddddddder items are',orderItems)
              resolve(orderItems)
            
            })
@@ -507,9 +487,7 @@ module.exports={
               };
               instance.orders.create(options, function(err, order) {
                   if(err){
-                      console.log(err)
                   }else{
-                    console.log('the orddddddddddddder in razorpay',order);
                     resolve(order)
                   }
                
@@ -547,7 +525,6 @@ module.exports={
     getUserDetails:(userId)=>{
         return new Promise((resolve,reject)=>{
             db.get().collection(collection.USER_COLLECTIONS).findOne({_id:objectId(userId)}).then((response)=>{
-                console.log('the response is',response)
                 resolve(response)
             })
             
@@ -571,7 +548,6 @@ module.exports={
                 }
             }
             ).then((response)=>{
-                console.log('the response after the updatinv the datas is here',userId);
                 resolve(userId)
             })
         })
@@ -579,7 +555,6 @@ module.exports={
     getOrderList:()=>{
         return new Promise(async(resolve,reject)=>{
             let orders =await db.get().collection(collection.ORDER_COLLECTION).find().toArray()
-            console.log('orddddddderrrrrrrrrrrssssssssssss arrrrrrrrrrreeee',orders )
             resolve(orders)
         })
 
