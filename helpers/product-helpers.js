@@ -53,5 +53,20 @@ module.exports={
                 resolve(response)
             })
         })
+    },
+    getBuyNowProduct:(proId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(proId)}).then((response)=>{
+               resolve(response)
+            })
+        })
+    },
+    getProduct:(proId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(proId)}).then((response)=>{
+                
+                resolve(response)
+            })
+        })
     }
-}
+}   

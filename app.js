@@ -42,21 +42,19 @@ app.use('/', usersRouter);
 app.use('/admin', adminRouter);
 Handlebars.registerHelper('hello',function(context,options,price){
 
-
-
-  for(key in context.products){
+  for(key in context){
  
-    if(options.toString() === context.products[key].item.toString()){
+    if(options.toString() === context[key].item.toString()){
       var inp=true;
       break;
     }else{
-      var inp = false
+      var inp = false  
     }
   }
   if (inp===true) {
     var data =`<a href="/cart" class="btn btn-primary mt-3" style="width: 80%;">View cart</a>`
   }else{
-    var data=`<a onclick="addToCart('${options}','${price}')" class="btn btn-primary mt-3" style="width: 80%;">Add to cart</a>`
+    var data=`<a onclick="addToCart('${options}','${price}')" class="btn btn-primary mt-3" style="width: 80%; color: white;">Add to cart</a>`
   }
   return data
 });
@@ -75,6 +73,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
+  console.log("The error is  : ",err.message);
   res.render('error');
 });
 

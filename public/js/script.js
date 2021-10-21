@@ -11,6 +11,7 @@ function addToCart(proId,prodPrice){
             let count=$('#cartCount').html()
             count=parseInt(count)+1
             $("#cartCount").html(count)
+            location.reload()
             
            }
         }

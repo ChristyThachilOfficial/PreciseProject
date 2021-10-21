@@ -105,12 +105,25 @@
 					</div>
 					<div class="occasion-cart">
 						<div class="snipcart-details top_brand_home_details item_add single-item hvr-outline-out">
-							<div>
-												<button onclick="addToCart('{{productDetails._id}}','{{productDetails.price}}')" class="btn btn-primary mt-3" style="width: 80%;" >Add to cart</button>
-											</div>
-											<div>
-												<a href="" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
-											</div>
+									{{#if user}}
+										
+									
+									<div>
+										{{#hello cart productDetails._id productDetails.price}}	
+										{{/hello}}
+										{{!-- <button onclick="addToCart('{{productDetails._id}}','{{productDetails.price}}')" class="btn btn-primary mt-3" style="width: 80%;" >Add to cart</button> --}}
+									</div>
+									<div>
+										<a href="/buynow/{{productDetails._id}}" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
+										
+									</div>
+
+									{{else}}
+
+									<a href="/login" class="btn btn-primary mt-3" style="width: 80%;">Add to cart</a>
+									<a href="/login" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
+
+									{{/if}}
 						</div>
 					</div>
 				</div>

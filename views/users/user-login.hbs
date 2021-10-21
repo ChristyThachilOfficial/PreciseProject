@@ -2,7 +2,7 @@
     <div class="container ">
         <div class="row ">
             <div class="col-md-6 m-auto " style="margin-top: 150px; display: inline:  !important;;">
-                <form action="/login" method="POST">
+                <form action="/login" id="loginForm" method="POST">
                     <div>
                         <h4 style="text-align: center; text-align: center;
     font-weight: bold;
@@ -40,3 +40,26 @@
         </div>
     </div>
 </section>
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>  
+<script>
+    $(document).ready(function(){
+        $('#loginForm').validate({
+            rules:{
+                email:{
+                    required:true,
+                    email:true
+                },
+                password:{
+                    required:true
+                }
+            }
+        })
+    })
+</script>
+<style>
+    .error{
+        color: red;
+    }
+</style>

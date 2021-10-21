@@ -53,17 +53,24 @@
                                                 </td>
                                                 <td>
 
-                                                    {{this.product.Productname}}
+                                                    {{this.product.productname}}
                                                 </td>
                                                 <td>
                                                     ₹<span>{{this.totalprice}}</span>
                                                 </td>
                                                 <td>
-                                                    {{this.product.Quantity}}
+                                                    {{this.Quantity}}
                                                 </td>
 
                                                 <td>
-                                                    {{this.status}}
+                                                   <select name="brand" class="form-control text-center" id="exInpuEmail1" aria-describedby="emailHelp">
+                                                        <option value="">Status</option>
+                                                        <option value="pending">Pending</option>
+                                                        <option value="shipped">Shipped</option>
+                                                        <option value="delivered">Delivered</option>
+                                                        <option value="returned">Returned</option>
+
+                                                    </select>
                                                 </td>
                                                 <td>
                                                     <a class="btn btn-danger btn-sm" href="">Update order</a>

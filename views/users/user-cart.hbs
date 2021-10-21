@@ -35,7 +35,9 @@
                         <td><img src="/productImages/{{this.product._id}}__1.jpg" style="width: 70px; height: 70px;" alt=""></td>
                         <td>{{this.Quantity}}</td>
                         <td>
+                          {{#gt this.Quantity '1'}}
                             <button class="btn "  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}',-1)">-</button>
+                          {{/gt}}
                             <span class="btn btn-light" id="{{this.product._id}}">{{this.Quantity}}</span>
                             <button class="btn"  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}',1)">+</button>
                         </td>

@@ -2,24 +2,24 @@
     <div class="container ">
         <div class="row ">
             <div class="col-md-6 m-auto ">
-                <form action="/signup" method="POST"  >
+                <form action="/signup" id="signup" method="POST"  >
                     <div>
                         <h4 style="text-align: center; text-align: center;font-weight: bold;padding: 10px;">SIGNUP</h4>
                     </div>
 
-					<input type="hidden" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+					<input type="hidden" class="form-control" id="exalema1" aria-describedby="emailHelp"
                          name="block"  value="true" placeholder="Enter your name">
 
                     <div class="form-group">
                         <label for="exampleInputEmail1">Name</label>
-                        <input type="Text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        <input type="Text" class="form-control" id="examplil1" aria-describedby="emailHelp"
                          name="name"   placeholder="Enter your name">
                         
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail1" >Select your country</label>
                         <select name="countryCode" id="" class="mb-1" style="border: none; display: block; font-size: small;">
-	<option data-countryCode="GB" value="44" Selected>UK (+44)</option>
+	<option data-countryCode="IND" value="91" Selected>India (+91)</option>
 	<option data-countryCode="US" value="1">USA (+1)</option>
 	<optgroup label="Other countries">
 		<option data-countryCode="DZ" value="213">Algeria (+213)</option>
@@ -242,23 +242,23 @@
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail1">Mobile number</label>
-                        <input type="tel" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        <input type="tel" class="form-control" id="extEmail1" aria-describedby="emailHelp"
                         name="number"    placeholder="Enter your mobile number">
                         
                     </div>
                     <div class="form-group">
                         <label for="exampleInputEmail1">Email address</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                        <input type="email" class="form-control" id="expleInEmail1" aria-describedby="emailHelp"
                          name="email"   placeholder="Enter email">
                         
                     </div>
                     <div class="form-group">
                         <label for="exampleInputPassword1">Password</label>
-                         <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                         <input type="password" name="password" class="form-control" id="password" placeholder="Password"  onchange='check_pass();'>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputPassword1">Confirm password</label>
-                        <input type="password" name="repassword" class="form-control" id="exampleInputPassword1" placeholder="Re-type your passord">
+                        <input type="password" name="repassword" class="form-control" id="confirm_password" placeholder="Re-type your passord"  onchange='check_pass();'>
                     </div>
                     {{#if signupError}}
                     <div>
@@ -266,7 +266,7 @@
                     </div>
                        
                     {{/if}}
-                    <button type="submit" href="/signupotp" class="btn btn-primary">Submit</button><br><br>
+                    <button type="submit" href="/signupotp" id="submit" class="btn btn-primary">Submit</button><br><br>
                     <div class="form-group">
                         {{!-- <label for="exampleInputPassword1">Enter the four digit OTP we have sent you</label>
                         <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Enter OTP">
@@ -280,3 +280,53 @@
         </div>
     </div>
 </section>
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>  
+<script>
+  $(document).ready(function(){
+    $('#signup').validate({
+      rules:{
+        name:{
+          required:true,
+          minlength:3
+        },
+		countryCode:{
+			required:true,	
+		},
+		number:{
+			required:true,	
+			number:true
+		},
+		email:{
+			required:true,	
+			email:true
+		},
+		password:{
+			required:true,	
+			minlength:3
+		},
+		repassword:{
+			required:true,	
+			minlength:3
+		}
+
+      }
+    })
+  })
+</script>
+<script>
+function check_pass() {
+    if (document.getElementById('password').value ==
+            document.getElementById('confirm_password').value) {
+        document.getElementById('submit').disabled = false;
+    } else {
+        document.getElementById('submit').disabled = true;
+    }
+}
+</script>
+<style>
+	.error{
+		color: red;
+	}
+</style>
