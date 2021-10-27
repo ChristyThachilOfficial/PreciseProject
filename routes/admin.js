@@ -63,8 +63,9 @@ router.get("/unblockusers/:id", (req, res, next) => {
 });
 
 // ADD products
-router.get("/addproduct", (req, res, next) => {
-  res.render("admin/add-product", { admin: true, typeOfPersonAdmin: true });
+router.get("/addproduct",async (req, res, next) => {
+  let category=await productHelpers.getAllCategory()
+  res.render("admin/add-product", { admin: true, typeOfPersonAdmin: true ,category });
 });
 
 // POST add products
@@ -146,13 +147,62 @@ router.post("/login", (req, res, next) => {
 });
 
 router.get("/view-orderedproduct/:orderId", async (req, res, next) => {
-  let products = await userHelpers.getOrderProducts(req.params.orderId);
-  console.log("the products areeeeeeeeeeeeee", products);
-  res.render("admin/admin-userorederproducts", {
-    typeOfPersonAdmin: true,
-    admin: true,
-    products,
-  });
+  let orderId=req.params.orderId
+  let orderStatus=await userHelpers.getOrderStatus(orderId)
+  let order =await userHelpers.findOrder(orderId)
+  console.log('the orderssssssssssstatus is',orderStatus)
+  console.log('the orrrrrrrrrrrrrrrder data is',order)
+  if (order.mode==='cart') {
+    let products = await userHelpers.getOrderProducts(req.params.orderId);
+    res.render("admin/admin-userorederproducts", {
+      typeOfPersonAdmin: true,
+      admin: true,
+      products,
+      orderId,
+      orderStatus,
+      cart:true
+    });
+  }else if (order.mode==='buynow') {
+    let products = await productHelpers.buyNowProduct(orderId)
+    res.render("admin/admin-userorederproducts", {
+      typeOfPersonAdmin: true,
+      admin: true,
+      products,
+      orderId,
+      orderStatus,
+      buynow:true
+    });
+  }
+
+ 
 });
+
+router.post('/updateOrderStatus',(req,res,next)=>{
+  
+  userHelpers.changeOrderStatus(req.body.proId,req.body.orderId,req.body.status)
+})
+
+//Get add catetory
+router.get('/addcategory',(req,res,next)=>{
+  productHelpers.getAllCategory().then((category)=>{
+    res.render('admin/admin-addCategory',{typeOfPersonAdmin:true,admin:true,category})
+  })
+ 
+})
+
+//post add category
+router.post('/addCategory',(req,res,next)=>{
+  productHelpers.addCategory(req.body.category).then(()=>{
+    res.redirect('/admin/addcategory')
+  })
+})
+
+//delete category
+router.get('/deleteCategory/:id',(req,res,next)=>{
+  productHelpers.deleteCategory(req.params.id).then(()=>{
+    res.json({status:true})
+  })
+})
+
 
 module.exports = router;

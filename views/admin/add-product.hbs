@@ -25,10 +25,14 @@
                       <label for="exampleInputEmail1" class="form-label ">Brand</label><br>
                       {{!-- <input type="text" name="brand" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp"> --}}
                       <select name="brand" class="form-control text-center" id="exInpuEmail1" aria-describedby="emailHelp">
-                        <option value="">Select brand</option>
-                        <option value="rolex">Rolex</option>
+                        {{#each category}}
+                          
+                        
+                        <option value="{{this.name}}">{{this.name}}</option>
+                        {{/each}}
+                        {{!-- <option value="rolex">Rolex</option>
                         <option value="titan">Titan</option>
-                        <option value="fastrack">Fastrack</option>
+                        <option value="fastrack">Fastrack</option> --}}
 
                       </select>
                     </div>
@@ -125,7 +129,7 @@
         var fileInput = document.getElementById('file1');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg)$/i;
+        var allowedExtensions = /(\.jpg|\.webp)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess1').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
             fileInput.value = '';
@@ -180,7 +184,7 @@
         var fileInput = document.getElementById('file2');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg)$/i;
+        var allowedExtensions = /(\.jpg|\.webp)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess2').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
             fileInput.value = '';
@@ -236,7 +240,7 @@
         var fileInput = document.getElementById('file3');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg)$/i;
+        var allowedExtensions = /(\.jpg|\.webp)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess3').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
             fileInput.value = '';

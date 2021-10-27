@@ -23,9 +23,20 @@
                 <div class="billing-address">
 
                     <h5 class="checkout-box-title">SAVED ADDRESS</h5>
+                    <a href="/addAddress" style="float: right;" class="btn btn-primary mr-3">Add address</a><br><br>
 
                     <div class="checkout-billing-adress-box">
-                        <dl>
+                        {{#each address}}
+                            
+                        
+                        <div class="col-md-12 pt-2  float-left">
+                                        
+                            <input id="{{this._id}}" type="radio" onchange="a('{{this.address.firstname}}','{{this.address.lastname}}','{{this.address.housename}}','{{this.address.streetaddress}}','{{this.address.address}}','{{this.address.town}}','{{this.address.state}}','{{this.address.zipcode}}','{{this.address.phone}}','{{this.address.altnum}}')" id="{{this.address._id}}" name="address" value="{{this.address._id}}">
+                            <label  for="{{this._id}}">{{this.address.firstname}},{{this.address.lastname}},{{this.address.housename}},{{this.address.streetaddress}},{{this.address.address}},{{this.address.town}},{{this.address.state}} <br> {{this.address.zipcode}},{{this.address.phone}},{{this.address.altnum}}</label>            
+                                        
+                        </div>
+                        {{/each}}
+                        {{!-- <dl>
                             <dt>1.Home</dt>
                             <dd>Black hot drink</dd>
                             <dt><input type="checkbox" id="useaddress" placeholder="Use"><span style="color: #007eff;">
@@ -34,12 +45,17 @@
                             <dd>White cold drink</dd>
                             <dt><input type="checkbox" id="useaddress" placeholder="Use"><span style="color: #007eff;">
                                     Use this Address</span></dt><br>
-                        </dl>
+                        </dl> --}}
                     </div>
 
                 </div>
             </div>
         </div>
+
+
+        {{!-- form starts herre --}}
+
+        
         <div class="row">
             <div class="col-md-8 col-sm-12 col-xs-12">
                 <div class="billing-address">
@@ -48,7 +64,7 @@
 
                         <div class="billing-address-input clearfix">
                             <label>FIRST NAME *</label>
-                            <input name="firstname" type="text">
+                            <input id="firstname" name="firstname" type="text">
 
                             {{!-- //hidden input --}}
                             <input type="text" name="userId" id="" value="{{user._id}}" hidden>
@@ -57,28 +73,28 @@
                         </div>
                         <div class="billing-address-input clearfix">
                             <label>LAST NAME *</label>
-                            <input name="lastname" type="text">
+                            <input id="lastname" name="lastname" type="text">
                         </div>
                         <div class="billing-address-input clearfix">
                             <label>COMPANY / HOUSE NAME *</label>
-                            <input name="housename" type="text">
+                            <input id="housename" name="housename" type="text">
                         </div>
                         <div class="billing-address-input clearfix">
                             <label>ADDRESS *</label>
-                            <input type="text" name="streetaddress" placeholder="Street Address">
-                            <input type="text" name="address" placeholder="Fashin, suite, unite ect (optinal)">
+                            <input id="streetaddress" type="text" name="streetaddress" placeholder="Street Address">
+                            <input id="address" type="text" name="address" placeholder="Fashin, suite, unite ect (optinal)">
                         </div>
                         <div class="billing-address-input clearfix">
                             <label>TOWN / CITY *</label>
-                            <input name="town" type="text">
+                            <input id="town" name="town" type="text">
                         </div>
                         <div class="billing-address-input clearfix">
                             <label>COUNTRY / STATES</label>
-                            <input name="state" type="text">
+                            <input id="state" name="state" type="text">
                         </div>
                         <div class="billing-address-input clearfix">
                             <label>POSTCODE / ZIP *</label>
-                            <input name="zipcode" type="number">
+                            <input id="zipcode" name="zipcode" type="number">
                         </div>
                         {{!-- <div class="billing-address-input clearfix">
                             <label>EMAIL ADDRESS *</label>
@@ -86,20 +102,20 @@
                         </div> --}}
                         <div class="billing-address-input clearfix" style="margin-bottom:0px">
                             <label>PHONE *</label>
-                            <input name="phone" type="number">
+                            <input id="phone" name="phone" type="number">
                         </div>
-                        <div class="cbab-create-account">
-                            <input type="checkbox" name="regnum">
+                        {{!-- <div class="cbab-create-account">
+                            <input id="regnum" type="checkbox" name="regnum">
                             <label>Use registered phone number</label>
-                        </div>
+                        </div> --}}
                         <div class="billing-address-input clearfix">
                             <label>ALTERNATE PHONE *</label>
-                            <input name="altnum" type="number">
+                            <input id="altnum" name="altnum" type="number">
                         </div><br>
-                        <div class="cbab-create-account">
+                        {{!-- <div class="cbab-create-account">
                             <input type="checkbox" name="saveaddress"> 
                             <label>Save address</label>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
@@ -119,9 +135,9 @@
                     <div class="yob-content">
                         <ul>
                             <li class="clearfix">Cart Subtotal <span style="font-weight: bolder;font-size: 20px;">₹
-                                    {{product.price}}</span></li>
+                                    {{totalCartPrice}}</span></li>
                             <li class="clearfix">Shipping and Handling <span>Free Shipping</span></li>
-                            <li class="order-total clearfix">Order Total ₹<span name="productPrice">{{product.price}}</span></li>
+                            <li class="order-total clearfix">Order Total <span>₹{{totalCartPrice}}</span></li>
                         </ul>
                     </div>
                 </div>
@@ -150,11 +166,28 @@
                     </div>
                 </div>
             </div>
+        </div>
 </section>
 </form>
+<script>
+    function a(firstname,lastname,housename,streetaddress,address,town,state,zipcode,phone,altnum){
+        document.getElementById('firstname').value=firstname
+         document.getElementById('lastname').value=lastname
+          document.getElementById('housename').value=housename
+           document.getElementById('streetaddress').value=streetaddress
+            document.getElementById('address').value=address
+             document.getElementById('town').value=town
+              document.getElementById('state').value=state
+               document.getElementById('zipcode').value=zipcode
+                document.getElementById('phone').value=phone
+                 document.getElementById('altnum').value=altnum
+
+    }
+</script>
 
 <script>
-    $("#buyNow-checkout-form").submit((e)=>{
+    {{!-- $("#buyNow-checkout-form").submit((e)=>{
+        console.log('yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyoooooooooooooooooooooooooooooooooooooooooooo')
         e.preventDefault()
         $.ajax({
             url:'/buyNowplace-order',
@@ -169,7 +202,7 @@
                 }
             }
         })
-    })
+    }) --}}
 
     function razorpayPayment(order){
         var options = {
@@ -217,9 +250,72 @@
         })
     }
 </script>
+{{!-- form validation --}}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $('#buyNow-checkout-form').validate({
+            rules:{
+                firstname:{
+                    required:true
+                },
+                lastname:{
+                    required:true
+                },
+                housename:{
+                    required:true
+                },
+                streetaddress:{
+                    required:true
+                },
+                address:{
+                    required:true
+                },
+                 town:{
+                    required:true
+                },
+                 state:{
+                    required:true
+                },
+                 zipcode:{
+                    required:true
+                },
+                 phone:{
+                    required:true
+                },
+                 altnum:{
+                    required:true
+                },
+                paymentMethod:{
+                    required:true
+                }
+            },
+            submitHandler:()=>{
+                 $.ajax({
+            url:'/buyNowplace-order',
+            method:'post',
+            data:$('#buyNow-checkout-form').serialize(),
+            success:(response)=>{
+               
+                if(response.codSuccess){
+                    location.href='/ordersuccess'
+                }else{
+                    razorpayPayment(response)
+                }
+            }
+        })
+            }
+        })
+    })
+</script>
 
 
 <style>
+    .error{
+        color:red
+    }
     dt {
         color: black;
     }

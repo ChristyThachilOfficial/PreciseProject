@@ -2,6 +2,9 @@
     <div class="container mt-5">
         <center><h1 class="m-auto">MY ORDERS</h1></center>
         <a href="/" class="btn">Continue shopping</a>
+        {{#if cart}}
+            
+       
         <div class="row">
             
                 {{#each products}}
@@ -17,6 +20,8 @@
                         
                         <p class="card-text">{{this.product.brand}} </p>
                         <p class="card-text">{{this.product.description}} </p>
+                        <p class="card-text">{{this.status}} </p>
+                        
                         {{!-- <a href="#" class="btn btn-primary">Go somewhere</a> --}}
                     </div>
                 </div>
@@ -24,6 +29,37 @@
             {{/each}}
             
         </div>
+
+        {{/if}}
+        {{#if buynow}}
+            
+       
+             <div class="row">
+            
+                
+                    
+                
+            
+            <div class="col-md-3 p-3">
+                <div class="card" style="width: 13rem;">
+                    <img class="card-img-top m-auto" src="/productImages/{{products.productId}}__1.jpg" style="width: 150px;height: 200px;" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{products.productname}}</h5>
+                        <p class="card-text">₹<span>{{products.price}}</span></p>
+                        
+                        <p class="card-text">{{products.brand}} </p>
+                        <p class="card-text">{{products.description}} </p>
+                        <p class="card-text">{{products.status}} </p>
+                        
+                        {{!-- <a href="#" class="btn btn-primary">Go somewhere</a> --}}
+                    </div>
+                </div>
+            </div>
+            
+            
+        </div>
+
+         {{/if}}
          
     </div>
 </section>

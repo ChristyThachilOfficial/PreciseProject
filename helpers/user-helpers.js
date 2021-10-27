@@ -128,6 +128,8 @@ module.exports = {
       Quantity: 1,
       price: parseInt(prodPrice),
       totalprice: parseInt(prodPrice),
+      status:'Placed',
+      
     };
     return new Promise(async (resolve, reject) => {
       let userCart = await db
@@ -461,6 +463,7 @@ module.exports = {
         date: new Date(),
         // when there is some errors check here
         totalAmount: total,
+        mode:'cart'
       };
 
       //im putting an inserted id over here
@@ -516,6 +519,7 @@ module.exports = {
               Quantity: "$products.Quantity",
               price: "$products.price",
               totalprice: "$products.totalprice",
+              status:"$products.status"
             },
           },
           {
@@ -532,12 +536,13 @@ module.exports = {
               Quantity: 1,
               price: 1,
               totalprice: 1,
+              status:1,
               product: { $arrayElemAt: ["$product", 0] },
             },
           },
         ])
         .toArray();
-
+        console.log('orderrrrrrrrrrrrrrrrrrrrrrrr items are',orderItems)
       resolve(orderItems);
     });
   },
@@ -654,7 +659,14 @@ module.exports = {
         },
         userId: objectId(order.userId),
         paymentMethod: order.paymentMethod,
-        products: products,
+        productId:products._id,
+        productname: products.productname,
+        brand:products.brand,
+        price:products.price,
+        description:products.description,
+
+        // buy now mode editing
+        mode:'buynow',
         status: status,
         date: new Date(),
         // when there is some errors check here
@@ -682,4 +694,50 @@ module.exports = {
         });
     });
   },
+  getOrderStatus:(orderId)=>{
+    return new Promise(async(resolve,reject)=>{
+      await db.get().collection(collection.ORDER_COLLECTION).findOne({_id:objectId(orderId)}).then((order)=>{
+        resolve(order.status)
+      })
+    })
+  },
+  addUserAddress:(addressData,userId)=>{
+    let addressDetails={
+      userId:userId,
+      address:addressData
+    }
+    return new Promise(async(resolve,reject)=>{
+      await db.get().collection(collection.ADDRESS_COLLECTION).insertOne(addressDetails).then((response)=>{
+        resolve(response)
+      })
+    })
+  },
+  getUserAddress:(personId)=>{
+    return new Promise(async(resolve,reject)=>{
+     let addressData =  await db.get().collection(collection.ADDRESS_COLLECTION).find({userId:personId}).toArray()
+     resolve(addressData)
+    })
+  },
+  changeOrderStatus:(proId,orderId,status)=>{
+    
+    return new Promise(async(resolve,reject)=>{
+      let order= await db.get().collection(collection.ORDER_COLLECTION).findOne({_id:objectId(orderId)})
+      console.log('oddddddddddddddddddeeeeeeeeeeeeeeeeeeraaaaaaaaaaa',order)
+      if (order.mode==='cart') {
+        db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objectId(orderId),products:{$elemMatch:{item:objectId(proId)}}},
+      {
+        $set:{
+          "products.$.status":status
+        }
+      }).then(()=>{
+        resolve()
+      })
+      }else if (order.mode==='buynow') {
+        db.get().collection(collection.ORDER_COLLECTION).updateOne({productId:objectId(proId)},{$set:{status:status}}).then((response)=>{
+          resolve()
+        })
+      }
+      
+    })
+  }
 };

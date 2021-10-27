@@ -17,9 +17,11 @@
                                 <div class="table-responsive">
                                     <table class="table">
                                         <thead class=" text-primary">
+                                            {{#if cart}}
                                             <th style="font-weight: bold;">
                                                 Sl.No
                                             </th>
+                                            {{/if}}
                                             <th style="font-weight: bold;">
                                                 Product Image
                                             </th>
@@ -29,18 +31,25 @@
                                             <th style="font-weight: bold;">
                                                 Price (₹)
                                             </th>
+                                            {{#if cart}}
+                                                
+                                            
                                             <th style="font-weight: bold;">
                                                 Quantity
                                             </th>
+                                            {{/if}}
 
                                             <th style="font-weight: bold;">
                                                 Status
                                             </th>
                                             <th style="font-weight: bold;">
-
+                                                <input type="hidden" name="orderId" value="{{orderId}}">
                                             </th>
 
                                         </thead>
+                                        {{#if cart}}
+                                            
+                                        
                                         <tbody>
                                             {{#each products}}
                                             <tr>
@@ -63,22 +72,57 @@
                                                 </td>
 
                                                 <td>
-                                                   <select name="brand" class="form-control text-center" id="exInpuEmail1" aria-describedby="emailHelp">
-                                                        <option value="">Status</option>
-                                                        <option value="pending">Pending</option>
+                                                   <select name="status" id="{{this.product._id}}" class="form-control text-center" onchange="updateStatus('{{this.product._id}}','{{../orderId}}')" >
+                                                        <option value="cancelled">Cancelled</option>
+                                                        <option selected value="pending">Pending</option>
                                                         <option value="shipped">Shipped</option>
                                                         <option value="delivered">Delivered</option>
                                                         <option value="returned">Returned</option>
 
                                                     </select>
                                                 </td>
-                                                <td>
-                                                    <a class="btn btn-danger btn-sm" href="">Update order</a>
-                                                </td>
+                                                
                                             </tr>
                                             {{/each}}
 
                                         </tbody>
+                                        {{/if}}
+                                        {{#if buynow}}
+                                            
+                                         <tbody>
+                                           
+                                            <tr>
+                                               
+                                                <td>
+                                                    <img style="width:50px;height:50px"
+                                                        src="/productImages/{{products.productId}}__1.jpg" alt="">
+                                                </td>
+                                                <td>
+
+                                                    {{products.productname}}
+                                                </td>
+                                                <td>
+                                                    ₹<span>{{products.price}}</span>
+                                                </td>
+                                              
+
+                                                <td>
+                                                   <select name="status" id="{{products.productId}}" class="form-control text-center" onchange="updateStatus('{{products.productId}}','{{orderId}}')" >
+                                                        <option value="cancelled">Cancelled</option>
+                                                        <option selected value="pending">Pending</option>
+                                                        <option value="shipped">Shipped</option>
+                                                        <option value="delivered">Delivered</option>
+                                                        <option value="returned">Returned</option>
+
+                                                    </select>
+                                                </td>
+                                                
+                                            </tr>
+                                           
+
+                                        </tbody>
+
+                                        {{/if}}
                                     </table>
                                 </div>
                             </div>
@@ -88,10 +132,25 @@
             </div>
         </div>
        
-        <script>
-            const x = new Date().getFullYear();
-            let date = document.getElementById('date');
-            date.innerHTML = '&copy; ' + x + date.innerHTML;
-        </script>
+        
     </div>
 </div>
+
+<script>
+    function updateStatus(proId,orderId){
+     
+        let currentStatus=document.getElementById(proId).value
+        
+        console.log(proId,orderId,currentStatus)
+        $.ajax({
+            url:'/admin/updateOrderStatus',
+            data:{
+                proId:proId,
+                orderId:orderId,
+                status:currentStatus
+            },
+            method:'post',
+           
+        })
+    }
+</script>

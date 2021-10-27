@@ -85,8 +85,8 @@
 						<!-- search -->
 						<div class="col-8 agileits_search">
 							<form class="form-inline" action="" >
-								<input class="form-control mr-sm-2" id="myInput" type="search" placeholder="Search" aria-label="Search" required>
-								<button class="btn my-2 my-sm-0" type="button">Search</button>
+								<input class="form-control mr-sm-2" id="myInput" type="search" placeholder="Search..." aria-label="Search" required>
+								{{!-- <button class="btn my-2 my-sm-0" type="button">Search</button> --}}
 							</form>
 						</div>
 						<!-- //search -->
@@ -136,15 +136,18 @@
 									<div class="row">
 										<div class="col-sm-6 multi-gd-img" >
 											<ul class="multi-column-dropdown">
-												<li>
-													<a href="product.html">Rolex</a>
-												</li>
-												<li>
+												{{#each category}}
+													<li>
+														<a href="/shopbybrand/{{this.name}}">{{this.name}}</a>
+													</li>
+												{{/each}}
+												
+												{{!-- <li>
 													<a href="product.html">Fastrack</a>
 												</li>
 												<li>
 													<a href="product.html">Titan</a>
-												</li>
+												</li> --}}
 												
 											</ul>
 										</div>
@@ -155,10 +158,10 @@
 						</li>
 						
 						<li class="nav-item mr-lg-2 mb-lg-0 mb-2">
-							<a class="nav-link" href="about.html">For Men's</a>
+							<a class="nav-link" href="/formens">For Men's</a>
 						</li>
 						<li class="nav-item mr-lg-2 mb-lg-0 mb-2">
-							<a class="nav-link" href="product.html">For Women's
+							<a class="nav-link" href="/forwomens">For Women's
                             </a>
 						</li>
                         <li class="nav-item mr-lg-2 mb-lg-0 mb-2">

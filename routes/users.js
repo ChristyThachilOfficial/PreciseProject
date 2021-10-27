@@ -19,7 +19,7 @@ router.get("/", async function (req, res, next) {
   if (req.session.loggedIn) {
     let user = req.session.user;
     let cart = await userHelpers.getCartProduct(req.session.user._id);
-
+    let category=await productHelpers.getAllCategory()
     let cartCount = await userHelpers.getCartCount(req.session.user._id);
     productHelpers.getallProducts().then((productsData) => {
       res.render("users/user-home", {
@@ -30,15 +30,18 @@ router.get("/", async function (req, res, next) {
         cartCount,
         userrr: req.session.user,
         cart,
+        category
       });
     });
   } else {
+    let category=await productHelpers.getAllCategory()
     productHelpers.getallProducts().then((productsData) => {
       res.render("users/user-home", {
         users: true,
         user: false,
         typeOfPersonUser: true,
         productsData,
+        category
       });
     });
   }
@@ -361,10 +364,7 @@ router.get("/cart", async (req, res, next) => {
 
     let products = await userHelpers.getCartProduct(req.session.user._id);
 
-    console.log(
-      "whhhhhhhhhhhhhhhhhhhhhatttttttttttttttt isssssssssss prrrrrrrrrrrroducts",
-      products
-    );
+    
     if (products) {
       let totalCartPrice = await userHelpers.getAllCartamount(
         req.session.user._id
@@ -403,12 +403,17 @@ router.get("/checkout", async (req, res, next) => {
     let totalCartPrice = await userHelpers.getAllCartamount(
       req.session.user._id
     );
+    let address=await userHelpers.getUserAddress(req.session.user._id)
+    let cartCount = await userHelpers.getCartCount(req.session.user._id);
+   
     res.render("users/user-payment", {
       typeOfPersonUser: true,
       user: true,
       users: true,
       totalCartPrice,
       user: req.session.user,
+      address,
+      cartCount
     });
   } else {
     res.redirect("/login");
@@ -418,6 +423,7 @@ router.get("/checkout", async (req, res, next) => {
 //post place order
 
 router.post("/place-order", async (req, res, next) => {
+  
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = await userHelpers.getAllCartamount(req.body.userId);
   userHelpers.placeOrder(req.body, products, totalPrice).then((orderId) => {
@@ -456,16 +462,31 @@ router.get("/vieworders", loginHelper, async (req, res, next) => {
 //view order products
 router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
   let orderId = req.params.id;
-  console.log("entered orderrrrrrrrrrrrrr products", orderId);
-  let products = await userHelpers.getOrderProducts(orderId);
+  let order =await userHelpers.findOrder(orderId)
+  if (order.mode ==='cart') {
+    let products = await userHelpers.getOrderProducts(orderId);
+    console.log('prooooooooooooddddddddductssssssssssss',products)
+    res.render("users/user-orderproducts", {
+      typeOfPersonUser: true,
+      users: true,
+      user: true,
+      userrrr: req.session.user,
+      products,
+      cart:true
+    });
+  }else if (order.mode === 'buynow') {
+    let products = await productHelpers.buyNowProduct(orderId)
+    res.render("users/user-orderProducts",{
+      typeOfPersonUser: true,
+      users: true,
+      user: true,
+      userrrr: req.session.user,
+      products,
+      buynow:true
+    })
+  }
 
-  res.render("users/user-orderproducts", {
-    typeOfPersonUser: true,
-    users: true,
-    user: true,
-    userrrr: req.session.user,
-    products,
-  });
+ 
 });
 
 //verify router
@@ -516,12 +537,16 @@ router.post("/updateuserdetails", loginHelper, async (req, res, next) => {
 //buy now
 router.get("/buynow/:id", loginHelper, async (req, res, next) => {
   let product = await productHelpers.getBuyNowProduct(req.params.id);
+  let address=await userHelpers.getUserAddress(req.session.user._id)
+  let cartCount = await userHelpers.getCartCount(req.session.user._id);
   res.render("users/user-buynowCheckout", {
     typeOfPersonUser: true,
     users: true,
     user: true,
     product,
     user: req.session.user,
+    address,
+    cartCount
   });
 });
 
@@ -554,10 +579,75 @@ router.get("/invoice/:id", loginHelper, (req, res, next) => {
   });
 });
 
+//user add address
+router.get('/addAddress',loginHelper,async(req,res,next)=>{
+  let cartCount = await userHelpers.getCartCount(req.session.user._id);
+  res.render('users/user-addAddress1',{typeOfPersonUser:true,users:true,user:true,cartCount})
+})
+
+//post user address
+router.post('/addAddress1',loginHelper,(req,res,next)=>{
+ userHelpers.addUserAddress(req.body,req.session.user._id).then(()=>{
+   res.redirect('/')
+ })
+
+})
+
+//shop by brand
+router.get('/shopbybrand/:name',async(req,res,next)=>{
+  let category=await productHelpers.getAllCategory()
+  if(req.session.loggedIn){
+    let cartCount = await userHelpers.getCartCount(req.session.user._id);
+    let cart = await userHelpers.getCartProduct(req.session.user._id);
+    productHelpers.findProductByBrand(req.params.name).then((products)=>{
+      res.render('users/user-shopByBrand',{typeOfPersonUser:true,users:true,user:true,products,userrr:req.session.user,cartCount,cart,category})
+    })
+  }else{
+    productHelpers.findProductByBrand(req.params.name).then((products)=>{
+      res.render('users/user-shopByBrand',{typeOfPersonUser:true,users:true,user:true,products,category})
+    })
+  }
+
+ 
+})
+
+//shop for men's
+router.get('/formens',async(req,res,next)=>{
+  let category=await productHelpers.getAllCategory()
+  if (req.session.loggedIn) {
+    let cartCount = await userHelpers.getCartCount(req.session.user._id);
+    let cart = await userHelpers.getCartProduct(req.session.user._id);
+    productHelpers.getMensProduct().then((products)=>{
+      res.render('users/user-forMens',{typeOfPersonUser:true,users:true,user:true,products,userrr:req.session.user,cartCount,cart,category})
+    })
+  }else{
+    productHelpers.getMensProduct().then((products)=>{
+      res.render('users/user-forMens',{typeOfPersonUser:true,users:true,user:true,products,category})
+    })
+  }
+
+})
+
+//shop for women's
+router.get('/forwomens',async(req,res,next)=>{
+
+  let category=await productHelpers.getAllCategory()
+  if (req.session.loggedIn) {
+    let cartCount = await userHelpers.getCartCount(req.session.user._id);
+    let cart = await userHelpers.getCartProduct(req.session.user._id);
+    productHelpers.getWomensProduct().then((products)=>{
+      res.render('users/user-forWomens',{typeOfPersonUser:true,users:true,user:true,products,userrr:req.session.user,cartCount,cart,category})
+    })
+  }else{
+    productHelpers.getWomensProduct().then((products)=>{
+      res.render('users/user-forWomens',{typeOfPersonUser:true,users:true,user:true,products,category})
+    })
+  }
+})
+
 //logout
 router.get("/logout", (req, res, next) => {
   req.session.loggedIn = false;
-
   res.redirect("/");
 });
 module.exports = router;

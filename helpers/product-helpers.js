@@ -45,9 +45,9 @@ module.exports={
                     gender:proDetails.gender,
                     description:proDetails.description,
                     date:proDetails.date,
-                    image1:proDetails.image1,
-                    image2:proDetails.image2,
-                    image3:proDetails.image3
+                    // image1:proDetails.image1,
+                    // image2:proDetails.image2,
+                    // image3:proDetails.image3
                 }
             }).then((response)=>{
                 resolve(response)
@@ -66,6 +66,54 @@ module.exports={
             db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(proId)}).then((response)=>{
                 
                 resolve(response)
+            })
+        })
+    },
+    buyNowProduct:(orderId)=>{
+        return new Promise(async(resolve,reject)=>{
+         let product =await   db.get().collection(collection.ORDER_COLLECTION).findOne({_id:objectId(orderId)})
+         resolve(product)
+        })
+    },
+    addCategory:(categoryName)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.CATEGORY_COLLECTION).insertOne({name:categoryName}).then((response)=>{
+                resolve(response)
+            })
+        })
+    },
+    getAllCategory:()=>{
+        return new Promise(async(resolve,reject)=>{
+            db.get().collection(collection.CATEGORY_COLLECTION).find().toArray().then((response)=>{
+                resolve(response)
+            })
+        })
+    },
+    deleteCategory:(categoryId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.CATEGORY_COLLECTION).deleteOne({_id:objectId(categoryId)}).then((response)=>{
+                resolve(response)
+            })
+        })
+    },
+    findProductByBrand:(brandName)=>{
+        return new Promise(async(resolve,reject)=>{
+            await db.get().collection(collection.PRODUCT_COLLECTION).find({brand:brandName}).toArray().then((response)=>{
+                resolve(response)
+            })
+        })
+    },
+    getMensProduct:()=>{
+        return new Promise(async(resolve,reject)=>{
+            await db.get().collection(collection.PRODUCT_COLLECTION).find({gender:"men"}).toArray().then((products)=>{
+                resolve(products)
+            })
+        })
+    },
+    getWomensProduct:()=>{
+        return new Promise(async(resolve,reject)=>{
+            await db.get().collection(collection.PRODUCT_COLLECTION).find({gender:"women"}).toArray().then((products)=>{
+                resolve(products)
             })
         })
     }
