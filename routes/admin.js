@@ -7,25 +7,61 @@ const userHelpers = require("../helpers/user-helpers");
 
 let admindetails = {
   name: "admin",
-  pass: 123,
+  pass: 000,
 };
 
 router.get("/otp", (req, res, next) => {
   res.render("admin/admin-otp", { typeOfPersonAdmin: true });
 });
 
+let adminLoginHelper = (req,res,next)=>{
+  if(req.session.adminLogin){
+    next();
+  }else{
+    res.redirect('/admin/login')
+  }
+}
+
 /* GET admin home. */
-router.get("/", function (req, res, next) {
-  res.render("admin/admin-home", { admin: true, typeOfPersonAdmin: true });
+router.get("/",adminLoginHelper, async(req, res, next)=> {
+  let getOrderCountData = await productHelpers.getAllOrderCount()
+  let totalUsers = await userHelpers.getUsersCount()
+  let totalRevenue = await productHelpers.getTotalRevenue()
+  let totalProducts=await productHelpers.getProductsCount()
+  let totalBrands = await productHelpers.getBrandsCount()
+
+  let orderDataArray = [getOrderCountData.totalOrders,getOrderCountData.totalCancelledOrder,getOrderCountData.totalDeliveredOrder,getOrderCountData.totalPlacedOrder]
+  res.render("admin/admin-home", { admin: true, typeOfPersonAdmin: true ,totalUsers,totalRevenue,totalProducts,totalBrands,orderDataArray});
 });
 
 //get admin login
 router.get("/login", (req, res, next) => {
-  res.render("admin/admin-login", { typeOfPersonAdmin: true });
+  if(req.session.adminLogin){
+    res.redirect('/admin')
+  }
+  else if(req.session.adminLoginErr ){
+    res.render('admin/admin-login',{typeOfPersonAdmin:true,loginErr:true})
+    req.session.adminLoginErr=false
+  }else{
+    
+    res.render("admin/admin-login", { typeOfPersonAdmin: true });
+  }
+ 
 });
 
+//post admin login
+router.post('/login',(req,res,next)=>{
+  if(req.body.adminId == admindetails.name && req.body.password == admindetails.pass){
+    req.session.adminLogin =true
+    res.redirect('/admin')
+  }else{
+    req.session.adminLoginErr =true
+    res.redirect('/admin/login')
+  }
+})
+
 // view products
-router.get("/viewproducts", (req, res, next) => {
+router.get("/viewproducts",adminLoginHelper, (req, res, next) => {
   productHelpers.getallProducts().then((products) => {
     res.render("admin/view-products", {
       typeOfPersonAdmin: true,
@@ -36,7 +72,7 @@ router.get("/viewproducts", (req, res, next) => {
 });
 
 // view users
-router.get("/viewusers", (req, res, next) => {
+router.get("/viewusers",adminLoginHelper, (req, res, next) => {
   userHelpers.getAllUsers().then((users) => {
     res.render("admin/view-users", {
       admin: true,
@@ -47,7 +83,7 @@ router.get("/viewusers", (req, res, next) => {
 });
 
 //block users
-router.get("/blockusers/:id", (req, res, next) => {
+router.get("/blockusers/:id",adminLoginHelper, (req, res, next) => {
   let userId = req.params.id;
   userHelpers.blockUser(userId).then((response) => {
     res.redirect("/admin/viewusers");
@@ -55,7 +91,7 @@ router.get("/blockusers/:id", (req, res, next) => {
 });
 
 //unblock users
-router.get("/unblockusers/:id", (req, res, next) => {
+router.get("/unblockusers/:id",adminLoginHelper, (req, res, next) => {
   let userId = req.params.id;
   userHelpers.unblockUser(userId).then((response) => {
     res.redirect("/admin/viewusers");
@@ -63,13 +99,13 @@ router.get("/unblockusers/:id", (req, res, next) => {
 });
 
 // ADD products
-router.get("/addproduct",async (req, res, next) => {
+router.get("/addproduct",adminLoginHelper,async (req, res, next) => {
   let category=await productHelpers.getAllCategory()
   res.render("admin/add-product", { admin: true, typeOfPersonAdmin: true ,category });
 });
 
 // POST add products
-router.post("/addproduct", (req, res, next) => {
+router.post("/addproduct",adminLoginHelper, (req, res, next) => {
   productHelpers.addProduct(req.body).then((id) => {
     let image1 = req.files.image1;
     let image2 = req.files.image2;
@@ -84,7 +120,7 @@ router.post("/addproduct", (req, res, next) => {
 });
 
 //delete product
-router.get("/deleteproducts/:id", (req, res, next) => {
+router.get("/deleteproducts/:id",adminLoginHelper, (req, res, next) => {
   let proId = req.params.id;
   productHelpers.deleteProduct(proId).then((result) => {
     res.redirect("/admin/viewproducts");
@@ -92,17 +128,20 @@ router.get("/deleteproducts/:id", (req, res, next) => {
 });
 
 //edit product
-router.get("/editproducts/:id", async (req, res, next) => {
+router.get("/editproducts/:id",adminLoginHelper, async (req, res, next) => {
+  let category=await productHelpers.getAllCategory()
   let product = await productHelpers.getProductDetails(req.params.id);
   res.render("admin/edit-product", {
     product,
     typeOfPersonAdmin: true,
     admin: true,
+    category
   });
 });
 
 //edit product post
-router.post("/editproducts/:id", (req, res, next) => {
+router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
+  
   productHelpers.updateproductDetails(req.params.id, req.body).then(() => {
     res.redirect("/admin");
     if (req.files.image1 || req.files.image2 || req.files.image3) {
@@ -123,7 +162,7 @@ router.post("/editproducts/:id", (req, res, next) => {
   });
 }),
   //order management
-  router.get("/order-management", (req, res, next) => {
+  router.get("/order-management", adminLoginHelper,(req, res, next) => {
     userHelpers.getOrderList().then((orders) => {
       res.render("admin/admin-orderManagement", {
         typeOfPersonAdmin: true,
@@ -133,8 +172,42 @@ router.post("/editproducts/:id", (req, res, next) => {
     });
   });
 
+  //sales report
+  router.get("/salesReport",adminLoginHelper, (req, res, next) => {
+    userHelpers.getOrderList().then((orders) => {
+      res.render("admin/admin-salesReport", {
+        typeOfPersonAdmin: true,
+        admin: true,
+        orders,
+      });
+    });
+  });
+
+  //coupons
+  router.get('/coupons',adminLoginHelper,(req,res,next)=>{
+    userHelpers.getAllCoupons().then((coupons)=>{
+      res.render('admin/admin-coupons',{typeOfPersonAdmin:true,admin:true,coupons})
+    })
+    
+  })
+  
+  //add coupons
+  router.post('/addCoupons',adminLoginHelper,(req,res,next)=>{
+    req.body.percentage =parseInt(req.body.percentage)
+    userHelpers.addCoupons(req.body).then(()=>{
+      res.redirect('/admin/coupons')
+    })
+  })
+
+  //delete coupons
+  router.get('/deleteCoupon/:id',adminLoginHelper,(req,res,next)=>{
+    userHelpers.deleteCoupon(req.params.id).then(()=>{
+      res.json({status:true})
+    })
+  })
+
 //order status update
-router.get("/change-status/:orderId/:status", (req, res, next) => {
+router.get("/change-status/:orderId/:status", adminLoginHelper,(req, res, next) => {
   userHelpers
     .changeOrderStatus(req.params.orderId, req.params.status)
     .then(() => {
@@ -142,16 +215,12 @@ router.get("/change-status/:orderId/:status", (req, res, next) => {
     });
 });
 
-router.post("/login", (req, res, next) => {
-  res.redirect("/admin");
-});
 
-router.get("/view-orderedproduct/:orderId", async (req, res, next) => {
+
+router.get("/view-orderedproduct/:orderId",adminLoginHelper, async (req, res, next) => {
   let orderId=req.params.orderId
   let orderStatus=await userHelpers.getOrderStatus(orderId)
   let order =await userHelpers.findOrder(orderId)
-  console.log('the orderssssssssssstatus is',orderStatus)
-  console.log('the orrrrrrrrrrrrrrrder data is',order)
   if (order.mode==='cart') {
     let products = await userHelpers.getOrderProducts(req.params.orderId);
     res.render("admin/admin-userorederproducts", {
@@ -177,13 +246,13 @@ router.get("/view-orderedproduct/:orderId", async (req, res, next) => {
  
 });
 
-router.post('/updateOrderStatus',(req,res,next)=>{
+router.post('/updateOrderStatus',adminLoginHelper,(req,res,next)=>{
   
   userHelpers.changeOrderStatus(req.body.proId,req.body.orderId,req.body.status)
 })
 
 //Get add catetory
-router.get('/addcategory',(req,res,next)=>{
+router.get('/addcategory',adminLoginHelper,(req,res,next)=>{
   productHelpers.getAllCategory().then((category)=>{
     res.render('admin/admin-addCategory',{typeOfPersonAdmin:true,admin:true,category})
   })
@@ -191,18 +260,27 @@ router.get('/addcategory',(req,res,next)=>{
 })
 
 //post add category
-router.post('/addCategory',(req,res,next)=>{
+router.post('/addCategory',adminLoginHelper,(req,res,next)=>{
   productHelpers.addCategory(req.body.category).then(()=>{
     res.redirect('/admin/addcategory')
   })
 })
 
 //delete category
-router.get('/deleteCategory/:id',(req,res,next)=>{
+router.get('/deleteCategory/:id',adminLoginHelper,(req,res,next)=>{
   productHelpers.deleteCategory(req.params.id).then(()=>{
     res.json({status:true})
   })
 })
+
+
+//admin logout
+router.get('/logout',(req,res,next)=>{
+  req.session.adminLogin=false
+  res.redirect('/admin/login')
+})
+
+
 
 
 module.exports = router;

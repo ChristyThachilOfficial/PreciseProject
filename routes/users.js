@@ -348,15 +348,16 @@ router.post("/changepassword", (req, res, next) => {
 });
 
 //add to cart
-router.get("/add-to-cart/:id/:price", loginHelper, (req, res, next) => {
-  console.log("the request of body is  ", req.params.id, req.params.price);
+router.get("/add-to-cart/:id/:price", loginHelper,async (req, res, next) => {
+  let brandName = await productHelpers.getBrandName(req.params.id)
+ let totalQuantity =await productHelpers.getTotalQuantity(req.params.id)
   userHelpers
-    .addToCart(req.params.id, req.session.user._id, req.params.price)
+    .addToCart(req.params.id, req.session.user._id, req.params.price,totalQuantity,brandName)
     .then(() => {
       res.json({ status: true });
     });
 });
-
+ 
 //get cart product
 router.get("/cart", async (req, res, next) => {
   if (req.session.loggedIn) {
@@ -422,11 +423,14 @@ router.get("/checkout", async (req, res, next) => {
 
 //post place order
 
-router.post("/place-order", async (req, res, next) => {
+router.post("/place-order",loginHelper, async (req, res, next) => {
   
   let products = await userHelpers.getCartProductList(req.body.userId);
-  let totalPrice = await userHelpers.getAllCartamount(req.body.userId);
+  let totalPrice = req.body.totalCartPrice
   userHelpers.placeOrder(req.body, products, totalPrice).then((orderId) => {
+    products.map((data)=>{
+      productHelpers.updateTotalQuantityCart(data)
+    })
     if (req.body["paymentMethod"] === "COD") {
       res.json({ codSuccess: true });
     } else {
@@ -465,14 +469,14 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
   let order =await userHelpers.findOrder(orderId)
   if (order.mode ==='cart') {
     let products = await userHelpers.getOrderProducts(orderId);
-    console.log('prooooooooooooddddddddductssssssssssss',products)
     res.render("users/user-orderproducts", {
       typeOfPersonUser: true,
       users: true,
       user: true,
       userrrr: req.session.user,
       products,
-      cart:true
+      cart:true,
+      orderId
     });
   }else if (order.mode === 'buynow') {
     let products = await productHelpers.buyNowProduct(orderId)
@@ -482,7 +486,8 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
       user: true,
       userrrr: req.session.user,
       products,
-      buynow:true
+      buynow:true,
+      orderId
     })
   }
 
@@ -537,6 +542,7 @@ router.post("/updateuserdetails", loginHelper, async (req, res, next) => {
 //buy now
 router.get("/buynow/:id", loginHelper, async (req, res, next) => {
   let product = await productHelpers.getBuyNowProduct(req.params.id);
+  let productPrice = parseInt(product.price)
   let address=await userHelpers.getUserAddress(req.session.user._id)
   let cartCount = await userHelpers.getCartCount(req.session.user._id);
   res.render("users/user-buynowCheckout", {
@@ -546,16 +552,17 @@ router.get("/buynow/:id", loginHelper, async (req, res, next) => {
     product,
     user: req.session.user,
     address,
-    cartCount
+    cartCount,
+    productPrice
   });
 });
 
 //buy now place order
-router.post("/buyNowplace-order", async (req, res, next) => {
+router.post("/buyNowplace-order", loginHelper,async (req, res, next) => {
   let product = await productHelpers.getProduct(req.body.proId);
-  let totalPrice = product.price;
+  let totalPrice = req.body.totalfinalPrice;
   userHelpers
-    .buyNowplaceOrder(req.body, product, product.price)
+    .buyNowplaceOrder(req.body, product,totalPrice)
     .then((orderId) => {
       if (req.body["paymentMethod"] === "COD") {
         res.json({ codSuccess: true });
@@ -565,6 +572,9 @@ router.post("/buyNowplace-order", async (req, res, next) => {
         });
       }
     });
+    productHelpers.updateTotalQuantity(req.body.proId).then(()=>{
+      alert('hoooooooooooooooooooo')
+    })
 });
 
 //get invoice
@@ -596,15 +606,17 @@ router.post('/addAddress1',loginHelper,(req,res,next)=>{
 //shop by brand
 router.get('/shopbybrand/:name',async(req,res,next)=>{
   let category=await productHelpers.getAllCategory()
+  let brandName=req.params.name
   if(req.session.loggedIn){
     let cartCount = await userHelpers.getCartCount(req.session.user._id);
     let cart = await userHelpers.getCartProduct(req.session.user._id);
     productHelpers.findProductByBrand(req.params.name).then((products)=>{
-      res.render('users/user-shopByBrand',{typeOfPersonUser:true,users:true,user:true,products,userrr:req.session.user,cartCount,cart,category})
+     
+      res.render('users/user-shopByBrand',{typeOfPersonUser:true,users:true,user:true,products,userrr:req.session.user,cartCount,cart,category,brandName})
     })
   }else{
     productHelpers.findProductByBrand(req.params.name).then((products)=>{
-      res.render('users/user-shopByBrand',{typeOfPersonUser:true,users:true,user:true,products,category})
+      res.render('users/user-shopByBrand',{typeOfPersonUser:true,users:true,user:true,products,category,brandName})
     })
   }
 
@@ -643,6 +655,48 @@ router.get('/forwomens',async(req,res,next)=>{
       res.render('users/user-forWomens',{typeOfPersonUser:true,users:true,user:true,products,category})
     })
   }
+})
+
+//cancel order buy now
+router.post('/cancelOrderBuyNow',loginHelper,(req,res,next)=>{
+  let productId = req.body.prodId
+  let status = req.body.status
+  let orderId = req.body.orderId
+  userHelpers.cancelOrderBuyNow(productId,status,orderId).then((response)=>{
+    res.json({status:true})
+  })
+})
+
+//cancel order cart
+router.post('/cancelOrderCart',loginHelper,async(req,res,next)=>{
+  let productId =req.body.proId
+  let status = req.body.status
+  let orderId = req.body.orderId
+  let orderedproducts =  await userHelpers.getOrderProducts(orderId);
+  userHelpers.cancelOrderCart(productId,status,orderId).then(()=>{
+    orderedproducts.map((data)=>{
+      productHelpers.updateTotalQuantityInCart(data)
+    })
+    res.json({status:true})
+  })
+})
+
+//coupon checking
+router.get('/checkCoupon/:couponCode/:productPrice',loginHelper,(req,res,next)=>{
+  userHelpers.checkCouponExistBuyNow(req.params.couponCode,req.params.productPrice,req.session.user._id).then((response)=>{
+    if (response) {
+      res.json(response)
+    }
+  })
+})
+
+//coupon checking cart
+router.get('/checkCouponCart/:couponCode/:cartPrice',loginHelper,(req,res,next)=>{
+  userHelpers.checkCouponExistCart(req.params.couponCode,req.params.cartPrice,req.session.user._id).then((response)=>{
+    if(response){
+      res.json(response)
+    }
+  })
 })
 
 //logout

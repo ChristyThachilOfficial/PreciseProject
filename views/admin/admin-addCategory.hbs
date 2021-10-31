@@ -1,12 +1,16 @@
-<section>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-7">
-                <table class="table mt-5">
+<section class="mt-5">
+    <div class="container mt-5">
+        <div class="row ">
+            <div class="col-md-2">
+                
+
+            </div>
+            <div class="col-md-8">
+              <table class="table mt-5" id="myTable">
   <thead>
     <tr>
       <th scope="col">No.</th>
-      <th scope="col">First</th>
+      <th scope="col">Brand</th>
       <th scope="col">Action</th>
      
     </tr>
@@ -24,15 +28,26 @@
    {{/each}}
   </tbody>
 </table>
-<form action="/admin/addCategory" method="post">
+<form action="/admin/addCategory" method="post" id="categoryForm"><br><br>
 <input name="category" style="border-radius: 4px;" type="text"><br>
 <button type="submit" class="btn btn-success">Add Category</button>
 </form>
-
             </div>
         </div>
     </div>
 </section>
+
+{{!-- data tables --}}
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables_themeroller.css">
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js" defer></script>
+
+<script>
+  $(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
 
 <script>
     function deleteCategory(CategoryId){
@@ -47,3 +62,26 @@
         })
     }
 </script>
+
+
+ {{!-- adddddddddddddddmmmmmmmmmmmminnnnnnnnnnn file validation --}}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js" defer></script>
+
+  <script>
+    $(document).ready(function(){
+      $('#categoryForm').validate({
+        rules:{
+          category:{
+            required:true
+          }
+        }
+      })
+    })
+  </script>
+
+  <style>
+    .error{
+      color: red;
+    }
+  </style>

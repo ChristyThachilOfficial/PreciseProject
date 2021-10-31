@@ -39,22 +39,30 @@
 												<a href="/singleview/{{this._id}}">{{this.productname}}</a>
 											</h4>
 											<div class="info-product-price my-2">
-												<span >₹{{this.price}}</span>
+												<span >Price ₹{{this.price}}</span>
 												
 											</div>
 											{{#if ../userrr}}
 												
-											
+												{{#gt this.quantity '0'}}
 											<div>
-												 
+												 <span class="text-success">In stock</span>
 												{{!-- adding the product price --}}
 												{{#hello ../cart this._id this.price}}
 												{{/hello}} 
 												
 											</div>
+											
+
 											<div>
 												<a href="/buynow/{{this._id}}" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
 											</div>
+												{{else}}
+												<span class="text-danger">Out of stock</span>
+												<button  class="btn btn-primary mt-3" style="width: 80%;" disabled>Add to cart</a>
+												<button  class="btn btn-success mt-3" style="width: 80%;" disabled>Buy now</a>
+												{{/gt}}
+
 											{{else}}
 											<a href="/login" class="btn btn-primary mt-3" style="width: 80%;">Add to cart</a>
 											<a href="/login" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>

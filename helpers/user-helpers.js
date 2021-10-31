@@ -122,13 +122,15 @@ module.exports = {
       }
     });
   },
-  addToCart: (proId, userId, prodPrice) => {
+  addToCart: (proId, userId, prodPrice,totalProductQuantity,brandName) => {
     let proObj = {
       item: objectId(proId),
       Quantity: 1,
       price: parseInt(prodPrice),
       totalprice: parseInt(prodPrice),
       status:'Placed',
+      totalQuantity:parseInt(totalProductQuantity),
+      brand:brandName
       
     };
     return new Promise(async (resolve, reject) => {
@@ -196,7 +198,7 @@ module.exports = {
               item: "$products.item",
               Quantity: "$products.Quantity",
               price: "$products.price",
-              totalprice: "$products.totalprice",
+              totalprice: "$products.totalprice"
             },
           },
           {
@@ -228,7 +230,6 @@ module.exports = {
   },
   getCartProductForChecking: (userId) => {
     return new Promise(async (resolve, reject) => {
-      console.log("the user id isssssssssss", userId);
       var cart = await db
         .get()
         .collection(collection.CART_COLLECTION)
@@ -430,14 +431,13 @@ module.exports = {
       if (totalCartPrice[0]) {
         resolve(totalCartPrice[0].totalcartprice);
       } else {
-        resolve({ emptyCart: true });
+
+        resolve();
       }
     });
   },
   placeOrder: (order, products, total) => {
     return new Promise((resolve, reject) => {
-      console.log("the product issssssssssssssssss", products);
-
       let status = order.paymentMethod === "COD" ? "placed" : "pending";
       let orderObj = {
         deliveryDetails: {
@@ -454,8 +454,9 @@ module.exports = {
           regnum: order.regnum,
           altnum: order.altnum,
 
-          coupon: order.coupon,
+          
         },
+        coupon: order.coupon,
         userId: objectId(order.userId),
         paymentMethod: order.paymentMethod,
         products: products,
@@ -542,7 +543,7 @@ module.exports = {
           },
         ])
         .toArray();
-        console.log('orderrrrrrrrrrrrrrrrrrrrrrrr items are',orderItems)
+        
       resolve(orderItems);
     });
   },
@@ -562,6 +563,7 @@ module.exports = {
     });
   },
   verifyPayment: (details) => {
+    console.log('reqqqqqquest')
     return new Promise((resolve, reject) => {
       const crypto = require("crypto");
       let hmac = crypto.createHmac("sha256", "EjgkpT60XJNQQgBvrvqJVWDn");
@@ -655,8 +657,9 @@ module.exports = {
           phone: order.phone,
           regnum: order.regnum,
           altnum: order.altnum,
-          coupon: order.coupon,
+         
         },
+        coupon: order.coupon,
         userId: objectId(order.userId),
         paymentMethod: order.paymentMethod,
         productId:products._id,
@@ -722,7 +725,6 @@ module.exports = {
     
     return new Promise(async(resolve,reject)=>{
       let order= await db.get().collection(collection.ORDER_COLLECTION).findOne({_id:objectId(orderId)})
-      console.log('oddddddddddddddddddeeeeeeeeeeeeeeeeeeraaaaaaaaaaa',order)
       if (order.mode==='cart') {
         db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objectId(orderId),products:{$elemMatch:{item:objectId(proId)}}},
       {
@@ -738,6 +740,111 @@ module.exports = {
         })
       }
       
+    })
+  },
+  getUsersCount:()=>{
+    return new Promise(async(resolve,reject)=>{
+      db.get().collection(collection.USER_COLLECTIONS).find().count().then((count)=>{
+        resolve(count)
+      })
+    })
+  },
+  cancelOrderBuyNow:(productId,status,orderId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objectId(orderId)},
+      {
+        $set:{status:'Cancelled'}
+      }
+      ).then((response)=>{
+        db.get().collection(collection.PRODUCT_COLLECTION).updateOne({_id:objectId(productId)},
+        {
+          $inc:{quantity:1}
+        }
+        )
+        resolve(response)
+      })
+    })
+  },
+  cancelOrderCart:(productId,status,orderId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objectId(orderId),products:{$elemMatch:{item:objectId(productId)}}},
+      {
+        $set:{"products.$.status":'Cancelled'}
+      }
+      ).then(()=>{
+        resolve()
+      })
+    })
+  },
+  addCoupons:(couponData)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.COUPON_COLLECTION).insertOne(couponData).then(()=>{
+        resolve()
+      })
+    })
+  },
+  getAllCoupons:()=>{
+    return new Promise(async(resolve,reject)=>{
+     await db.get().collection(collection.COUPON_COLLECTION).find().toArray().then((coupons)=>{
+       resolve(coupons)
+     })
+    })
+  },
+  deleteCoupon:(couponId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.COUPON_COLLECTION).deleteOne({_id:objectId(couponId)}).then(()=>{
+        resolve()
+      })
+    })
+  },
+  checkCouponExistBuyNow:(couponCode,productPrice,userId)=>{
+    
+    return new Promise(async(resolve,reject)=>{
+      let coupon= await db.get().collection(collection.COUPON_COLLECTION).findOne({coupon:couponCode})
+     if (coupon) {
+      let couponCheckingInOrder = await db.get().collection(collection.ORDER_COLLECTION).findOne({userId:objectId(userId),coupon:coupon.coupon})
+      if (couponCheckingInOrder === null) {
+       var couponSuccess = {}
+       couponSuccess.discountPrice =(productPrice*coupon.percentage)/100
+       couponSuccess.finalPrice = productPrice - ((productPrice*coupon.percentage)/100)
+
+       resolve(couponSuccess)
+      }else{
+        let userUsedCoupon ={}
+        userUsedCoupon.usedCoupon = 'true'
+        resolve(userUsedCoupon)
+      }
+       
+     }else{
+       let validCoupon = {}
+       validCoupon.InvalidCoupon ='true'
+       resolve(validCoupon)
+     }
+    })
+  },
+
+  checkCouponExistCart:(couponCode,cartPrice,userId)=>{
+    return new Promise(async(resolve,reject)=>{
+      let coupon = await db.get().collection(collection.COUPON_COLLECTION).findOne({coupon:couponCode})
+      if(coupon){
+        console.log(coupon)
+        let isCouponUsed = await db.get().collection(collection.ORDER_COLLECTION).findOne({userId:objectId(userId),coupon:coupon.coupon})
+        if(isCouponUsed === null){
+          let couponSuccess ={}
+          couponSuccess.discountPrice = (cartPrice * coupon.percentage)/100
+          couponSuccess.finalPrice = cartPrice - ((cartPrice * coupon.percentage)/100)
+          resolve(couponSuccess)
+          
+        }else{
+          let couponUsed={}
+          couponUsed.used='true'
+          resolve(couponUsed)
+        }
+      }else{
+        let invalidCoupon ={}
+        invalidCoupon.invalid='true'
+        resolve(invalidCoupon)
+      }
     })
   }
 };

@@ -29,23 +29,14 @@
                         {{#each address}}
                             
                         
-                        <div class="col-md-12 pt-2  float-left">
+                        <div class="col-md-12 pt-2 ">
                                         
                             <input id="{{this._id}}" type="radio" onchange="a('{{this.address.firstname}}','{{this.address.lastname}}','{{this.address.housename}}','{{this.address.streetaddress}}','{{this.address.address}}','{{this.address.town}}','{{this.address.state}}','{{this.address.zipcode}}','{{this.address.phone}}','{{this.address.altnum}}')" id="{{this.address._id}}" name="address" value="{{this.address._id}}">
                             <label  for="{{this._id}}">{{this.address.firstname}},{{this.address.lastname}},{{this.address.housename}},{{this.address.streetaddress}},{{this.address.address}},{{this.address.town}},{{this.address.state}} <br> {{this.address.zipcode}},{{this.address.phone}},{{this.address.altnum}}</label>            
                                         
                         </div>
                         {{/each}}
-                        {{!-- <dl>
-                            <dt>1.Home</dt>
-                            <dd>Black hot drink</dd>
-                            <dt><input type="checkbox" id="useaddress" placeholder="Use"><span style="color: #007eff;">
-                                    Use this Address</span></dt><br>
-                            <dt>2.Office</dt>
-                            <dd>White cold drink</dd>
-                            <dt><input type="checkbox" id="useaddress" placeholder="Use"><span style="color: #007eff;">
-                                    Use this Address</span></dt><br>
-                        </dl> --}}
+                       
                     </div>
 
                 </div>
@@ -125,8 +116,9 @@
                     <div class="pcb-content">
                         <p>Enter your coupon code if you have one</p>
                         <div class="pcb-cuppon-input clearfix">
-                            <input type="text" name="coupon" placeholder="Coupon code">
-                            <button class="checkout-page-button hvr-bs">Apply</button>
+                            <div id="errorDiv"></div>
+                            <input type="text" id="couponCode" name="coupon" placeholder="Coupon code">
+                            <button type="button" onclick="checkCoupon('{{productPrice}}')" class="checkout-page-button hvr-bs">Apply</button>
                         </div>
                     </div>
                 </div>
@@ -135,9 +127,11 @@
                     <div class="yob-content">
                         <ul>
                             <li class="clearfix">Cart Subtotal <span style="font-weight: bolder;font-size: 20px;">₹
-                                    {{totalCartPrice}}</span></li>
+                                    {{productPrice}}</span></li>
+                             <li class="order-total clearfix">discount Price<span id="totaldiscount">₹000</span></li>
                             <li class="clearfix">Shipping and Handling <span>Free Shipping</span></li>
-                            <li class="order-total clearfix">Order Total <span>₹{{totalCartPrice}}</span></li>
+                            <li class="order-total clearfix">Order Total <span id="totalPrice">{{productPrice}}</span></li>
+                            <input type="hidden" name="totalfinalPrice" id="totalfinalPrice" value="{{productPrice}}">
                         </ul>
                     </div>
                 </div>
@@ -163,6 +157,7 @@
                                 <button class="checkout-page-button hvr-bs">Place order</button>
                             </div>
                         </div>
+                       
                     </div>
                 </div>
             </div>
@@ -186,23 +181,7 @@
 </script>
 
 <script>
-    {{!-- $("#buyNow-checkout-form").submit((e)=>{
-        console.log('yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyoooooooooooooooooooooooooooooooooooooooooooo')
-        e.preventDefault()
-        $.ajax({
-            url:'/buyNowplace-order',
-            method:'post',
-            data:$('#buyNow-checkout-form').serialize(),
-            success:(response)=>{
-               
-                if(response.codSuccess){
-                    location.href='/ordersuccess'
-                }else{
-                    razorpayPayment(response)
-                }
-            }
-        })
-    }) --}}
+    
 
     function razorpayPayment(order){
         var options = {
@@ -246,6 +225,31 @@
                 }else{
                     alert('payment failed')
                 }
+            }
+        })
+    }
+</script>
+
+<script>
+    function checkCoupon(productPrice){
+       
+        let couponCode =document.getElementById('couponCode').value
+        $.ajax({
+            url:'/checkCoupon/'+couponCode+'/'+productPrice,
+            method:'get',
+            success:(response)=>{
+                console.log(response)
+                if(response.usedCoupon){
+                    document.getElementById('errorDiv').innerHTML=' <span class="text-danger">Coupon already used!!</span>'
+                }else if(response.InvalidCoupon){
+                    document.getElementById('errorDiv').innerHTML=' <span class="text-danger">Enter a valid coupon!!</span>'
+                }else{
+                    document.getElementById('totaldiscount').innerHTML ='₹'+ response.discountPrice
+                document.getElementById('totalPrice').innerHTML ='₹'+ parseInt(response.finalPrice)
+                 document.getElementById('totalfinalPrice').value =parseInt(response.finalPrice)
+                }
+                
+                
             }
         })
     }

@@ -67,7 +67,7 @@ p {
     margin: 0;
     letter-spacing: 1px;
     font-size: 15px;
-    line-height: 1.9;
+    /* line-height: 1.9; */
     color: #999;
     font-family: 'Open Sans', sans-serif;
 }

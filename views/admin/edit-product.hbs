@@ -23,10 +23,12 @@
                       <label for="exampleInputEmail1" class="form-label ">Brand</label><br>
                       {{!-- <input type="text" name="brand" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp"> --}}
                       <select name="brand"  class="form-control text-center" value="{{product.brand}}" id="exampleInputEmail1" aria-describedby="emailHelp">
-                        <option value="">Select brand</option>
-                        <option value="rolex">Rolex</option>
-                        <option value="titan">Titan</option>
-                        <option value="fastrack">Fastrack</option>
+                        {{#each category}}
+                          
+                        
+                        <option value="{{this.name}}">{{this.name}}</option>
+                        
+                        {{/each}}
 
                       </select>
                     </div>

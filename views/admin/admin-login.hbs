@@ -7,13 +7,17 @@
                     <h2 class="text-center">ADMIN LOGIN</h2>
   <div class="mb-3">
     <label for="exampleInputEmail1" class="form-label">Admin id</label>
-    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+    <input type="text" class="form-control" name="adminId" id="exampleInputEmail1" aria-describedby="emailHelp">
    
   </div>
   <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Password</label>
-    <input type="password" class="form-control" id="exampleInputPassword1">
+    <label for="exampleInputPassword1"  class="form-label">Password</label>
+    <input type="password" name="password" class="form-control" id="exampleInputPassword1">
   </div>
+  {{#if loginErr}}
+     <span class="text-danger">Invalid UserId or Password</span>
+  {{/if}}
+ 
   <div >
                         {{!-- <a href="/" style="text-decoration: none;">Forgot password?</a><br><br> --}}
                         
