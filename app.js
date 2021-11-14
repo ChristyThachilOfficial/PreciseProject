@@ -59,6 +59,41 @@ Handlebars.registerHelper('hello',function(context,options,price){
   return data
 });
 
+Handlebars.registerHelper('wishlistADDtocart',function(context,options,price){
+
+  for(key in context){
+ 
+    if(options.toString() === context[key].item.toString()){
+      var inp=true;
+      break;
+    }else{
+      var inp = false  
+    }
+  }
+  if (inp===true) {
+    var data =`<a href="/cart" class="btn btn-primary mt-2" >View cart</a>`
+  }else{
+    var data=`<a onclick="addToCart('${options}','${price}')" class="btn btn-primary mt-2 text-white"  ">Add to cart</a>`
+  }
+  return data
+});
+
+Handlebars.registerHelper('checkArrayLengthPDF',function(array){
+  if(array.length >= 1){
+
+    return data = '<button class="btn btn-success" onclick="getPdf()">Download PDF</button>'
+    
+  }
+})
+
+Handlebars.registerHelper('checkArrayLengthXLS',function(array){
+  if(array.length >= 1){
+    return data = '<button class="btn btn-success" onclick="getspreadSheet()">Download XLS</button>'
+  }
+})
+
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

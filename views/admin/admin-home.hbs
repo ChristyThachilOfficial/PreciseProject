@@ -77,25 +77,45 @@
               </div>
             </div>
             {{!-- ccccccccccccchhhhhhhhhhhhhhart tryingggggggggggggggg --}}
+            
           <div class="row mt-5">
-            <div class="col-md-2">
-
-            </div>
-            <div class="col-md-8">
-              <h1 class="text-center">USER ORDERS</h1>
+            <h3 class="text-center mb-5">USER ORDERS</h3>
+            <div class="col-md-1"></div>
+            <div class="col-md-6 mb-3" style="background-color: rgb(37, 12, 12);">
+              
               <canvas id="myChart" width="500" height="210"></canvas>
             </div>
-            <div class="row mt-5">
-             <div class="col-md-1">
+          
+            <div class="col-md-1"></div>
 
-             </div>
-              <div class="col-md-4 mt-5">
+
+            <div class="col-md-4 " style="background-color: rgb(255, 255, 255);">
                 <canvas id="ppp" width="500" height="210"></canvas>
               </div>
-            </div>
+
+
+            
             
           </div>
         
+
+          <div class="row mt-5">
+             <h3 class="text-center mb-5">PAYMENT METHOD</h3>
+            <div class="col-md-1"></div>
+            
+             <div class="col-md-6" style="background-color: rgb(255, 255, 255);">
+              
+              <canvas id="paymentMethod" width="500" height="210"></canvas>
+            </div>
+
+            <div class="col-md-1">
+
+            </div>
+            <div class="col-md-4" style="background-color: rgb(37, 12, 12);">
+              <canvas id="graph4" width="500" height="210"></canvas>
+            </div>
+              
+            </div>
          
           </div>
          
@@ -124,7 +144,49 @@ const ctx = document.getElementById('myChart');
 const myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: ['total orders', 'cancelled orders', 'Delivered order', 'Placed order'],
+        labels: ['pending orders', 'cancelled orders', 'Delivered order', 'Placed order'],
+        datasets: [{
+            label: 'Orders',
+            data: [{{orderDataArray}}],
+            backgroundColor: [
+                'rgb(27, 232, 27)',
+                'rgb(232, 27, 27)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgb(27, 232, 232)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+
+
+
+
+
+<script>
+const ctx2 = document.getElementById('ppp');
+const myChart2 = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: ['pending orders', 'cancelled orders', 'Delivered order', 'Placed order'],
         datasets: [{
             label: 'Orders',
             data: [{{orderDataArray}}],
@@ -157,23 +219,57 @@ const myChart = new Chart(ctx, {
 });
 </script>
 
-
-
-
-
 <script>
-const ctx2 = document.getElementById('ppp');
-const myChart2 = new Chart(ctx2, {
-    type: 'doughnut',
+const ctx3 = document.getElementById('paymentMethod');
+const myChart3 = new Chart(ctx3, {
+    type: 'bar',
     data: {
-        labels: ['total orders', 'cancelled orders', 'Delivered order', 'Placed order'],
+        labels: ['Razorpay', 'COD', 'Paypal'],
         datasets: [{
-            label: 'Orders',
-            data: [{{orderDataArray}}],
+            label: 'paymentMethod',
+            data: [{{totalOrdersByPaymentmethod}}],
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
                 'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 5
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+
+<script>
+const ctx4 = document.getElementById('graph4');
+const myChart4 = new Chart(ctx4, {
+    type: 'pie',
+    data: {
+        labels: ['Razorpay', 'COD', 'Paypal'],
+        datasets: [{
+            label: 'paymentMethod',
+            data: [{{totalOrdersByPaymentmethod}}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
                 'rgba(75, 192, 192, 0.2)',
                 'rgba(153, 102, 255, 0.2)',
                 'rgba(255, 159, 64, 0.2)'

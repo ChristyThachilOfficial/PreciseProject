@@ -71,13 +71,30 @@
                                                     {{this.Quantity}}
                                                 </td>
 
+                                                
+
+
                                                 <td>
+                                                    
                                                    <select name="status" id="{{this.product._id}}" class="form-control text-center" onchange="updateStatus('{{this.product._id}}','{{../orderId}}')" >
+                                                        <option selected value="{{this.status}}">{{this.status}}</option>
+                                                        {{#eq this.status 'returned'}}
+
+                                                        {{else}}
+
+                                                        {{#eq this.status 'cancelled'}}
+
+                                                        {{else}}
+
+
                                                         <option value="cancelled">Cancelled</option>
-                                                        <option selected value="pending">Pending</option>
+                                                        <option  value="pending">Pending</option>
                                                         <option value="shipped">Shipped</option>
                                                         <option value="delivered">Delivered</option>
                                                         <option value="returned">Returned</option>
+
+                                                        {{/eq}}
+                                                        {{/eq}}
 
                                                     </select>
                                                 </td>
@@ -108,6 +125,7 @@
 
                                                 <td>
                                                    <select name="status" id="{{products.productId}}" class="form-control text-center" onchange="updateStatus('{{products.productId}}','{{orderId}}')" >
+                                                        <option selected value="{{products.status}}">{{products.status}}</option>
                                                         <option value="cancelled">Cancelled</option>
                                                         <option selected value="pending">Pending</option>
                                                         <option value="shipped">Shipped</option>
@@ -150,7 +168,10 @@
                 status:currentStatus
             },
             method:'post',
-           
+           success:(response)=>{
+               
+               location.reload()
+           }
         })
     }
 </script>

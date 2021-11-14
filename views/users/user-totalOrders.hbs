@@ -1,0 +1,78 @@
+<section>
+    <div class="container">
+
+        <center>
+            <h2 class="mt-4">MY ORDERS</h2>
+        </center>
+
+        <div class="row">
+            {{#each orderlist}}
+
+            {{#eq this.mode 'cart'}}
+
+            {{#each this.products }}
+            <div class="col-md-3">
+                <div class="d-flex justify-content-center container mt-5">
+                    <div class="card p-3 bg-white " style="width: 16rem; !important"><i class="fa fa-apple"></i>
+                        <div class="about-product text-center mt-2"><img height="150px"
+                                src="/productImages/{{this.item}}__1.jpg" width="150">
+                            <div>
+
+                                <h6 class="mt-0 text-black-50">{{this.brand}}</h6>
+                            </div>
+                        </div>
+                        <div class="stats mt-2">
+                            <div class="d-flex justify-content-between p-price"><span
+                                    style="font-weight: bold;">Price</span><span>₹{{this.price}}</span></div>
+                            <div class="d-flex justify-content-between p-price"><span
+                                    style="font-weight: bold;">Quantity</span><span>{{this.Quantity}}</span>
+                            </div>
+                            <div class="d-flex justify-content-between p-price"><span
+                                    style="font-weight: bold;">Status</span><span>{{this.status}}</span></div>
+                        </div>
+                        <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                            <span>Total</span><span>₹{{this.price}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+
+            {{/eq}}
+
+            {{#eq this.mode 'buynow'}}
+
+            <div class="col-md-3">
+                <div class="d-flex justify-content-center container mt-5">
+                    <div class="card p-3 bg-white " style="width: 16rem; !important"><i class="fa fa-apple"></i>
+                        <div class="about-product text-center mt-2"><img height="150px"
+                                src="/productImages/{{this.productId}}__1.jpg" width="150">
+                            <div>
+
+                                <h6 class="mt-0 text-black-50">{{this.brand}}</h6>
+                            </div>
+                        </div>
+                        <div class="stats mt-2">
+                            <div class="d-flex justify-content-between p-price"><span
+                                    style="font-weight: bold;">Price</span><span>₹{{this.price}}</span></div>
+                            <div class="d-flex justify-content-between p-price"><span
+                                    style="font-weight: bold;">Quantity</span><span>1</span>
+                            </div>
+                            <div class="d-flex justify-content-between p-price"><span
+                                    style="font-weight: bold;">Status</span><span>{{this.status}}</span></div>
+                        </div>
+                        <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                            <span>Total</span><span>₹{{this.price}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{/eq}}
+
+            {{/each}}
+
+
+        </div>
+    </div>
+</section>

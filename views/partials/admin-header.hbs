@@ -45,7 +45,7 @@
            <li class="nav-item ">
             <a class="nav-link" href="/admin/addcategory">
               <i class="material-icons">library_books</i>
-              <p>Category management</p>
+              <p>Brand management</p>
             </a>
           </li>
 
@@ -55,13 +55,36 @@
               <p>Coupons</p>
             </a>
           </li>
-         
-          <li class="nav-item ">
-            <a class="nav-link" href="/admin/salesReport">
-              <i class="material-icons">notifications</i>
-              <p>Sales report</p>
+          
+          <li class="nav-item dropdown show">
+            <a class="nav-link dropdown"  role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="material-icons">bubble_chart</i>
+              <p>Offer management</p>
             </a>
+			<div class="dropdown-menu bg-dark" style="width: 100%;" aria-labelledby="dropdownMenuLink">
+				<a class="dropdown-item text-white bg-dark" href="/admin/brandOffers">Brand offers</a>
+				<a class="dropdown-item text-white bg-dark " href="/admin/productOffers">Product offers</a>
+					
+
+			</div>
           </li>
+
+
+          <li class="nav-item dropdown show">
+            <a class="nav-link dropdown"  role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="material-icons">notifications</i>
+              <p>Report</p>
+            </a>
+			<div class="dropdown-menu bg-dark" style="width: 100%;" aria-labelledby="dropdownMenuLink">
+				<a class="dropdown-item text-white bg-dark" href="/admin/salesReport">Total Orders</a>
+				<a class="dropdown-item text-white bg-dark " href="/admin/deliveredOrders">Delivered orders</a>
+        <a class="dropdown-item text-white bg-dark " href="/admin/cancelledOrders">Cancelled orders</a>
+        <a class="dropdown-item text-white bg-dark " href="/admin/returnedOrders">Returned orders</a>
+					
+
+			</div>
+          </li>
+
            
         </ul>
       </div>
@@ -90,12 +113,12 @@
              
               <li class="nav-item">
                 <a href="/admin/logout" class="btn btn-primary">logout</a>
-                <a class="nav-link" href="javascript:void(0)">
+                {{!-- <a class="nav-link" href="javascript:void(0)">
                   <i class="material-icons">person</i>
                   <p class="d-lg-none d-md-block">
                     Account
                   </p>
-                </a>
+                </a> --}}
               </li>
             </ul>
           </div>

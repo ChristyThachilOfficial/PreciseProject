@@ -12,6 +12,7 @@
       <th scope="col">No.</th>
       <th scope="col">Coupon code</th>
       <th scope="col">Offer percentage</th>
+      <th scope="col">End date</th>
       <th scope="col">Action</th>
      
     </tr>
@@ -24,6 +25,7 @@
       <th scope="row">{{add @index '1'}}</th>
       <td>{{this.coupon}}</td>
       <td>{{this.percentage}}</td>
+      <td>{{this.endDate}}</td>
       <td><button class="btn btn-danger" onclick="deleteCoupon('{{this._id}}')">Delete</button></td>
 
     </tr>
@@ -31,16 +33,29 @@
   </tbody>
 </table>
 <form action="/admin/addCoupons" method="post" id="couponForm"><br><br>
+
 <label for="">COUPON NAME</label><br>
+{{#if couponExists}}
+<span style="color: red;">Entered coupon already exists</span><br>
+{{/if}}
 <input name="coupon" style="border-radius: 4px;" type="text"><br>
 <label for="">OFFER PERCENTAGE</label><br>
 <input name="percentage" style="border-radius: 4px;" type="number"><br>
+<label for="">END DATE</label><br>
+<input type="date" oninput="checkEndDate()" min="{{todayDate}}" name="endDate" id="endDate"><br>
 <button type="submit" class="btn btn-success">Add Coupons</button>
 </form>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+  function checkEndDate(){
+    let todaysDate = new Date().toISOString().slice(0,10)
+    document.getElementById('endDate').min = todaysDate
+  }
+</script>
 
 {{!-- data tables --}}
 <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css">
@@ -54,9 +69,30 @@
 } );
 </script>
 
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     function deleteCoupon(CouponId){
-        $.ajax({
+        const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: 'btn btn-success m-2',
+            cancelButton: 'btn btn-danger'
+          },
+          buttonsStyling: false
+        })
+
+        swalWithBootstrapButtons.fire({
+          title: 'Are you sure?',
+          text: "You really want to delete this COUPON!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'No, cancel!',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
             url:'/admin/deleteCoupon/'+CouponId,
             method:'get',
             success:()=>{
@@ -65,8 +101,21 @@
                 location.reload();
             }
         })
+           
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            swalWithBootstrapButtons.fire(
+              'Cancelled',
+              'COUPON not deleted :)',
+              'error'
+            )
+          }
+        })
     }
 </script>
+
 
 
  {{!-- adddddddddddddddmmmmmmmmmmmminnnnnnnnnnn file validation --}}
@@ -77,9 +126,25 @@
     $(document).ready(function(){
       $('#couponForm').validate({
         rules:{
-          category:{
+          coupon:{
+            required:true
+          },
+          percentage:{
+            required:true,
+            digits:true,
+            maxlength:2
+          },
+          endDate:{
             required:true
           }
+        },
+        messages:{
+          percentage:{
+            maxlength:'percentage should be under hundred'
+          },
+          endDate:'Please double check your date'
+
+          
         }
       })
     })

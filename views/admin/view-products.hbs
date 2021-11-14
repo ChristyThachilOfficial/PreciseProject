@@ -57,8 +57,9 @@
                             {{this.price}}
                           </td>
                           <td >
-                            <a href="/admin/editproducts/{{this._id}}" class="btn btn-success">Edit</a>
-                            <a href="/admin/deleteproducts/{{this._id}}"  onclick="return confirm('are you sure want to delete {{this.productname}}')" class="btn btn-danger ">Delete</a>
+                            
+                            <a href="/admin/editproducts/{{this._id}}" class="btn btn-success"><i class="material-icons">edit</i></a>
+                            <a  onclick="deleteProduct('{{this._id}}')" class="btn btn-danger "><i class="material-icons">delete</i></a>
                           </td>
                             
                          
@@ -89,6 +90,37 @@
   $(document).ready( function () {
     $('#myTable').DataTable();
 } );
+</script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  function deleteProduct(prodId){
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url:'/admin/deleteproducts/'+prodId,
+          method:'get',
+          success:()=>{
+             Swal.fire(
+          'Deleted!',
+          'Your file has been deleted.',
+          'success',
+          location.reload()
+        )
+          }
+        })
+       
+      }
+})
+  }
 </script>
 
 

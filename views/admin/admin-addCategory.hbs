@@ -7,31 +7,34 @@
             </div>
             <div class="col-md-8">
               <table class="table mt-5" id="myTable">
-  <thead>
-    <tr>
-      <th scope="col">No.</th>
-      <th scope="col">Brand</th>
-      <th scope="col">Action</th>
-     
-    </tr>
-  </thead>
-  <tbody>
-      {{#each category}}
-          
-      
-    <tr>
-      <th scope="row">{{add @index '1'}}</th>
-      <td>{{this.name}}</td>
-      <td><button class="btn btn-danger" onclick="deleteCategory('{{this._id}}')">Delete</button></td>
+                    <thead>
+                      <tr>
+                        <th scope="col">No.</th>
+                        <th scope="col">Brand</th>
+                        <th scope="col">Action</th>
+                      
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {{#each category}}
+                            
+                        
+                      <tr>
+                        <th scope="row">{{add @index '1'}}</th>
+                        <td>{{this.name}}</td>
+                        <td><button class="btn btn-danger" onclick="deleteCategory('{{this._id}}')">Delete</button></td>
 
-    </tr>
-   {{/each}}
-  </tbody>
-</table>
-<form action="/admin/addCategory" method="post" id="categoryForm"><br><br>
-<input name="category" style="border-radius: 4px;" type="text"><br>
-<button type="submit" class="btn btn-success">Add Category</button>
-</form>
+                      </tr>
+                    {{/each}}
+                    </tbody>
+                  </table>
+                <form action="/admin/addCategory" method="post" id="categoryForm"><br><br>
+                {{#if categoryExists}}
+                  <span style="color: red;">Category already exists</span><br>
+                {{/if}}
+                <input name="category" style="border-radius: 4px;" type="text"><br>
+                <button type="submit" class="btn btn-success">Add Category</button>
+                </form>
             </div>
         </div>
     </div>
@@ -49,16 +52,49 @@
 } );
 </script>
 
+
+
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     function deleteCategory(CategoryId){
-        $.ajax({
+        const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: 'btn btn-success m-2',
+            cancelButton: 'btn btn-danger'
+          },
+          buttonsStyling: false
+        })
+
+        swalWithBootstrapButtons.fire({
+          title: 'Are you sure?',
+          text: "You really want to delete this brand!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'No, cancel!',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+               $.ajax({
             url:'/admin/deleteCategory/'+CategoryId,
             method:'get',
             success:()=>{
-               
-                alert('category deleted');
                 location.reload();
             }
+        })
+           
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            swalWithBootstrapButtons.fire(
+              'Cancelled',
+              'brand not deleted :)',
+              'error'
+            )
+          }
         })
     }
 </script>

@@ -5,5 +5,8 @@ module.exports={
     ORDER_COLLECTION:'order',
     ADDRESS_COLLECTION:'address',
     CATEGORY_COLLECTION:'category',
-    COUPON_COLLECTION:'coupon'
+    COUPON_COLLECTION:'coupon',
+    WISHLIST_COLLECTION:'wishlist',
+    PRODUCTOFFER_COLLECTION : 'productOffer',
+    BRANDOFFER_COLLECTION : 'brandOffer'
 }

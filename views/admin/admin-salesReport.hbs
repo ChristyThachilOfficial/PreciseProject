@@ -2,10 +2,20 @@
    <div class="container">
           <div class="row">
             <div class="col-md-12">
+              <div id="errorDiv"></div>
+              <form action="/admin/totalSalesBetweenDates" id="dateValidation" method="post">
+              <label for="startDate">From</label>
+              <input type="date" max="{{todayDate}}"  name="startDate" id="startDate"> 
+              <label for="endDate">To</label>
+              <input type="date" oninput="checkEndDate()" max="{{todayDate}}" name="endDate" id="endDate"> 
+              <input type="hidden" name="list" value="totalOrders" id="">
+              <button class="btn btn-primary" id="dateSubmit"  type="submit">Submit</button>
+              </form>
               <div class="card mt-5">
                 <div class="card-header card-header-primary">
+                  
                   <h4 class="card-title ">Order Table</h4>
-                  <p class="card-category">Currently ongoing orders</p>
+                  <p class="card-category">Total orders</p>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive">
@@ -29,12 +39,7 @@
                         
                         
                         
-                         {{!-- <th>
-                         Status
-                        </th> --}}
-                        <th>
-                         Action
-                        </th>
+                         
                       </thead>
                       <tbody >
                         {{#each orders}}
@@ -59,17 +64,7 @@
                           </td>
                           
                           
-                          {{!-- <td >
-
-                              {{this.products.status}}
-                           
-                            
-                          </td> --}}
-
-                           <td>
-                                <a href="/admin/view-orderedproduct/{{this._id}}" class="btn btn-success">Products</a>
-                           
-                          </td>
+                         
                             
                          
                         </tr>
@@ -80,8 +75,12 @@
                     
                   
                   </div>
-                  <button class="btn btn-success" onclick="getPdf()">Download PDF</button>
-                  <button class="btn btn-success" onclick="getspreadSheet()">Download XLS</button>
+                   {{#checkArrayLengthPDF orders}}
+                  {{/checkArrayLengthPDF}}
+                  {{#checkArrayLengthXLS orders}}
+                  {{/checkArrayLengthXLS}}
+                  {{!-- <button class="btn btn-success" onclick="getPdf()">Download PDF</button>
+                  <button class="btn btn-success" onclick="getspreadSheet()">Download XLS</button> --}}
                 </div>
               </div>
             </div>
@@ -90,6 +89,21 @@
         </div>
         
 </section>
+
+
+<script>
+  function checkStartDate(){
+    let todaysDate = new Date().toISOString().slice(0,10)
+    document.getElementById('startDate').max = todaysDate
+  }
+  function checkEndDate(){
+    let todaysDate = new Date().toISOString().slice(0,10)
+    document.getElementById('endDate').max = todaysDate
+    document.getElementById('endDate').min = document.getElementById('startDate').value
+  }
+ 
+</script>
+
 
 
 {{!-- html2pdf --}}
@@ -123,3 +137,31 @@
     $('#myTable').DataTable();
 } );
 </script>
+
+{{!-- adddddddddddddddmmmmmmmmmmmminnnnnnnnnnn file validation --}}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js" defer></script>
+
+  <script>
+    $(document).ready(function(){
+      $('#dateValidation').validate({
+        rules:{
+          startDate:{
+            required:true
+          },
+          endDate:{
+            required:true,
+           
+          }
+        },
+       
+      })
+    })
+  </script>
+
+  <style>
+    .error{
+      color: red;
+    }
+  </style>
+

@@ -3,7 +3,7 @@
         <div class="row mt-5">
           <center>
           <div style="width: 50%;">
-                  <form class="mt-5" action="/admin/editproducts/{{product._id}}" method="POST" enctype="multipart/form-data">
+                  <form class="mt-5" id="editProduct" action="/admin/editproducts/{{product._id}}" method="POST" enctype="multipart/form-data">
 
                   <div class="mb-3 ">
                        <h2>Edit product</h2>
@@ -270,4 +270,50 @@
   
 </script>
 
- 
+ {{!-- adddddddddddddddmmmmmmmmmmmminnnnnnnnnnn file validation --}}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+
+ <script>
+  $(document).ready(function(){
+    $('#editProduct').validate({
+      rules:{
+        productname:{
+          required:true,
+          minlength:3
+        },
+        quantity:{
+          required:true,
+          digits:true,
+          
+        },
+        brand:{
+          required:true
+        },
+        price:{
+          required:true,
+          digits:true
+        },
+        offerprice:{
+          required:true,
+          digits:true
+        },
+        gender:{
+          required:true
+        },
+        description:{
+          required:true
+        },
+        
+
+
+      }
+    })
+  })
+</script>
+
+<style>
+  .error{
+    color: red;
+  }
+</style>

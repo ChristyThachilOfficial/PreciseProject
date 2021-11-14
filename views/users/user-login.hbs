@@ -8,6 +8,10 @@
     font-weight: bold;
     padding: 10px;">LOGIN</h4>
                     </div>
+                    {{#if passwordChangedSuccessfully}}
+                        <span class="text-success">Password changed successfully</span>
+                    {{/if}}
+                    
                     <div class="form-group">
                         <label for="exampleInputEmail1">Email address</label>
                         <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"

@@ -1,8 +1,8 @@
 <section style="margin-top: 150px;">
     <div class="container ">
         <div class="row ">
-            <div class="col-md-6 m-auto " style="margin-top: 150px; display: inline:  !important;;">
-                <form action="/loginotp" method="POST">
+            <div class="col-md-6 m-auto " style="margin-top: 150px; display: inline  !important;">
+                <form action="/loginotp" id="otpSendingForm" method="POST">
 
                      <div>
                         <h4 style="text-align: center; text-align: center;
@@ -18,12 +18,21 @@
                         <label for="exampleInputEmail1" class="p-2"> OTP</label>
                         <input type="tel" name="otp" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter otp number">
                         <input type="hidden" name="countryCode" value="{{countryCode}}">
-                        <input type="hidden" name="num" value="{{mobilenum}}">
+                        <input type="hidden" name="num" value="{{number}}">
                         
+                    </div>
+
+
+                    {{!-- otp timer setup --}}
+                    <div class="col-sm-12" style="text-align: center;" >
+                        <div id="counter">
+
+                        </div>
+                        <button style="border: none;background-color: white; color: #0d6efd;" id="resendButton" onclick="resendOTP('{{countryCode}}','{{number}}')" type="button" class="btn btn-outline-dark btn-lg px-5"disabled>Resend OTP</button>
                     </div>
                    
                    
-                   
+                  
                     <button style="width:100%;" type="submit" class="btn btn-primary mt-3">Submit</button> <br>
                    
                 </form>
@@ -31,3 +40,54 @@
         </div>
     </div>
 </section>
+
+
+<script>
+  var count = 10
+  function counter() {
+    document.getElementById("counter").innerHTML = `<span>Resend New OTP in: ${count}s</span>`
+    count = count - 1;
+    if (count >= 0) {
+      setTimeout(counter, 1000)
+    }
+  }
+    
+  //How remove the disalbed attribute to a button
+  function setDisabled() {
+    
+    document.getElementById('resendButton').disabled = false
+  }
+  
+  window.onload = counter();
+  window.onload = function () {
+    window.setTimeout(setDisabled, 10000);
+  }
+  function resendOTP(countryCode,mobile){
+    location.href = '/resend_OTP'
+  }
+
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>  
+<script>
+    $(document).ready(function(){
+        $('#otpSendingForm').validate({
+            rules:{
+                otp:{
+                    required:true,
+                    maxlength:4,
+                    minlength:4
+                }
+             },
+             messages:{
+               otp:'Enter valid OTP'
+             }
+        })
+    })
+</script>
+<style>
+  .error{
+    color: red !important;
+  }
+</style>

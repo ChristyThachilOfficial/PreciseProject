@@ -5,6 +5,8 @@ var productHelpers = require("../helpers/product-helpers");
 const keys = require("../config/keys");
 const { parse } = require("handlebars");
 const { response } = require("express");
+const { Db } = require("mongodb");
+const { token } = require("morgan");
 const twilio = require("twilio")(keys.accountsSID, keys.authToken);
 
 var loginHelper = (req, res, next) => {
@@ -14,14 +16,55 @@ var loginHelper = (req, res, next) => {
     res.redirect("/login");
   }
 };
+var move_cart = (req,res,next)=>{
+  req.session.move_cart = true;
+  next()
+}
+
+const move_wishlist = (req,res,next)=>{
+  req.session.move_wishlist = true;
+  next()
+}
+
+
+
+
 /* GET home page. */
 router.get("/", async function (req, res, next) {
+  let offerExpiredBrands =await productHelpers.getAllOfferValidityExpiredBrands()
+  
+  offerExpiredBrands.map((data)=>{
+     
+     productHelpers.deleteBrandOffer(data._id,data.brandName).then((brandProducts)=>{
+      brandProducts.map((data)=>{
+        productHelpers.updatePriceToRealPrice(data)
+      })
+     
+    })
+  })
+
+  let offerExpiredProducts = await productHelpers.getAllofferValidityExpiredProducts()
+  
+  offerExpiredProducts.map((data)=>{
+    productHelpers.deleteProductOffer(data._id,data.productName)
+  })
+
+
+  let ExpiredCoupons = await productHelpers.getValidityExpiredCoupons()
+  
+  ExpiredCoupons.map((data)=>{
+    userHelpers.deleteCoupon(data._id)
+  })
+
   if (req.session.loggedIn) {
     let user = req.session.user;
+    console.log('where is the user id i want to get that for lobin',req.session.user)
     let cart = await userHelpers.getCartProduct(req.session.user._id);
     let category=await productHelpers.getAllCategory()
     let cartCount = await userHelpers.getCartCount(req.session.user._id);
+    let wishlistProducts = await userHelpers.getWishListProducts(req.session.user._id)
     productHelpers.getallProducts().then((productsData) => {
+      console.log(productsData)
       res.render("users/user-home", {
         users: true,
         user: true,
@@ -30,7 +73,8 @@ router.get("/", async function (req, res, next) {
         cartCount,
         userrr: req.session.user,
         cart,
-        category
+        category,
+        wishlistProducts
       });
     });
   } else {
@@ -59,7 +103,34 @@ router.get("/login", (req, res, next) => {
     req.session.userblock = false;
   } else if (req.session.loggedIn) {
     res.redirect("/");
-  } else {
+  }else if(req.session.passwordChanged){
+    res.render("users/user-login", {
+      users: false,
+      loginError: req.session.loginErr,
+      typeOfPersonUser: true,
+      passwordChangedSuccessfully :true
+    });
+    req.session.passwordChanged = false
+    
+  }
+   else {
+    let token=req.query.token
+    if(token=='guestToBuyNow'){
+    req.session.guestToBuyNow=true 
+    req.session.guestToBuyNowProdId=req.query.prodId
+    
+  }
+  let tokenCart = req.query.tokenCart
+  if(tokenCart === 'guestToCart'){
+    req.session.guestToCart = true
+    req.session.guestToCartDetails = { prodId : req.query.prodId,price:req.query.price}
+   
+  }
+  let tokenWishlist = req.query.tokenWishlist
+  if(tokenWishlist === 'guestToWishlist'){
+    req.session.guestToWishlist = true
+    req.session.guestToWishlistDetails = { prodId :req.query.prodId,price:req.query.price }
+  }
     res.render("users/user-login", {
       users: false,
       loginError: req.session.loginErr,
@@ -69,13 +140,19 @@ router.get("/login", (req, res, next) => {
   }
 });
 
-//login with otp
+
+
+
+
+//login with otp loginwithotp1
 router.get("/loginwithotp", (req, res, next) => {
+  console.log('we have reached our first destiny 🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚')
   if (req.session.loginErr) {
     res.render("users/user-loginWithNumber", {
       typeOfPersonUser: true,
       users: false,
       loginError: req.session.loginErr,
+      
     });
     req.session.loginErr = false;
   } else {
@@ -86,13 +163,16 @@ router.get("/loginwithotp", (req, res, next) => {
   }
 });
 
-//post login otp
+//post login otp loginwithotp2 here twilio gets the user number
 router.post("/loginwithotp", async (req, res, next) => {
+  console.log('we have reached to our second destiny 😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎')
   mob = req.body.countryCode + req.body.mob;
   mobile = parseInt(mob);
-  let user = await userHelpers.findUser(req.body.mob);
-
+  let user = await userHelpers.findUser(req.body.countryCode,req.body.mob);
   if (user) {
+    req.session.userMobileNumber = {countryCode : user.countryCode  , number :user.number}
+    let countryCode = req.session.userMobileNumber.countryCode
+    let number = req.session.userMobileNumber.number
     twilio.verify
       .services(keys.ServiceID)
       .verifications.create({ to: "+" + mobile, channel: "sms" })
@@ -100,8 +180,8 @@ router.post("/loginwithotp", async (req, res, next) => {
         res.render("users/user-loginWithOtpVerify", {
           typeOfPersonUser: true,
           users: false,
-          mobilenum: req.body.mob,
-          countryCode: req.body.countryCode,
+          countryCode,
+          number
         });
       })
       .catch((err) => {});
@@ -111,8 +191,13 @@ router.post("/loginwithotp", async (req, res, next) => {
   }
 });
 
-//post otp verify
+
+
+
+
+//post otp verify loginwithotp3 here the user send his otp 
 router.post("/loginotp", (req, res, next) => {
+  console.log('this is our final destiny....................❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️')
   let otp = req.body.otp;
   let countryCode = req.body.countryCode;
   let number = req.body.num;
@@ -123,22 +208,54 @@ router.post("/loginotp", (req, res, next) => {
     .then((verification_check) => {
       console.log(verification_check.status);
       if (verification_check.status == "approved") {
-        userHelpers.findUser(number).then((response) => {
+        userHelpers.findUser(countryCode,number).then((response) => {
+          req.session.userMobileNumber = false
           req.session.user = response;
           req.session.loggedIn = true;
           res.redirect("/");
         });
       } else {
+        console.log('user daaaaaaaaaaaaaata njn sessionill eduthu njan arrrrrrra mwo',req.session.userMobileNumber)
+        let countryCode = req.session.userMobileNumber.countryCode
+        let number = req.session.userMobileNumber.number
         otpError = true;
         res.render("users/user-loginWithOtpVerify", {
           typeOfPersonUser: true,
           users: false,
           otpError,
+          countryCode,
+          number
         });
         otpError = false;
       }
     });
 });
+
+
+//resend otp
+router.get('/resend_OTP',(req,res,next)=>{
+  if(req.session.loggedIn){
+    res.redirect('/')
+  }else{
+  let countryCode = req.session.userMobileNumber.countryCode
+  let number = req.session.userMobileNumber.number
+  let mobile = parseInt(req.session.userMobileNumber.countryCode + req.session.userMobileNumber.number)
+  twilio.verify
+      .services(keys.ServiceID)
+      .verifications.create({ to: "+" + mobile, channel: "sms" })
+      .then((verification) => {
+        res.render("users/user-loginWithOtpVerify", {
+          typeOfPersonUser: true,
+          users: false,
+          countryCode,
+          number
+        });
+      })
+      .catch((err) => {});
+  }
+  
+
+})
 
 //POST login page
 router.post("/login", async (req, res, next) => {
@@ -150,7 +267,21 @@ router.post("/login", async (req, res, next) => {
       if (req.session.user.block == "false") {
         req.session.userblock = true;
         res.redirect("/login");
-      } else {
+      }else if (req.session.move_cart){
+        res.redirect("/cart");
+        req.session.move_cart = false
+      }else if(req.session.move_wishlist){
+        res.redirect('/wishlist') 
+        req.session.move_wishlist = false
+      }else if(req.session.guestToBuyNow)
+      { 
+        res.redirect('/buynow/'+req.session.guestToBuyNowProdId)
+      }else if( req.session.guestToCart){
+        res.redirect('/add-to-cart/'+req.session.guestToCartDetails.prodId+'/'+req.session.guestToCartDetails.price)
+      }else if(req.session.guestToWishlist){
+        res.redirect('/wishlist/'+req.session.guestToWishlistDetails.prodId+'/'+req.session.guestToWishlistDetails.price)
+      }
+       else {
         req.session.userblock = false;
         res.redirect("/");
       }
@@ -247,18 +378,27 @@ router.get("/forgotpassword", (req, res, next) => {
   if (req.session.loggedIn) {
     res.redirect("/");
   } else {
-    res.render("users/user-forgotpassword", { typeOfPersonUser: true });
+    if(req.session.userNumberNotFound){
+      res.render("users/user-forgotpassword", { typeOfPersonUser: true, userNumberNotFound:true });
+      req.session.userNumberNotFound = false
+    }else{
+      res.render("users/user-forgotpassword", { typeOfPersonUser: true });
+    }
+    
   }
 });
 
 router.post("/forgotpassword", (req, res, next) => {
   mobile1 = req.body.countryCode + req.body.mob;
-  mobile = parseInt(mobile1);
-  console.log(mobile);
   userHelpers
     .findNumber(req.body)
     .then((response) => {
       if (response) {
+        console.log('response in the user router',response)
+        req.session.userMobileNumber = {countryCode : response.countryCode  , number :response.number}
+        let countryCode = req.session.userMobileNumber.countryCode
+        let number = req.session.userMobileNumber.number
+        let mobile = parseInt( countryCode + number)
         req.session.userRegnum = response;
         console.log(req.session.userRegnum);
         console.log(response);
@@ -269,7 +409,10 @@ router.post("/forgotpassword", (req, res, next) => {
           .catch((err) => {
             console.log("Teh err is : ", err);
           });
-        res.render("users/user-otpverify", { typeOfPersonUser: true, mobile });
+        res.render("users/user-otpverify", { typeOfPersonUser: true, countryCode , number });
+      }else{
+        req.session.userNumberNotFound = true
+        res.redirect('/forgotpassword')
       }
     })
     .catch((err) => {
@@ -278,31 +421,53 @@ router.post("/forgotpassword", (req, res, next) => {
 });
 
 router.post("/otpverify", (req, res) => {
-  mobile = req.body.num;
+  let countryCode = req.session.userMobileNumber.countryCode
+  let number = req.session.userMobileNumber.number
+  let mobile = parseInt( countryCode + number)
   twilio.verify
     .services(keys.ServiceID)
-    .verificationChecks.create({ to: "+" + req.body.num, code: req.body.otp })
+    .verificationChecks.create({ to: "+" + mobile, code: req.body.otp })
     .then((verification_check) => {
       console.log(verification_check.status);
       if (verification_check.status == "approved") {
         res.render("users/user-changepassword", {
-          mobile,
+          countryCode,
+          number,
           typeOfPersonUser: true,
         });
       } else {
+        
         otpError = true;
         res.render("users/user-otpverify", {
           typeOfPersonUser: true,
-          mobile,
-          otpError,
+          countryCode,
+          number,
+          otpError
         });
         otpError = false;
       }
     });
 });
 
+//resend otp password change
+router.get('/resend_OTP_CHANGEPASSWORD',(req,res,next)=>{
+  let countryCode = req.session.userMobileNumber.countryCode
+  let number = req.session.userMobileNumber.number
+  let mobile = parseInt(req.session.userMobileNumber.countryCode + req.session.userMobileNumber.number)
+  twilio.verify
+  .services(keys.ServiceID)
+  .verifications.create({ to: "+" + mobile, channel: "sms" })
+  .then((verification) => console.log(verification.sid))
+  .catch((err) => {
+    console.log("Teh err is : ", err);
+  });
+res.render("users/user-otpverify", { typeOfPersonUser: true, countryCode , number });
+  
+})
+
 //product single view
 router.get("/singleview/:id", async (req, res, next) => {
+  let category=await productHelpers.getAllCategory()
   if (req.session.loggedIn) {
     let proId = req.params.id;
     let cart = await userHelpers.getCartProduct(req.session.user._id);
@@ -316,6 +481,7 @@ router.get("/singleview/:id", async (req, res, next) => {
         cartCount,
         cart,
         user: req.session.user,
+        category
       });
     });
   } else {
@@ -325,6 +491,7 @@ router.get("/singleview/:id", async (req, res, next) => {
         users: true,
         typeOfPersonUser: true,
         productDetails,
+        category
       });
     });
   }
@@ -333,13 +500,14 @@ router.get("/singleview/:id", async (req, res, next) => {
 //post change password
 router.post("/changepassword", (req, res, next) => {
   let passDetails = req.body;
-  let oldDetails = req.session.userRegnum;
+  let mobile = req.session.userMobileNumber.number;
 
   userHelpers
-    .changePassword(passDetails, oldDetails)
+    .changePassword(passDetails,mobile )
     .then((response) => {
       if (response) {
-        res.redirect("/");
+        req.session.passwordChanged = true
+        res.redirect("/login");
       }
     })
     .catch((err) => {
@@ -349,6 +517,16 @@ router.post("/changepassword", (req, res, next) => {
 
 //add to cart
 router.get("/add-to-cart/:id/:price", loginHelper,async (req, res, next) => {
+ if( req.session.guestToCart){
+  let brandName = await productHelpers.getBrandName(req.params.id)
+  let totalQuantity =await productHelpers.getTotalQuantity(req.params.id)
+  req.session.guestToCart = false
+   userHelpers
+     .addToCart(req.params.id, req.session.user._id, req.params.price,totalQuantity,brandName)
+     .then(() => {
+       res.redirect('/cart');
+     });
+ }else{
   let brandName = await productHelpers.getBrandName(req.params.id)
  let totalQuantity =await productHelpers.getTotalQuantity(req.params.id)
   userHelpers
@@ -356,16 +534,18 @@ router.get("/add-to-cart/:id/:price", loginHelper,async (req, res, next) => {
     .then(() => {
       res.json({ status: true });
     });
+ }
+  
 });
  
 //get cart product
-router.get("/cart", async (req, res, next) => {
-  if (req.session.loggedIn) {
+router.get("/cart",move_cart,loginHelper, async (req, res, next) => {
+  req.session.move_cart=false
+  let category=await productHelpers.getAllCategory()
+  
     let cartCount = await userHelpers.getCartCount(req.session.user._id);
 
     let products = await userHelpers.getCartProduct(req.session.user._id);
-
-    
     if (products) {
       let totalCartPrice = await userHelpers.getAllCartamount(
         req.session.user._id
@@ -377,29 +557,32 @@ router.get("/cart", async (req, res, next) => {
         products,
         cartCount,
         totalCartPrice,
+        category
       });
     } else {
       res.render("users/user-cart", {
         typeOfPersonUser: true,
         user: true,
         users: true,
+        category
       });
     }
-  } else {
-    res.redirect("/login");
-  }
+ 
 });
 
 //change product quantity
-router.post("/changeproductquantity", async (req, res, next) => {
-  userHelpers.changeProductQuantity(req.body).then((response) => {
-    console.log("response in user router", response);
+router.post("/changeproductquantity",loginHelper, async (req, res, next) => {
+  
+  userHelpers.changeProductQuantity(req.body).then(async(response) => {
+    let totalCartPrice = await userHelpers.getAllCartamount(req.session.user._id)
+    response.grandTotal = totalCartPrice
     res.json(response);
   });
 });
 
 //get payment page
 router.get("/checkout", async (req, res, next) => {
+  let category=await productHelpers.getAllCategory()
   if (req.session.loggedIn) {
     let totalCartPrice = await userHelpers.getAllCartamount(
       req.session.user._id
@@ -414,7 +597,8 @@ router.get("/checkout", async (req, res, next) => {
       totalCartPrice,
       user: req.session.user,
       address,
-      cartCount
+      cartCount,
+      category
     });
   } else {
     res.redirect("/login");
@@ -424,47 +608,66 @@ router.get("/checkout", async (req, res, next) => {
 //post place order
 
 router.post("/place-order",loginHelper, async (req, res, next) => {
+  console.log('the place orderllllllllllllllllllllllllllllll',req.body)
   
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = req.body.totalCartPrice
+  req.session.cart = true
   userHelpers.placeOrder(req.body, products, totalPrice).then((orderId) => {
     products.map((data)=>{
       productHelpers.updateTotalQuantityCart(data)
     })
     if (req.body["paymentMethod"] === "COD") {
       res.json({ codSuccess: true });
-    } else {
+    }
+     else{
       userHelpers.generateRazorpay(orderId, totalPrice).then((response) => {
         res.json(response);
       });
     }
+    
   });
 });
 
 //order success page
-router.get("/ordersuccess", loginHelper, (req, res, next) => {
+router.get("/ordersuccess", loginHelper, async(req, res, next) => {
+  let category=await productHelpers.getAllCategory()
+  let cartCount = await userHelpers.getCartCount(req.session.user._id);
+  if(req.session.cart){
+    userHelpers.deleteCartProducts(req.session.user._id)
+  }
+
   res.render("users/user-orderSuccess", {
     typeOfPersonUser: true,
     users: true,
     user: true,
     userrrr: req.session.user,
+    category,
+    cartCount
   });
 });
 
 //my order list
 router.get("/vieworders", loginHelper, async (req, res, next) => {
+  let category=await productHelpers.getAllCategory()
   let orders = await userHelpers.getUserOrders(req.session.user._id);
+  let cartCount = await userHelpers.getCartCount(req.session.user._id);
+  console.log(orders)
   res.render("users/user-myorders", {
     typeOfPersonUser: true,
     users: true,
     user: true,
     userrrr: req.session.user,
     orders,
+    category,
+    cartCount
   });
 });
 
 //view order products
 router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
+  let category=await productHelpers.getAllCategory()
+  let cartCount = await userHelpers.getCartCount(req.session.user._id);
   let orderId = req.params.id;
   let order =await userHelpers.findOrder(orderId)
   if (order.mode ==='cart') {
@@ -476,7 +679,9 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
       userrrr: req.session.user,
       products,
       cart:true,
-      orderId
+      orderId,
+      category,
+      cartCount
     });
   }else if (order.mode === 'buynow') {
     let products = await productHelpers.buyNowProduct(orderId)
@@ -496,7 +701,6 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
 
 //verify router
 router.post("/verify-payment", (req, res, next) => {
-  console.log(req.body);
   userHelpers
     .verifyPayment(req.body)
     .then(() => {
@@ -513,6 +717,7 @@ router.post("/verify-payment", (req, res, next) => {
 
 //userprofile
 router.get("/profile", loginHelper, async (req, res, next) => {
+  let category=await productHelpers.getAllCategory()
   let cartCount = await userHelpers.getCartCount(req.session.user._id);
   let userDetails = userHelpers
     .getUserDetails(req.session.user._id)
@@ -523,6 +728,7 @@ router.get("/profile", loginHelper, async (req, res, next) => {
         user: true,
         userData,
         cartCount,
+        category
       });
     });
 });
@@ -532,10 +738,15 @@ router.post("/updateuserdetails", loginHelper, async (req, res, next) => {
   await userHelpers
     .updateUserProfile(req.body, req.session.user._id)
     .then((id) => {
-      let image = req.files.image;
+      if(req.files){
+        let image = req.files.image;
       console.log("what is this id coming here", id);
       image.mv("../ProjectClone22/public/userImages/" + id + ".jpg");
       res.redirect("/profile");
+      }else{
+        res.redirect("/profile");
+      }
+      
     });
 });
 
@@ -545,6 +756,7 @@ router.get("/buynow/:id", loginHelper, async (req, res, next) => {
   let productPrice = parseInt(product.price)
   let address=await userHelpers.getUserAddress(req.session.user._id)
   let cartCount = await userHelpers.getCartCount(req.session.user._id);
+  let category=await productHelpers.getAllCategory()
   res.render("users/user-buynowCheckout", {
     typeOfPersonUser: true,
     users: true,
@@ -553,7 +765,8 @@ router.get("/buynow/:id", loginHelper, async (req, res, next) => {
     user: req.session.user,
     address,
     cartCount,
-    productPrice
+    productPrice,
+    category
   });
 });
 
@@ -561,9 +774,11 @@ router.get("/buynow/:id", loginHelper, async (req, res, next) => {
 router.post("/buyNowplace-order", loginHelper,async (req, res, next) => {
   let product = await productHelpers.getProduct(req.body.proId);
   let totalPrice = req.body.totalfinalPrice;
+  req.session.cart =false
   userHelpers
     .buyNowplaceOrder(req.body, product,totalPrice)
     .then((orderId) => {
+     
       if (req.body["paymentMethod"] === "COD") {
         res.json({ codSuccess: true });
       } else {
@@ -572,33 +787,72 @@ router.post("/buyNowplace-order", loginHelper,async (req, res, next) => {
         });
       }
     });
-    productHelpers.updateTotalQuantity(req.body.proId).then(()=>{
-      alert('hoooooooooooooooooooo')
-    })
+    productHelpers.updateTotalQuantity(req.body.proId)
 });
 
 //get invoice
-router.get("/invoice/:id", loginHelper, (req, res, next) => {
+router.get("/invoice/:id", loginHelper, async(req, res, next) => {
+  let category=await productHelpers.getAllCategory()
+  let cartCount = await userHelpers.getCartCount(req.session.user._id);
   userHelpers.findOrder(req.params.id).then((orderDetails) => {
     res.render("users/user-invoice", {
       typeOfPersonUser: true,
       users: true,
       user: true,
-      orderDetails
+      orderDetails,
+      category,
+      cartCount
     });
   });
 });
 
 //user add address
 router.get('/addAddress',loginHelper,async(req,res,next)=>{
+  let category=await productHelpers.getAllCategory()
   let cartCount = await userHelpers.getCartCount(req.session.user._id);
-  res.render('users/user-addAddress1',{typeOfPersonUser:true,users:true,user:true,cartCount})
+  let address=await userHelpers.getUserAddress(req.session.user._id)
+  if (req.session.limitExceeded) {
+    res.render('users/user-addAddress1',{typeOfPersonUser:true,users:true,user:true,cartCount,category,address,addressLimitExceeded:true})
+    req.session.limitExceeded=false
+  }else{
+    res.render('users/user-addAddress1',{typeOfPersonUser:true,users:true,user:true,cartCount,category,address})
+  }
+  
 })
 
+//delete user address
+router.get('/deleteAddress/:addressId',loginHelper,(req,res,next)=>{
+  userHelpers.deleteAddress(req.params.addressId).then(()=>{
+    res.json({status:true})
+  })
+})
+
+//edit user address
+router.get('/editAddress/:addressId',loginHelper,async(req,res,next)=>{
+  let category=await productHelpers.getAllCategory()
+    let cartCount = await userHelpers.getCartCount(req.session.user._id);
+  let address =await userHelpers.getUserAddressToEdit(req.params.addressId)
+  res.render('users/user-editAddress',{typeOfPersonUser:true,users:true,user:true,address,category,cartCount})
+})
+
+
+//post edit address
+router.post('/editAddress',loginHelper,(req,res,next)=>{
+  let addressId = req.body.addressId
+  userHelpers.updateUserAddress(addressId,req.body).then(()=>{
+    res.redirect('/addAddress')
+  })
+})
 //post user address
 router.post('/addAddress1',loginHelper,(req,res,next)=>{
- userHelpers.addUserAddress(req.body,req.session.user._id).then(()=>{
-   res.redirect('/')
+ userHelpers.addUserAddress(req.body,req.session.user._id).then((response)=>{
+   if(response.limitExceeded){
+     req.session.limitExceeded = true
+     res.redirect('/addAddress')
+   }else{
+    res.redirect('/addAddress')
+   }
+   
  })
 
 })
@@ -616,7 +870,7 @@ router.get('/shopbybrand/:name',async(req,res,next)=>{
     })
   }else{
     productHelpers.findProductByBrand(req.params.name).then((products)=>{
-      res.render('users/user-shopByBrand',{typeOfPersonUser:true,users:true,user:true,products,category,brandName})
+      res.render('users/user-shopByBrand',{typeOfPersonUser:true,users:true,user:false,products,category,brandName})
     })
   }
 
@@ -634,7 +888,7 @@ router.get('/formens',async(req,res,next)=>{
     })
   }else{
     productHelpers.getMensProduct().then((products)=>{
-      res.render('users/user-forMens',{typeOfPersonUser:true,users:true,user:true,products,category})
+      res.render('users/user-forMens',{typeOfPersonUser:true,users:true,user:false,products,category})
     })
   }
 
@@ -652,7 +906,7 @@ router.get('/forwomens',async(req,res,next)=>{
     })
   }else{
     productHelpers.getWomensProduct().then((products)=>{
-      res.render('users/user-forWomens',{typeOfPersonUser:true,users:true,user:true,products,category})
+      res.render('users/user-forWomens',{typeOfPersonUser:true,users:true,user:false,products,category})
     })
   }
 })
@@ -696,6 +950,65 @@ router.get('/checkCouponCart/:couponCode/:cartPrice',loginHelper,(req,res,next)=
     if(response){
       res.json(response)
     }
+  })
+})
+
+
+//wishlist
+router.get('/wishlist/:prodId/:prodPrice',loginHelper,(req,res,next)=>{
+  if(req.session.guestToWishlist){
+    req.session.guestToWishlis = false
+    userHelpers.addToWishlist(req.params.prodId,req.session.user._id,req.params.prodPrice).then((response)=>{
+      res.redirect('/wishlist')
+    })
+  }else{
+    userHelpers.addToWishlist(req.params.prodId,req.session.user._id,req.params.prodPrice).then((response)=>{
+    
+      res.json(response)
+    })
+  }
+  
+})
+
+//get wishlist
+router.get('/wishlist',move_wishlist,loginHelper,async(req,res,next)=>{
+  req.session.move_wishlist =false;
+  let category=await productHelpers.getAllCategory()
+  let cartCount = await userHelpers.getCartCount(req.session.user._id);
+ let wishListProducts = await userHelpers.getWishListProducts(req.session.user._id)
+ let cart = await userHelpers.getCartProduct(req.session.user._id);
+ 
+  res.render('users/user-wishlist',{typeOfPersonUser:true,users:true,user:true,wishListProducts,category,cartCount,cart})
+})
+
+//delete wishlist product
+router.get('/deleteWishlistProduct/:productId',loginHelper,(req,res,next)=>{
+  userHelpers.deleteWishlistProduct(req.params.productId,req.session.user._id).then(()=>{
+    res.json({status:true})
+  })
+})
+
+//get total orders
+router.get('/totalOrders',loginHelper,(req,res,next)=>{
+  productHelpers.getOrderedProductsByStatus().then((orderlist)=>{
+    console.log(orderlist)
+    res.render('users/user-totalOrders',{typeOfPersonUser:true,users:true,user:true,orderlist})
+  })
+ 
+})
+
+//paypal currency converter cart
+router.post('/currencycoverterCart/:amount',(req,res)=>{
+  userHelpers.convertAmount(req.params.amount).then((total)=>{
+    res.json(total)
+  })
+})
+
+//user product search
+router.get('/getSearchProducts/:text',(req,res,next)=>{
+  productHelpers.findSearchProducts(req.params.text).then((searchResult)=>{
+    console.log(searchResult)
+    res.json(searchResult)
   })
 })
 

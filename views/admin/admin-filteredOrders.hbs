@@ -1,0 +1,202 @@
+<section class="mt-5">
+   <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+                 <form action="/admin/totalSalesBetweenDates" id="dateValidation" method="post">
+              <label for="startDate">From</label>
+              <input type="date" oninput="checkStartDate()" name="startDate" id="startDate"> 
+              <label for="endDate">To</label>
+              <input type="date" oninput="checkEndDate()" name="endDate" id="endDate"> 
+              {{#if totalOrders}}
+                  <input type="hidden" name="list" value="totalOrders" id="">
+              {{/if}}
+              {{#if delivered}}
+                  <input type="hidden" name="list" value="deliveredOrders" id="">
+              {{/if}}
+              {{#if cancelled}}
+                  <input type="hidden" name="list" value="cancelled" id="">
+              {{/if}}
+              {{#if returned}}
+                     <input type="hidden" name="list" value="returnedOrders" id="">
+              {{/if}}    
+              <button class="btn btn-primary" type="submit">Submit</button>
+              </form>
+              <div class="card mt-5">
+                <div class="card-header card-header-primary">
+                  <h4 class="card-title "> Orders</h4>
+                  <p class="card-category">  orders</p>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table mt-5" id="myTable">
+                      <thead class=" text-primary">
+                        <th>
+                          No
+                        </th>
+                        <th>
+                          Order date
+                        </th>
+                         <th>
+                          Order Id
+                        </th>
+                        <th>
+                          User Id
+                        </th>
+                        <th>
+                          Price
+                        </th>
+                        
+                        
+                        
+                         {{!-- <th>
+                         Status
+                        </th> --}}
+                        {{!-- <th>
+                         Action
+                        </th> --}}
+                      </thead>
+                     
+                      <tbody >
+                        
+                          
+                        
+                        {{#each SortedArray}}
+                            
+                        
+                        <tr>
+                            
+                          <td>
+                           {{add @index '1'}}
+                          </td>
+                          <td>
+                            {{this.date}}
+                          </td>
+                           <td>
+                            {{this._id}}
+                          </td>
+                          <td>
+                            {{this.userId}}
+                          </td>
+                          <td>
+                           ₹<span>{{this.totalAmount}}</span>
+                          </td>
+                          
+                          
+                          {{!-- <td >
+
+                              {{this.products.status}}
+                           
+                            
+                          </td> --}}
+
+                           {{!-- <td>
+                                <a href="/admin/view-orderedproduct/{{this._id}}" class="btn btn-success">Products</a>
+                           
+                          </td> --}}
+                            
+                         
+                        </tr>
+                        {{/each}}
+
+                        
+                     
+                      </tbody>
+                      
+                    </table>
+                    
+                  
+                  </div>
+                  {{#checkArrayLengthPDF SortedArray}}
+                  {{/checkArrayLengthPDF}}
+                  {{#checkArrayLengthXLS SortedArray}}
+                  {{/checkArrayLengthXLS}}
+                  {{!-- <button class="btn btn-success" onclick="getPdf()">Download PDF</button>
+                  <button class="btn btn-success" onclick="getspreadSheet()">Download XLS</button> --}}
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+        
+</section>
+
+
+<script>
+  function checkStartDate(){
+    let todaysDate = new Date().toISOString().slice(0,10)
+     document.getElementById('startDate').max = todaysDate
+      document.getElementById('endDate').min =  document.getElementById('startDate').max  
+  }
+  function checkEndDate(){
+     let todaysDate = new Date().toISOString().slice(0,10)
+     document.getElementById('endDate').max = todaysDate
+    document.getElementById('endDate').min = document.getElementById('startDate').value
+  }
+ 
+</script>
+
+
+
+{{!-- html2pdf --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"defer></script>
+<script>
+  function getPdf(){
+    var element = document.getElementById('myTable');
+    html2pdf(element);
+  }
+
+ function getspreadSheet() {
+        $(document).ready(function () {
+            $("#myTable").table2excel({
+                filename: "Order Report.xls"
+            });
+        });
+
+    }
+</script>
+
+
+{{!-- data tables --}}
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables_themeroller.css">
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js" defer></script>
+
+<script>
+  $(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+
+{{!-- adddddddddddddddmmmmmmmmmmmminnnnnnnnnnn file validation --}}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js" defer></script>
+
+  <script>
+    $(document).ready(function(){
+      $('#dateValidation').validate({
+        rules:{
+          startDate:{
+            required:true
+          },
+          endDate:{
+            required:true,
+           
+          }
+        },
+        messages:{
+          startDate:'please double check your selected date',
+          endDate:'please double check your selected date'
+        }
+       
+      })
+    })
+  </script>
+
+  <style>
+    .error{
+      color: red;
+    }
+  </style>

@@ -5,6 +5,8 @@ var objectId = require("mongodb").ObjectId;
 const { response } = require("express");
 const Razorpay = require("razorpay");
 const { resolve } = require("path");
+const axios = require('axios')
+const ACCESS_KEY= '0def761e0fef0efed2cecd235b25aa04'
 var instance = new Razorpay({
   key_id: "rzp_test_Fu2xGkKojPgkAm",
   key_secret: "EjgkpT60XJNQQgBvrvqJVWDn",
@@ -29,11 +31,11 @@ module.exports = {
       }
     });
   },
-  findUser: (userMobile) => {
+  findUser: (userCountryCode,userMobile) => {
     return new Promise((resolve, reject) => {
       db.get()
         .collection(collection.USER_COLLECTIONS)
-        .findOne({ number: userMobile })
+        .findOne({ number: userMobile ,countryCode :userCountryCode})
         .then((response) => {
           resolve(response);
         });
@@ -222,12 +224,25 @@ module.exports = {
         .toArray();
 
       if (cartItems[0]) {
-        resolve(cartItems);
+        for (key in cartItems){
+          product = await db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(cartItems[key].item)})
+          db.get().collection(collection.CART_COLLECTION).updateOne({products:{$elemMatch:{item:objectId(product._id)}}},{
+            $set:{
+             'products.$.price':product.price,
+             'products.$.totalprice':cartItems[key].Quantity * product.price
+            }
+          }).then(()=>{
+            resolve(cartItems)
+          })
+        }
+        
       } else {
         resolve(false);
       }
     });
   },
+
+ 
   getCartProductForChecking: (userId) => {
     return new Promise(async (resolve, reject) => {
       var cart = await db
@@ -239,11 +254,13 @@ module.exports = {
     });
   },
   findNumber: (userNum) => {
+    console.log('userrrrrrrrrrrrrrrrrrrrrrnumber is ',userNum)
     return new Promise(async (resolve, reject) => {
       userNumber = await db
         .get()
         .collection(collection.USER_COLLECTIONS)
-        .findOne({ number: userNum.mob });
+        .findOne({ countryCode:userNum.countryCode,number: userNum.mob });
+        console.log(userNumber)
       if (userNumber) {
         resolve(userNumber);
       } else {
@@ -251,7 +268,11 @@ module.exports = {
       }
     });
   },
-  changePassword: (userData, oldData) => {
+
+
+
+  //ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+  changePassword: (userData, mobile) => {
     return new Promise(async (resolve, reject) => {
       userData.password = await bcrypt.hash(userData.password, 10);
 
@@ -259,7 +280,7 @@ module.exports = {
         .get()
         .collection(collection.USER_COLLECTIONS)
         .updateOne(
-          { _id: objectId(oldData._id) },
+          { number: mobile },
           { $set: { password: userData.password } }
         );
       resolve(dataUpdated);
@@ -363,7 +384,7 @@ module.exports = {
           paymentMethod: order.paymentMethod,
           products: products,
           status: status,
-          date: new Date(),
+          date: new Date().toISOString().slice(0,10),
           // when there is some errors check here
           totalAmount: total,
         };
@@ -442,7 +463,6 @@ module.exports = {
       let orderObj = {
         deliveryDetails: {
           firstname: order.firstname,
-
           lastname: order.lastname,
           housename: order.housename,
           streetaddress: order.streetaddress,
@@ -461,7 +481,7 @@ module.exports = {
         paymentMethod: order.paymentMethod,
         products: products,
         status: status,
-        date: new Date(),
+        date: new Date().toISOString().slice(0,10),
         // when there is some errors check here
         totalAmount: total,
         mode:'cart'
@@ -472,19 +492,25 @@ module.exports = {
         .collection(collection.ORDER_COLLECTION)
         .insertOne(orderObj)
         .then((response) => {
-          db.get()
-            .collection(collection.CART_COLLECTION)
-            .deleteOne({ user: objectId(order.userId) });
           resolve(response.insertedId);
         });
     });
+  },
+
+  //deleting the cart products after order success
+  deleteCartProducts:(userId)=>{
+     db.get()
+            .collection(collection.CART_COLLECTION)
+            .deleteOne({ user: objectId(userId) }).then(()=>{
+              resolve()
+            });
   },
   getCartProductList: (userId) => {
     return new Promise(async (resolve, reject) => {
       let cart = await db
         .get()
         .collection(collection.CART_COLLECTION)
-        .findOne({ user: objectId(userId) });
+        .findOne({ user: objectId(userId) })
 
       resolve(cart.products);
     });
@@ -494,9 +520,8 @@ module.exports = {
       let orders = await db
         .get()
         .collection(collection.ORDER_COLLECTION)
-        .find({ userId: objectId(userId) })
+        .find({ userId: objectId(userId) }).sort({date:-1})
         .toArray();
-
       resolve(orders);
     });
   },
@@ -563,7 +588,7 @@ module.exports = {
     });
   },
   verifyPayment: (details) => {
-    console.log('reqqqqqquest')
+   
     return new Promise((resolve, reject) => {
       const crypto = require("crypto");
       let hmac = crypto.createHmac("sha256", "EjgkpT60XJNQQgBvrvqJVWDn");
@@ -671,7 +696,7 @@ module.exports = {
         // buy now mode editing
         mode:'buynow',
         status: status,
-        date: new Date(),
+        date: new Date().toISOString().slice(0,10),
         // when there is some errors check here
         totalAmount: total,
       };
@@ -710,8 +735,23 @@ module.exports = {
       address:addressData
     }
     return new Promise(async(resolve,reject)=>{
-      await db.get().collection(collection.ADDRESS_COLLECTION).insertOne(addressDetails).then((response)=>{
-        resolve(response)
+      let totalAddressOfUser = await db.get().collection(collection.ADDRESS_COLLECTION).find({userId:userId}).count()
+      if (totalAddressOfUser < 2) {
+        await db.get().collection(collection.ADDRESS_COLLECTION).insertOne(addressDetails).then((response)=>{
+          resolve(response)
+        })
+      }else{
+        let addressCount ={}
+        addressCount.limitExceeded ='true'
+        resolve(addressCount)
+      }
+      
+    })
+  },
+  deleteAddress:(addressId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ADDRESS_COLLECTION).deleteOne({_id:objectId(addressId)}).then(()=>{
+        resolve()
       })
     })
   },
@@ -732,11 +772,11 @@ module.exports = {
           "products.$.status":status
         }
       }).then(()=>{
-        resolve()
+        resolve({buynowStatusUpdate:true})
       })
       }else if (order.mode==='buynow') {
-        db.get().collection(collection.ORDER_COLLECTION).updateOne({productId:objectId(proId)},{$set:{status:status}}).then((response)=>{
-          resolve()
+        db.get().collection(collection.ORDER_COLLECTION).updateOne({productId:objectId(proId)},{$set:{status:status}}).then(()=>{
+          resolve({cartStatusUpdate:true})
         })
       }
       
@@ -753,7 +793,7 @@ module.exports = {
     return new Promise((resolve,reject)=>{
       db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objectId(orderId)},
       {
-        $set:{status:'Cancelled'}
+        $set:{status:'cancelled'}
       }
       ).then((response)=>{
         db.get().collection(collection.PRODUCT_COLLECTION).updateOne({_id:objectId(productId)},
@@ -769,7 +809,7 @@ module.exports = {
     return new Promise((resolve,reject)=>{
       db.get().collection(collection.ORDER_COLLECTION).updateOne({_id:objectId(orderId),products:{$elemMatch:{item:objectId(productId)}}},
       {
-        $set:{"products.$.status":'Cancelled'}
+        $set:{"products.$.status":'cancelled'}
       }
       ).then(()=>{
         resolve()
@@ -777,10 +817,25 @@ module.exports = {
     })
   },
   addCoupons:(couponData)=>{
-    return new Promise((resolve,reject)=>{
-      db.get().collection(collection.COUPON_COLLECTION).insertOne(couponData).then(()=>{
-        resolve()
-      })
+    console.log(couponData)
+    return new Promise(async(resolve,reject)=>{
+      let coupon= await db.get().collection(collection.COUPON_COLLECTION).findOne({coupon:couponData.coupon})
+      if(coupon){
+        isCouponExists ={}
+        isCouponExists.yesItExists='true'
+        resolve(isCouponExists)
+        
+
+       
+      }else{
+       
+        db.get().collection(collection.COUPON_COLLECTION).insertOne(couponData).then(()=>{
+          let isCouponExists ={}
+          isCouponExists.notExists='true'
+          resolve(isCouponExists)
+        })
+      }
+      
     })
   },
   getAllCoupons:()=>{
@@ -846,5 +901,201 @@ module.exports = {
         resolve(invalidCoupon)
       }
     })
-  }
+  },
+  //wishlist
+  addToWishlist:(prodId,userId,prodPrice)=>{
+    
+    
+    return new Promise(async(resolve,reject)=>{
+      let addedProduct = await db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(prodId)})
+      addedProduct.price =parseInt(addedProduct.price)
+      let userWishlistProductExists = await db.get().collection(collection.WISHLIST_COLLECTION).findOne({user:objectId(userId)})
+      if(userWishlistProductExists){
+        let isWishlistProductAlreadyExists =await db.get().collection(collection.WISHLIST_COLLECTION).aggregate([
+         {
+          $match:{user:objectId(userId)}
+         },
+         {
+           $unwind:"$wishListProduct"
+         },
+         {
+           $project:{
+             _id:"$wishListProduct._id"
+           }
+         },
+         {
+           $match:{_id:objectId(prodId)}
+         }
+        ]).toArray()
+        
+       if(isWishlistProductAlreadyExists[0]){
+         //product is existing in the wishlist
+         resolve()
+        // db.get().collection(collection.WISHLIST_COLLECTION).updateOne({user:objectId(userId)},
+        // {
+        //   $pull:{wishListProduct:{_id:objectId(prodId)}}
+        // }
+        // ).then(()=>{
+        //   let removeFromWishList ={}
+        //   removeFromWishList.removed='true'
+        //   resolve(removeFromWishList)
+        // })
+       }else{
+         //product is not existing in the wishlist
+         
+        db.get().collection(collection.WISHLIST_COLLECTION).updateOne({user:objectId(userId)},
+        {
+          $push:{wishListProduct:addedProduct}
+        }
+        ).then(()=>{
+          let addedToWishlist ={}
+          addedToWishlist.added ='true'
+          resolve(addedToWishlist)
+        })
+       }
+        
+      }else{
+        //order not existing in the cart
+        
+        let wishListObj = {
+          user:objectId(userId),
+          wishListProduct:[addedProduct]
+        }
+        db.get().collection(collection.WISHLIST_COLLECTION).insertOne(wishListObj).then(()=>{
+          resolve()
+        }).then(()=>{
+          let addedProduct ={}
+          addedProduct.added ='true'
+          resolve(addedProduct)
+        })
+      }
+     
+    })
+  },
+  getWishListProducts:(userId)=>{
+    return new Promise(async(resolve,reject)=>{
+      let wishlistProducts = await db.get().collection(collection.WISHLIST_COLLECTION).aggregate([
+        {
+          $match:{user:objectId(userId)}
+        },
+        {
+          $unwind:"$wishListProduct"
+        },
+        {
+          $project:{
+            _id:"$wishListProduct._id",
+            productname:"$wishListProduct.productname",
+            brand:"$wishListProduct.brand",
+            price:"$wishListProduct.price"
+          }
+        }
+      ]).toArray()
+      console.log(wishlistProducts)
+      if(wishlistProducts[0]){
+        for(key in wishlistProducts){
+          let products = await db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(wishlistProducts[key]._id)})
+          console.log(products)
+          db.get().collection(collection.WISHLIST_COLLECTION).updateOne({wishListProduct:{$elemMatch:{_id:objectId(wishlistProducts[key]._id)}}},
+          {
+            $set:{
+              "wishListProduct.$.price":products.price
+            }
+          }
+          ).then(()=>{
+            resolve(wishlistProducts)
+          })
+          
+        }
+      }else{
+        resolve(false)
+      }
+       
+      
+      
+      
+    })
+  },
+  deleteWishlistProduct:(prodId,userId)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.WISHLIST_COLLECTION).updateOne({user:objectId(userId)},
+      {
+        $pull:{wishListProduct:{_id:objectId(prodId)}}
+      }).then((response)=>{
+        resolve(response)
+      })
+    })
+  },
+  getUserAddressToEdit:(addressId)=>{
+    return new Promise(async(resolve,reject)=>{
+      await db.get().collection(collection.ADDRESS_COLLECTION).findOne({_id:objectId(addressId)}).then((address)=>{
+        resolve(address)
+      })
+    })
+  },
+  updateUserAddress:(addressId,userAddress)=>{
+    return new Promise((resolve,reject)=>{
+      db.get().collection(collection.ADDRESS_COLLECTION).updateOne({_id:objectId(addressId)},
+      {
+        $set:{
+          address:userAddress
+        }
+      }
+      ).then(()=>{
+        resolve()
+      })
+    })
+  },
+  convertAmount : (amount)=>{
+    return new Promise(async(resolve,reject)=>{
+        amount = parseInt(amount)
+        axios.get(`http://apilayer.net/api/live?access_key=${ACCESS_KEY}&currencies=INR`).then(response => {
+          console.log('ddddddddddddddddddddddddddddddddddddddddddddddd',response)
+            amount = amount/response.data.quotes.USDINR
+            resolve(amount)
+        })
+       
+       
+    })  
+},
+generatePaypal:(orderId,totalprice)=>{
+  totalPrice = parseFloat(totalPrice).toFixed(2)
+  return new Promise((resolve,reject)=>{
+    var create_payment_json = {
+      "intent": "sale",
+      "payer": {
+          "payment_method": "paypal"
+      },
+      "redirect_urls": {
+          "return_url": 'http://localhost:8000/test',
+          "cancel_url": "http://cancel.url"
+      },
+      "transactions": [{
+          "item_list": {
+              "items": [{
+                  "name": orderId,
+                  "sku": "item",
+                  "price": totalprice,
+                  "currency": "USD",
+                  "quantity": 1
+              }]
+          },
+          "amount": {
+              "currency": "USD",
+              "total": totalprice,
+          },
+          "description": "The Payement success"
+      }]
+  };
+  paypal.payment.create(create_payment_json, function (error, payment) {
+      if (error) {
+          console.log('🦈🦈🦈🦈🦈 The error in payement : ', error.response.details)
+          reject(false);
+      } else {
+          console.log('🦠🦠🦠🦠🦠🦠🦠 : ', payment.transactions[0].item_list.items[0]);
+          resolve(true)
+      }
+  });
+  })
+}
+
 };

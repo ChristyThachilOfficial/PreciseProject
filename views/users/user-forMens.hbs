@@ -19,7 +19,7 @@
 					<div class="wrapper">
 						<!-- first section -->
 						<div class="product-sec1 px-sm-4 px-3 py-sm-5  py-3 mb-4">
-							<h3 class="heading-tittle text-center font-italic">New Brand watches</h3>
+							
 							
 							<div class="row">
 								
@@ -40,15 +40,25 @@
 											<h4 class="pt-1">
 												<a href="/singleview/{{this._id}}">{{this.productname}}</a>
 											</h4>
-											<div class="info-product-price my-2">
+											{{!-- <div class="info-product-price my-2">
 												<span >₹{{this.price}}</span>
 												
+											</div> --}}
+
+											<div class="info-product-price my-2">
+												<span class="item_price">₹{{this.price}}</span>
+												<del>₹{{this.productOfferPrice}}</del>
 											</div>
 											{{#if ../userrr}}
 												
 											
+											{{#gt this.quantity '0'}}
+											
 											<div>
-												 
+												<button class="btn btn-link" onclick="addToWishlist('{{this._id}}','{{this.price}}')" id="{{this._id}}123" style="color: red;"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-suit-heart-fill" viewBox="0 0 16 16">
+												<path d="M4 1c2.21 0 4 1.755 4 3.92C8 2.755 9.79 1 12 1s4 1.755 4 3.92c0 3.263-3.234 4.414-7.608 9.608a.513.513 0 0 1-.784 0C3.234 9.334 0 8.183 0 4.92 0 2.755 1.79 1 4 1z"/>
+												</svg></button>
+												  <span class="text-success">In stock</span><br>
 												{{!-- adding the product price --}}
 												{{#hello ../cart this._id this.price}}
 												{{/hello}} 
@@ -58,8 +68,30 @@
 												<a href="/buynow/{{this._id}}" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
 											</div>
 											{{else}}
-											<a href="/login" class="btn btn-primary mt-3" style="width: 80%;">Add to cart</a>
-											<a href="/login" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
+											<button class="btn btn-link" onclick="addToWishlist('{{this._id}}','{{../userrr._id}}','{{this.price}}')" id="{{this._id}}12" style="color: red;" disabled><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-suit-heart-fill" viewBox="0 0 16 16" >
+												<path d="M4 1c2.21 0 4 1.755 4 3.92C8 2.755 9.79 1 12 1s4 1.755 4 3.92c0 3.263-3.234 4.414-7.608 9.608a.513.513 0 0 1-.784 0C3.234 9.334 0 8.183 0 4.92 0 2.755 1.79 1 4 1z"/>
+												</svg></button>
+												<span class="text-danger">Out of stock</span>
+												<button  class="btn btn-primary mt-3" style="width: 80%;" disabled>Add to cart</a>
+												<button  class="btn btn-success mt-3" style="width: 80%;" disabled>Buy now</a>
+
+											{{/gt}}
+											{{else}}
+											{{#gt this.quantity '0'}}
+											<a class="btn btn-link" href="/login?prodId={{this._id}}&price={{this.price}}&tokenWishlist=guestToWishlist" style="color: red;" ><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-suit-heart-fill" viewBox="0 0 16 16" >
+											<path d="M4 1c2.21 0 4 1.755 4 3.92C8 2.755 9.79 1 12 1s4 1.755 4 3.92c0 3.263-3.234 4.414-7.608 9.608a.513.513 0 0 1-.784 0C3.234 9.334 0 8.183 0 4.92 0 2.755 1.79 1 4 1z"/>
+											</svg></a>
+											<span class="text-success">In stock</span><br>
+											<a href="/login?prodId={{this._id}}&price={{this.price}}&tokenCart=guestToCart" class="btn btn-primary mt-3" style="width: 80%;">Add to cart</a>
+											<a href="/login?prodId={{this._id}}&token=guestToBuyNow" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
+											{{else}}
+											<button class="btn btn-link" onclick="addToWishlist('{{this._id}}','{{../userrr._id}}','{{this.price}}')" id="{{this._id}}12" style="color: red;" disabled><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-suit-heart-fill" viewBox="0 0 16 16" >
+												<path d="M4 1c2.21 0 4 1.755 4 3.92C8 2.755 9.79 1 12 1s4 1.755 4 3.92c0 3.263-3.234 4.414-7.608 9.608a.513.513 0 0 1-.784 0C3.234 9.334 0 8.183 0 4.92 0 2.755 1.79 1 4 1z"/>
+												</svg></button>
+												<span class="text-danger">Out of stock</span>
+												<button  class="btn btn-primary mt-3" style="width: 80%;" disabled>Add to cart</a>
+												<button  class="btn btn-success mt-3" style="width: 80%;" disabled>Buy now</a>
+											{{/gt}}
 											{{/if}}
 										</div>
 									</div>
@@ -93,6 +125,31 @@
 	
 
     </section>
+
+	{{!-- sweet alert --}}
+	<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		function addToWishlist(productId,prodPrice){
+			let buttonId =productId+'123'
+			console.log(buttonId)
+			$.ajax({
+				url:'/wishlist/'+productId+'/'+prodPrice,
+				method:'get',
+				success:(response)=>{
+					if(response.added){
+						document.getElementById(buttonId).style.color ='red'
+						Swal.fire({
+						  icon: 'success',
+						  title: 'Item added to wishlist!!!!',
+						  timer:1500
+						 
+						})
+					}
+					
+				}
+			})
+		}
+	</script>
 	
 	
 

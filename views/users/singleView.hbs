@@ -1,4 +1,8 @@
-
+<!-- <style>
+	.magnifier{
+		left: 0px !important;
+	}
+</style> -->
 <section>
    
 	<!-- page -->
@@ -58,8 +62,8 @@
 				<div class="col-lg-7 single-right-left simpleCart_shelfItem">
 					<h3 class="mb-3">{{productDetails.productname}}</h3>
 					<p class="mb-3">
-						<span class="item_price">₹{{productDetails.offerprice}}</span>
-						<del class="mx-2 font-weight-light">₹{{productDetails.price}}</del>
+						<span class="item_price">₹{{productDetails.price}}</span>
+						<del class="mx-2 font-weight-light">₹{{productDetails.productOfferPrice}}</del>
 						<label>Free delivery</label>
 					</p>
 					<div class="single-infoagile">
@@ -107,7 +111,9 @@
 						<div class="snipcart-details top_brand_home_details item_add single-item hvr-outline-out">
 									{{#if user}}
 										
-									
+										{{#gt productDetails.quantity '0'}}
+											
+										
 									<div>
 										{{#hello cart productDetails._id productDetails.price}}	
 										{{/hello}}
@@ -117,11 +123,23 @@
 										<a href="/buynow/{{productDetails._id}}" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
 										
 									</div>
-
 									{{else}}
+										<span class="text-danger">Out of stock</span>
+										<button  class="btn btn-primary mt-3" style="width: 80%;" disabled>Add to cart</a>
+										<button  class="btn btn-success mt-3" style="width: 80%;" disabled>Buy now</a>
+									{{/gt}}
+									{{else}}
+										{{#gt productDetails.quantity '0'}}
+											<span class="text-success">In stock</span><br>
+											<a href="/login?prodId={{productDetails._id}}&price={{productDetails.price}}&tokenCart=guestToCart" class="btn btn-primary mt-3" style="width: 80%;">Add to cart</a>
+											<a href="/login?prodId={{productDetails._id}}&token=guestToBuyNow" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
+										{{else}}
+											<span class="text-danger">Out of stock</span>
+										<button  class="btn btn-primary mt-3" style="width: 80%;" disabled>Add to cart</a>
+										<button  class="btn btn-success mt-3" style="width: 80%;" disabled>Buy now</a>
+										{{/gt}}
 
-									<a href="/login" class="btn btn-primary mt-3" style="width: 80%;">Add to cart</a>
-									<a href="/login" class="btn btn-success mt-3" style="width: 80%;">Buy now</a>
+									
 
 									{{/if}}
 						</div>

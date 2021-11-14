@@ -1,0 +1,381 @@
+<section>
+    <form action="/editAddress" id="editAddress" method="post">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                
+
+            </div>
+
+            <div class="col-md-7">
+                
+
+
+
+
+                <div>
+                    <div class="billing-address mt-5">
+                        <h5 class="checkout-box-title">EDIT ADDRESS</h5>
+                        
+
+                        <div class="checkout-billing-adress-box">
+
+                            <div class="billing-address-input clearfix">
+                                <label>FIRST NAME *</label>
+                                <input name="firstname" value="{{address.address.firstname}}" id="firstname" type="text" />
+                               <input type="hidden" name="addressId" value="{{address._id}}" id="">
+
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>LAST NAME *</label>
+                                <input name="lastname" value="{{address.address.lastname}}" id="lastname" type="text" />
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>COMPANY / HOUSE NAME *</label>
+                                <input name="housename" id="housename" value="{{address.address.housename}}" type="text" />
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>ADDRESS *</label>
+                                <input type="text" name="streetaddress" value="{{address.address.streetaddress}}" id="streetaddress"
+                                    placeholder="Street Address" />
+                                <input type="text" name="address" value="{{address.address.address}}" id="address"
+                                    placeholder="Fashin, suite, unite ect (optinal)" />
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>TOWN / CITY *</label>
+                                <input name="town" value="{{address.address.town}}" id="town" type="text" />
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>COUNTRY / STATES</label>
+                                <input name="state" value="{{address.address.state}}"  id="state" type="text" />
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>POSTCODE / ZIP *</label>
+                                <input name="zipcode" value="{{address.address.zipcode}}" id="zipcode" type="number" />
+                            </div>
+
+                            <div class="billing-address-input clearfix" style="margin-bottom:0px">
+                                <label>PHONE *</label>
+                                <input name="phone" value="{{address.address.phone}}" id="phone" type="number" />
+                            </div>
+
+                            <div class="billing-address-input clearfix">
+                                <label>ALTERNATE PHONE *</label>
+                                <input name="altnum" value="{{address.address.altnum}}" id="altnum" type="number" />
+                            </div><br />
+
+                            <div>
+                                <button type="submit" class="btn btn-primary text-white">Edit
+                                    address</button>
+                                    
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+    </div>
+    </div>
+    </form>
+</section>
+
+{{! form validation }}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#editAddress').validate({
+            rules: {
+                firstname: {
+                    required: true
+                }, lastname: { required: true }, housename: { required: true },
+                streetaddress: { required: true }, address: { required: true }, town: {
+                    required: true
+                }, state: { required: true }, zipcode: {
+                    required: true, digits: true
+                }, phone: { required: true, digits: true, maxlength: 10 }, altnum: {
+                    required: true,
+                    digits: true, maxlength: 10
+                }
+            }, messages: { phone: { maxlength: 'enter valid mobile number' }, altnum: { maxlength: 'enter valid mobile number' } }
+        })
+    })
+</script>
+
+<style>
+    .error {
+        color: red !important;
+    }
+
+    dt {
+        color: black;
+    }
+
+    .checkout-top {
+        margin-bottom: 23px;
+    }
+
+    .checkout-top p,
+    .checkout-top p a {
+        color: #000000;
+        font-family: "Montserrat", sans-serif;
+        font-size: 16px;
+    }
+
+    .checkout-top p a {
+        color: #d22a28;
+    }
+
+    .checkout-box-title {
+        border-bottom: 1px solid #ecedee;
+        color: #000000;
+        font-size: 18px;
+        font-weight: normal;
+        letter-spacing: 0;
+        padding: 16px 0;
+        text-align: center;
+    }
+
+    .billing-address {
+        background: #fff none repeat scroll 0 0;
+        border: 1px solid #ecedee;
+    }
+
+    .checkout-billing-adress-box {
+        padding: 21px 35px 50px 25px;
+    }
+
+    .billing-address-input {
+        margin-bottom: 20px;
+    }
+
+    .billing-address-input label {
+        color: #000000;
+        float: left;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0;
+    }
+
+    .billing-address-input select,
+    .billing-address-input input[type="text"] {
+        border: 0 none;
+        border-bottom: 1px solid #e5e5e5;
+        color:
+            #000000;
+        float: right;
+        font-size: 14px;
+        font-weight: 300;
+        height: 40px;
+        padding: 0 10px;
+        width: 55%;
+    }
+
+    .billing-address-input select option {}
+
+    .cbab-create-account {
+        margin-bottom: 19px;
+    }
+
+    .cbab-create-account input[type="checkbox"] {}
+
+    .cbab-create-account label {
+        color: #000000;
+        font-size: 14px;
+        font-weight: 300;
+        letter-spacing: 0;
+        line-height: 16px;
+        margin: 0;
+    }
+
+    .cbab-create-account p {
+        color: #000000;
+        line-height: 24px;
+        margin: 12px 0 0;
+    }
+
+    .cbab-account-password {
+        margin: 0 0 31px;
+    }
+
+    .cbab-account-password label {
+        color: #000000;
+        font-size: 14px;
+        font-weight:
+            300;
+        letter-spacing: 0;
+        line-height: 16px;
+        margin: 0;
+    }
+
+    .cbab-account-password input[type="password"] {
+        border: 0 none;
+        border-bottom: 1px solid #e5e5e5;
+        color: #000000;
+        float: right;
+        font-size: 14px;
+        font-weight: 300;
+        height: 40px;
+        padding: 0 10px;
+        width: 55%;
+    }
+
+    .cbab-order-notes {}
+
+    .cbab-order-notes p {
+        color: #000000;
+        font-size: 14px;
+        font-weight: 300;
+        letter-spacing: 0;
+        line-height: 16px;
+        margin: 0 0 10px;
+    }
+
+    .cbab-order-notes input[type="text"] {
+        border: 0 none;
+        border-bottom: 1px solid #e5e5e5;
+        color: #000000;
+        font-size:
+            14px;
+        font-weight: 300;
+        height: 40px;
+        padding: 0 10px;
+        width: 100%;
+    }
+
+    .promotional-code-box {
+        background: #fff none repeat scroll 0 0;
+        border: 1px solid #ecedee;
+        margin-bottom: 30px;
+        margin-top: 30px;
+    }
+
+    .pcb-content {
+        padding: 0 35px 25px;
+    }
+
+    .pcb-content p {
+        color: #000000;
+        margin-bottom: 25px;
+    }
+
+    .pcb-cuppon-input {}
+
+    .pcb-cuppon-input input[type="text"] {
+        border: 0 none;
+        border-bottom: 1px solid #e5e5e5;
+        color: #000000;
+        float: left;
+        font-weight:
+            300;
+        height: 40px;
+        letter-spacing: 0;
+        text-align: center;
+        width: 46%;
+    }
+
+    .pcb-cuppon-input button {
+        float: right;
+        width: 50%;
+    }
+
+    .checkout-page-button {
+        background: #79B4B7 none repeat scroll 0 0;
+        border: 0 none;
+        border-radius:
+            3px;
+        color: #fff;
+        display: inline-block;
+        padding: 5px 30px;
+        text-transform:
+            uppercase;
+    }
+
+    .your-order-box {
+        background: #fff none repeat scroll 0 0;
+        border: 1px solid #ecedee;
+        margin-bottom: 30px;
+    }
+
+    .yob-content {
+        padding: 25px 25px 70px;
+    }
+
+    .yobc-title,
+    .yobc-title span {
+        color: #232530;
+        font-family:
+            "Montserrat", sans-serif;
+        margin-bottom: 33px;
+    }
+
+    .yobc-title span {
+        float:
+            right;
+    }
+
+    .yob-content ul {
+        list-style: outside none none;
+        padding: 0;
+    }
+
+    .yob-content ul li {
+        border-bottom: 1px solid #e5e5e5;
+        color: #000000;
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 30px;
+        margin: 0 0 27px;
+        padding: 0 0 1px;
+    }
+
+    .yob-content ul li.order-total {
+        text-transform: uppercase;
+    }
+
+    .yob-content ul li span {
+        color: #d22a28;
+        float:
+            right;
+    }
+
+    .create-account-checkout-method {}
+
+    .select-payment-method {
+        margin-bottom: 3px;
+    }
+
+    .select-payment-method input[type="checkbox"] {}
+
+    .select-payment-method label {
+        color: #000000;
+        font-size: 14px;
+        font-weight:
+            300;
+        letter-spacing: 0;
+        margin-left: 10px;
+    }
+
+    .create-account-text {
+        border:
+            1px solid #e5e5e5;
+        margin: 0 0 20px;
+        padding: 21px 20px;
+    }
+
+    .create-account-text p {
+        color: #000000;
+        font-weight: 300;
+        line-height: 24px;
+    }
+
+    .place-order {
+        margin: 15px 0 0;
+        text-align: center;
+    }
+
+    .place-order button {}
+</style>

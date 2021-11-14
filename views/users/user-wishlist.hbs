@@ -1,0 +1,104 @@
+<section class="mt-5">
+    <div class="container">
+        <h3 class="text-center mb-5">WISHLIST</h3>
+        <div class="table-responive" style="overflow-x:auto; !important">
+            {{#if wishListProducts}}
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Image</th>
+                  <th scope="col">Details</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Action</th>
+                  <th scope="col">Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+                  
+                
+                  {{#each wishListProducts}}
+                      
+                  
+                <tr>
+                  <th scope="row"><a href="/singleview/{{this._id}}"><img src="/productImages/{{this._id}}__1.jpg" style="width: 100px; height: 100px;" alt=""></a></th>
+                  <td><p style="margin-bottom: 0; !important">{{this.productname}}</p><br><p style="margin-bottom: 0; !important">{{this.brand}}</p><br><p style="margin-bottom: 0; !important">{{this.description}}</p><br></td>
+                  <td>{{this.price}}</td>
+                  <td>{{!-- adding the product price --}}
+										{{#wishlistADDtocart ../cart this._id this.price}}
+										{{/wishlistADDtocart}} <br>
+                    <a href="/buynow/{{this._id}}" class="btn btn-success mt-1" >Buy now</a>
+                    </td>
+                  <td><a  onclick="deleteProduct('{{this._id}}')" class="btn btn-light "><i class="far fa-trash-alt"></i></a></td>
+                </tr>
+                {{/each}}
+
+               
+              </tbody>
+             
+            </table>
+            {{else}}
+            <h2 class="text-center  mt-5">your Wishlist is empty</h2>
+                     
+                     <center>
+                       <img class="m-auto img-fluid" src="/coverImages/emptycart.png" alt="">
+                       <div>
+                         <a href="/" class="btn btn-success " >Continue shopping</a>
+                       </div>
+                
+            </center>
+            {{/if}}
+            {{#if wishListProducts}}
+             <a class="btn btn-primary mt-3" style="background-color: #007bff; !important" href="/">Continue shopping</a>
+             {{/if}}
+        </div>
+    </div>
+
+</section>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function deleteProduct(productId){
+        const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: 'btn btn-success m-2',
+            cancelButton: 'btn btn-danger'
+          },
+          buttonsStyling: false
+        })
+
+        swalWithBootstrapButtons.fire({
+          title: 'Are you sure?',
+          text: "You really want to remove this from wishlist!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'No, cancel!',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+                  url:'/deleteWishlistProduct/'+productId,
+                  method:'get',
+                  success:(response)=>{
+                      location.reload() 
+                  },
+                  
+                  
+                  
+              })
+           
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            swalWithBootstrapButtons.fire(
+              'Cancelled',
+              'Your product is still in wishlist :)',
+              'error'
+            )
+          }
+        })
+    }
+</script>

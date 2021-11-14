@@ -5,7 +5,7 @@
     <div class="container bootstrap snippets bootdey">
 		<div class="row">
             
-			<div class="col-md-12" id="invoice">
+			<div class="col-md-12 mb-5" id="invoice">
 				<div class="invoice-wrapper">
 					<div class="intro">
 						Hi <strong>{{orderDetails.deliveryDetails.firstname}} {{orderDetails.deliveryDetails.lastname}}</strong>, 
@@ -62,13 +62,39 @@
 							</div>
 						</div>
 					</div>
+					{{!-- <div class="row">
+						<div class="col-md-12">
+							<center>
+							<table class="table">
+							<thead>
+								<tr>
+								<th scope="col">No</th>
+								<th scope="col">Image</th>
+								<th scope="col">Product Name</th>
+								<th scope="col">Price</th>
+								</tr>
+							</thead>
+							<tbody>
+								
+								<tr>
+								<th scope="row">{{add @index '1'}}</th>
+								<td>Jacob</td>
+								<td>Thornton</td>
+								<td>@fat</td>
+								</tr>
+								
+							</tbody>
+							</table>
+						</center>
+						</div>
+						
+					</div> --}}
 
 					<div class="line-items">
 						<div class="headers clearfix">
 							<div class="row">
 								<div class="col-xs-4">Description</div>
-								{{!-- <div class="col-xs-3">Quantity</div>
-								<div class="col-xs-5 text-right">Amount</div> --}}
+								
 							</div>
 						</div>
 						<div class="items">
@@ -83,55 +109,22 @@
 									<strong>₹{{orderDetails.totalAmount}}</strong>
 								</div>
 							</div>
-							{{!-- <div class="row item">
-								<div class="col-xs-4 desc">
-									Bootstrap snippet
-								</div>
-								<div class="col-xs-3 qty">
-									1
-								</div>
-								<div class="col-xs-5 amount text-right">
-									$20.00
-								</div>
-							</div>
-							<div class="row item">
-								<div class="col-xs-4 desc">
-									Snippets on bootdey 
-								</div>
-								<div class="col-xs-3 qty">
-									2
-								</div>
-								<div class="col-xs-5 amount text-right">
-									$18.00
-								</div>
-							</div> --}}
+							
 						</div>
 						<div class="total text-right">
 							<p class="extra-notes">
-								{{!-- <strong>Extra Notes</strong>
-								Please send all items at the same time to shipping address by next week.
-								Thanks a lot. --}}
+								
 							</p>
 							<div class="field">
 								Subtotal <span>₹{{orderDetails.totalAmount}}</span>
 							</div>
-							{{!-- <div class="field">
-								Shipping <span>$0.00</span>
-							</div>
-							<div class="field">
-								Discount <span>4.5%</span>
-							</div>--}}
+							
 							<div class="field grand-total">
 								Total <span>₹{{orderDetails.totalAmount}}</span>
 							</div>
 						</div>
 
-						<div class="print">
-							<button class="btn btn-success" onclick="getPdf()">
-								<i class="fa fa-print"></i>
-								Print this receipt
-							</button>
-						</div>
+						
 					</div>
 				</div>
 
@@ -139,6 +132,12 @@
 			</div>
 		</div>
 	</div>
+</div>
+<div class="print text-center	">
+	<button class="btn btn-success" onclick="getPdf()">
+		<i class="fa fa-print"></i>
+		Print this receipt
+	</button>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.8.0/html2pdf.bundle.min.js"></script>
 {{!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}

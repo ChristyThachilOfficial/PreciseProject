@@ -1,0 +1,88 @@
+<script>
+    if (document.getElementById('payementChoiceCod').checked == true || document.getElementById('payementChoiceRazor').checked == true || document.getElementById('payementChoicePay').checked == true) {
+                    if (document.getElementById('payementChoicePay').checked == true) {
+
+                        paypal.Button.render({
+                            // Configure environment
+                            env: 'sandbox',
+                            client: {
+                                sandbox: 'demo_sandbox_client_id',
+                                production: 'demo_production_client_id'
+                            },
+                            // Customize button (optional)
+                            locale: 'en_US',
+                            style: {
+                                size: 'small',
+                                color: 'blue',
+                                shape: 'rect',
+                            },
+                            // Enable Pay Now checkout flow (optional)
+                            commit: true,
+                            // Set up a payment
+                            payment: function (data, actions) {
+                                console.log("the datas are : ", actions)
+                                $.ajax({
+                                    url: '/currencycoverter/' + document.getElementById('orderTotal').innerHTML,
+                                    method: 'post',
+                                    success: (total) => {
+                                        document.getElementById('usdToInr').value = total
+                                    }
+                                })
+                                price = document.getElementById('usdToInr').value
+
+
+                                return actions.payment.create({
+                                    transactions: [{
+                                        amount: {
+                                            total: parseFloat(price).toFixed(2),
+                                            currency: 'USD',
+                                        }
+                                    }]
+                                });
+                            },
+
+                            // Execute the payment
+
+                            onAuthorize: function (data, actions) {
+                                return actions.payment.execute().then(function () {
+
+
+                                    $.ajax({
+                                        url: '/checkoutbuynow',
+                                        method: 'post',
+                                        data: $('#checkoutbuynow-form').serialize(),
+                                        success: (response) => {
+                                            if (response) {
+                                                location.href = '/orderconfirmed';
+                                            } else {
+                                                location.href = '/404';
+                                            }
+                                        }
+                                    })
+
+                                });
+
+                            }
+
+                        },'#paypal-button');
+                    }
+</script>
+
+
+
+<script>
+     $.ajax({
+                                        url:'/buyNowplace-order',
+                                        method:'post',
+                                        data:$('#buyNow-checkout-form').serialize(),
+                                        success:(response)=>{
+                                        
+                                            if(response.codSuccess){
+                                                location.href='/ordersuccess'
+                                            }
+                                            else{
+                                                razorpayPayment(response)
+                                            }
+                                        }
+                                    })
+</script>

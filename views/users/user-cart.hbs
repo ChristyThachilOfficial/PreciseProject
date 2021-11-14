@@ -12,7 +12,7 @@
 
                     <th scope="col">Item</th>
                     <th scope="col">Image</th> 
-                    <th scope="col">Quantity</th>
+                    {{!-- <th scope="col">Quantity</th> --}}
                     <th scope="col">Change Quantity</th>
                     <th scope="col">Sub total</th>
                     <th scope="col">Action</th>
@@ -37,13 +37,15 @@
 
                         <td>{{this.product.productname}}<br/>₹<span>{{this.price}}</span></td>
                         <td><img src="/productImages/{{this.product._id}}__1.jpg" style="width: 70px; height: 70px;" alt=""></td>
-                        <td>{{this.Quantity}}</td>
+                        {{!-- <td>{{this.Quantity}}</td> --}}
                         <td>
-                          {{#gt this.Quantity '1'}}
-                            <button class="btn "  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}',-1)">-</button>
-                          {{/gt}}
+                         
+                            <button class="btn " id="{{this.product._id}}minus" onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}','{{this.product.quantity}}','{{this.product.productname}}',-1)">-</button>
+                          
                             <span class="btn btn-light" id="{{this.product._id}}">{{this.Quantity}}</span>
-                            <button class="btn"  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}',1)">+</button>
+                            
+                            <button class="btn" id="{{this.product._id}}plus"  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}','{{this.product.quantity}}','{{this.product.productname}}',1)">+</button>
+                            
                         </td>
                         
                         <td>₹<span id="{{this.product._id}}1">
@@ -70,7 +72,7 @@
                                   Are you sure you want to remove this product from cart?
                                 </div>
                                 <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                  <button type="button" class="btn btn-secondary" id="{{this.product._id}}modalClose" data-dismiss="modal">Close</button>
                                   <button type="button" onclick="removeCartProduct('{{this._id}}','{{this.product._id}}')" class="deletebtn btn btn-danger">Remove</button>
                                 </div>
                               </div>
@@ -105,7 +107,7 @@
                      <h2 class="text-center text-danger mt-5">your cart is empty</h2>
                      
                      <center>
-                       <img class="m-auto" src="/coverImages/emptyCart.jpg" alt="">
+                       <img class="m-auto img-fluid" src="/coverImages/emptyCart.jpg" alt="">
                        <div>
                          <a href="/" class="btn btn-success " >Continue shopping</a>
                        </div>
@@ -119,19 +121,34 @@
             
         
         {{!-- this is payment card --}}
-        <div class="card mt-5 m-auto" style="width: 50%;">
+        <div class="card mt-5 m-auto" style="width: 100%;">
 		<div class="card-body">
 			<dl class="dlist-align">
 			  <dt>Total price:</dt>
-			  <dd class="text-right">₹<span>{{totalCartPrice}}</span></dd>
+			  <dd class="text-right">₹<span id="grandTotal">{{totalCartPrice}}</span></dd>
 			</dl>
 			
 			<hr>
 			
-			<a href="/checkout" style="background-color: #79B4B7;" class="btn btn-primary btn-block">Proceed to Checkout </a>
+			
 			
 		</div> <!-- card-body.// -->
+    
+    <div class="row">
+      <div class="col-md-6">
+        
+      </div>
+      <div class="col-md-3">
+
+      </div>
+      <div class="col-md-3">
+        <a href="/checkout" style="background-color: #345B63;" style="width: 100px; !important" class="btn btn-primary btn-block mb-2 ms-5">Proceed to Checkout </a>
+      </div>
+    </div>
+
 		</div>
+    
+    
         
 
         {{/if}}
@@ -140,27 +157,26 @@
     </div>
 </section>
 
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-{{!-- data tables --}}
-<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css">
-<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables_themeroller.css">
-<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js" defer></script>
 
 <script>
-  $(document).ready( function () {
-    $('#myTable').DataTable();
-} );
-</script>
-<script>
-    function changeQuantity(cartId,proId,proPrice,count){
-        console.log('Price of : ',proPrice)
+    function changeQuantity(cartId,proId,proPrice,totalProductQuantity,productName,count){
+        
         let Quantity=parseInt(document.getElementById(proId).innerHTML)
         count=parseInt(count)
-       id = proId+'1'
+        let subtotalId = proId + '1'
+        let minusButton = proId + 'minus'
+        let plusButton = proId + 'plus'
 
-        $.ajax({
+        if(Quantity == 1 && count == -1){
+          
+        }else{
+         
+          if(Quantity >= totalProductQuantity &&  count == 1){
+            Swal.fire('Stock quantity reached')
+          }else{
+            $.ajax({
             url:'/changeproductquantity',
             data:{
                 cart:cartId,
@@ -172,19 +188,23 @@
             },
             method:'post',
             success:(response)=>{
+              console.log(response)
                 if(response.removeProduct){
-                    
-                    
                     location.reload()
                 }else{
                     document.getElementById(proId).innerHTML=Quantity+count
-                    
-                    location.reload()
-                    
+                    document.getElementById(subtotalId).innerHTML = (Quantity+count) * proPrice
+                    document.getElementById('grandTotal').innerHTML = response.grandTotal
                 }
                
             }
         })
+          }
+          
+        }
+       
+
+        
     }
 
     //remove from cart

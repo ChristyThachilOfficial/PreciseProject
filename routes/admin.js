@@ -1,12 +1,13 @@
 const { response } = require("express");
 var express = require("express");
 const { Db } = require("mongodb");
+const { AwsInstance } = require("twilio/lib/rest/accounts/v1/credential/aws");
 var router = express.Router();
 var productHelpers = require("../helpers/product-helpers");
 const userHelpers = require("../helpers/user-helpers");
 
 let admindetails = {
-  name: "admin",
+  name: "chris@gmail.com",
   pass: 000,
 };
 
@@ -29,9 +30,10 @@ router.get("/",adminLoginHelper, async(req, res, next)=> {
   let totalRevenue = await productHelpers.getTotalRevenue()
   let totalProducts=await productHelpers.getProductsCount()
   let totalBrands = await productHelpers.getBrandsCount()
+  let totalOrdersByPaymentmethod =await productHelpers.totalOrdersByPaymentmethod()
 
   let orderDataArray = [getOrderCountData.totalOrders,getOrderCountData.totalCancelledOrder,getOrderCountData.totalDeliveredOrder,getOrderCountData.totalPlacedOrder]
-  res.render("admin/admin-home", { admin: true, typeOfPersonAdmin: true ,totalUsers,totalRevenue,totalProducts,totalBrands,orderDataArray});
+  res.render("admin/admin-home", { admin: true, typeOfPersonAdmin: true ,totalUsers,totalRevenue,totalProducts,totalBrands,orderDataArray,totalOrdersByPaymentmethod});
 });
 
 //get admin login
@@ -143,7 +145,7 @@ router.get("/editproducts/:id",adminLoginHelper, async (req, res, next) => {
 router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
   
   productHelpers.updateproductDetails(req.params.id, req.body).then(() => {
-    res.redirect("/admin");
+    res.redirect("/admin/viewproducts");
     if (req.files.image1 || req.files.image2 || req.files.image3) {
       let image1 = req.files.image1;
       let image2 = req.files.image2;
@@ -175,27 +177,88 @@ router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
   //sales report
   router.get("/salesReport",adminLoginHelper, (req, res, next) => {
     userHelpers.getOrderList().then((orders) => {
+      let todayDate = new Date().toISOString().slice(0,10)
       res.render("admin/admin-salesReport", {
         typeOfPersonAdmin: true,
         admin: true,
         orders,
+        todayDate
       });
     });
   });
 
+  //post sales report to get orders between dates
+  router.post('/totalSalesBetweenDates',adminLoginHelper,async(req,res,next)=>{
+    console.log(req.body)
+    let startDate = req.body.startDate
+    let endDate = req.body.endDate
+    
+    if (req.body.list === 'totalOrders') {
+      let totalOrders = await userHelpers.getOrderList()
+
+   let filteredItems = totalOrders.filter((item, index) => item.date >=  startDate && item.date <= endDate);
+   let SortedArray = filteredItems.sort((a,b)=>{
+     return  new Date(b.date) - new Date(a.date) ;
+   })
+   let todaysDate = new Date().toISOString().slice(0,10)
+   res.render('admin/admin-filteredOrders',{typeOfPersonAdmin:true,admin:true,totalOrders:true,SortedArray,todaysDate}) 
+    }else if(req.body.list === 'deliveredOrders'){
+     let totalDeliveredOrder=await productHelpers.getDeliveredOrders()
+     let filteredItems = totalDeliveredOrder.filter((item,index)=> item.date >= startDate && item.date <= endDate)
+     let SortedArray = filteredItems.sort((a,b)=>{
+       return new Date(a.date) - new Date(b.date)
+     })
+     res.render('admin/admin-filteredOrders',{typeOfPersonAdmin:true,admin:true,delivered:true,SortedArray}) 
+    }else if (req.body.list === 'cancelled') {
+      let totalCancelledOrder = await productHelpers.getCancelledOrders()
+      let filteredItems = totalCancelledOrder.filter((item,index)=> item.date >= startDate && item.date <= endDate)
+      let SortedArray = filteredItems.sort((a,b)=>{
+        return new Date(a.date) - new Date(b.date)
+      })
+      res.render('admin/admin-filteredOrders',{typeOfPersonAdmin:true,admin:true,cancelled:true,SortedArray})
+    }else if(req.body.list === 'returnedOrders'){
+      let todaysDate = new Date().toISOString().slice(0,10)
+      let totalReturnedOrder = await  productHelpers.getReturnedOrders()
+      let filteredItems = totalReturnedOrder.filter((item,index)=> item.date >= startDate && item.date <= endDate)
+      let SortedArray = filteredItems.sort((a,b)=>{
+        return new Date(a.date) - new Date (b.date)
+      })
+      
+      res.render('admin/admin-filteredOrders',{typeOfPersonAdmin:true,admin:true,returned:true,SortedArray,todaysDate})
+    }
+    
+  })
+
   //coupons
   router.get('/coupons',adminLoginHelper,(req,res,next)=>{
-    userHelpers.getAllCoupons().then((coupons)=>{
-      res.render('admin/admin-coupons',{typeOfPersonAdmin:true,admin:true,coupons})
-    })
+    let todayDate = new Date().toISOString().slice(0,10)
+    if(req.session.couponExists){
+      userHelpers.getAllCoupons().then((coupons)=>{
+        res.render('admin/admin-coupons',{typeOfPersonAdmin:true,admin:true,coupons,couponExists:true,todayDate})
+        req.session.couponExists = false
+      })
+    }else{
+      userHelpers.getAllCoupons().then((coupons)=>{
+        res.render('admin/admin-coupons',{typeOfPersonAdmin:true,admin:true,coupons,todayDate})
+      })
+    }
+  
     
   })
   
   //add coupons
   router.post('/addCoupons',adminLoginHelper,(req,res,next)=>{
     req.body.percentage =parseInt(req.body.percentage)
-    userHelpers.addCoupons(req.body).then(()=>{
+    userHelpers.addCoupons(req.body).then((response)=>{
+      console.log(response)
+     if( response.yesItExists){
+       req.session.couponExists = true
+       res.redirect('/admin/coupons')
+     }else{
       res.redirect('/admin/coupons')
+     }
+     
+     
     })
   })
 
@@ -248,27 +311,159 @@ router.get("/view-orderedproduct/:orderId",adminLoginHelper, async (req, res, ne
 
 router.post('/updateOrderStatus',adminLoginHelper,(req,res,next)=>{
   
-  userHelpers.changeOrderStatus(req.body.proId,req.body.orderId,req.body.status)
+  userHelpers.changeOrderStatus(req.body.proId,req.body.orderId,req.body.status).then((response)=>{
+    res.json(response)
+  })
 })
 
 //Get add catetory
 router.get('/addcategory',adminLoginHelper,(req,res,next)=>{
-  productHelpers.getAllCategory().then((category)=>{
-    res.render('admin/admin-addCategory',{typeOfPersonAdmin:true,admin:true,category})
-  })
+  if( req.session.categoryExists){
+    productHelpers.getAllCategory().then((category)=>{
+      res.render('admin/admin-addCategory',{typeOfPersonAdmin:true,admin:true,category,categoryExists:true})
+      req.session.categoryExists = false
+    })
+  }else{
+    productHelpers.getAllCategory().then((category)=>{
+      res.render('admin/admin-addCategory',{typeOfPersonAdmin:true,admin:true,category})
+    })
+  }
+ 
  
 })
 
 //post add category
 router.post('/addCategory',adminLoginHelper,(req,res,next)=>{
-  productHelpers.addCategory(req.body.category).then(()=>{
-    res.redirect('/admin/addcategory')
+  productHelpers.addCategory(req.body.category).then((response)=>{
+    if(response.yesItExists){
+      req.session.categoryExists = true
+      res.redirect('/admin/addcategory')
+    }else{
+      res.redirect('/admin/addcategory')
+    }
+    
   })
 })
 
 //delete category
 router.get('/deleteCategory/:id',adminLoginHelper,(req,res,next)=>{
   productHelpers.deleteCategory(req.params.id).then(()=>{
+    res.json({status:true})
+  })
+})
+
+//delivered orders sales report
+router.get('/deliveredOrders',adminLoginHelper,(req,res,next)=>{
+  productHelpers.getDeliveredOrders().then((totalDeliveredOrder)=>{
+    let todayDate = new Date().toISOString().slice(0,10)
+    console.log(totalDeliveredOrder)
+    res.render('admin/admin-deliveredSalesReport',{typeOfPersonAdmin:true,admin:true,totalDeliveredOrder,todayDate})
+  })
+})
+
+//cancelled orders sales report
+router.get('/cancelledOrders',adminLoginHelper,(req,res,next)=>{
+  productHelpers.getCancelledOrders().then((totalCancelledOrder)=>{
+    let todayDate = new Date().toISOString().slice(0,10)
+    res.render('admin/admin-cancelledSalesReport',{typeOfPersonAdmin:true,admin:true,totalCancelledOrder,todayDate})
+  })
+})
+
+//returned order sales report
+router.get('/returnedOrders',adminLoginHelper,(req,res,next)=>{
+  productHelpers.getReturnedOrders().then((totalReturnedOrder)=>{
+    let todayDate = new Date().toISOString().slice(0,10)
+    res.render('admin/admin-returnedSalesReport',{typeOfPersonAdmin:true,admin:true,totalReturnedOrder,todayDate})
+  })
+})
+
+
+
+//brand offer managent
+router.get('/brandOffers',adminLoginHelper,async (req,res,next)=>{
+  let category=await productHelpers.getAllCategory()
+  let allBrandOffers = await productHelpers.getAllBrandOffers()
+  let todayDate = new Date().toISOString().slice(0,10)
+  if ( req.session.brandOfferExists) {
+    res.render('admin/admin-brandOffers',{typeOfPersonAdmin:true,admin:true,category,allBrandOffers,brandOfferExists:true,todayDate})
+    
+     req.session.brandOfferExists= false
+  }else{
+    res.render('admin/admin-brandOffers',{typeOfPersonAdmin:true,admin:true,category,allBrandOffers,todayDate})
+  }
+  
+})
+
+//add brand offer
+router.post('/addBrandOffer',adminLoginHelper,(req,res,next)=>{ 
+  req.body.percentage = parseInt(req.body.percentage)
+  productHelpers.addBrandOffer(req.body).then((response)=>{
+    if(response.unavailable){
+    
+    res.redirect('/admin/brandOffers')
+    }else if(response.exists){
+        req.session.brandOfferExists = true
+        res.redirect('/admin/brandOffers')
+      }else {
+
+        //maping the brand products
+        response.map((data)=>{
+          productHelpers.updateProductOfferDetails(data)
+        })
+        res.redirect('/admin/brandOffers')
+      }
+     
+     
+    
+   
+  })
+ 
+})
+
+//delete product offer
+router.get('/deleteBrandOffer/:prodOfferId/:brand',adminLoginHelper,(req,res,next)=>{
+  console.log('req.params.prodOfferId,req.params.brand',req.params.prodOfferId,req.params.brand)
+  productHelpers.deleteBrandOffer(req.params.prodOfferId,req.params.brand).then((brandProducts)=>{
+    brandProducts.map((data)=>{
+      productHelpers.updatePriceToRealPrice(data)
+    })
+    res.json({status:true})
+  })
+})
+
+//get product offers
+router.get('/productOffers',adminLoginHelper,async(req,res,next)=>{
+  let products = await productHelpers.getAllProductNames()
+  let offerProductsData = await productHelpers.getAllProductsOfferData()
+
+  if(req.session.productOfferExists){
+    res.render('admin/admin-productOffers',{typeOfPersonAdmin:true,admin:true,products,productOfferAlreadyExists:true,offerProductsData})
+    req.session.productOfferExists = false
+  }else{
+    res.render('admin/admin-productOffers',{typeOfPersonAdmin:true,admin:true,products,offerProductsData})
+  }
+  
+})
+
+//post product offers
+router.post('/addProductOffer',adminLoginHelper,(req,res,next)=>{
+  productHelpers.addProductOffer(req.body).then((response)=>{
+    if(response){
+      res.redirect('/admin/productOffers')
+    }else{
+      
+      req.session.productOfferExists = true
+      res.redirect('/admin/productOffers')
+    }
+    
+  })
+ 
+})
+
+//delete product offer
+router.get('/deleteProductOffer/:productOfferId/:productName',adminLoginHelper,(req,res,next)=>{
+  console.log('what is happening right now ',req.params.productOfferId,req.params.productName)
+  productHelpers.deleteProductOffer(req.params.productOfferId,req.params.productName).then(()=>{
     res.json({status:true})
   })
 })

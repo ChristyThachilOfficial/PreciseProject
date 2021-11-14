@@ -1,267 +1,432 @@
-
+{{!-- <script src="https://www.paypal.com/sdk/js?client-id=AUM8cG2b7wJn_1WRj3en5cpfd0kqWcbsN95p4huRCQxeOuiCpnx0ncMBj_hgJaDTMxZbl9pmdKKP5gB1" defer></script> --}}
 <form action="" id="checkout-form">
-<section id="page-title" class="page-title">
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12"></div>
+    <section id="page-title" class="page-title">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12"></div>
                 <h3>Checkout</h3>
             </div>
 
 
         </div>
 
-    </div>
-
-</section>
-
-
-<section style="margin-top: 30px;padding-top: 50px;">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12" style="margin-bottom: 10px ;">
-
-                <div class="billing-address">
-
-                    <h5 class="checkout-box-title">SAVED ADDRESS</h5>
-                    <a href="/addAddress" style="float: right;" class="btn btn-primary mr-3">Add address</a><br><br>
-
-                    <div class="checkout-billing-adress-box">
-                        {{#each address}}
-                            
-                        
-                        <div class="col-md-12 pt-2 ">
-                                        
-                            <input type="radio" onchange="a('{{this.address.firstname}}','{{this.address.lastname}}','{{this.address.housename}}','{{this.address.streetaddress}}','{{this.address.address}}','{{this.address.town}}','{{this.address.state}}','{{this.address.zipcode}}','{{this.address.phone}}','{{this.address.altnum}}')" id="{{this.address._id}}" name="address" value="{{this.address._id}}">
-                            <label for="">{{this.address.firstname}},{{this.address.lastname}},{{this.address.housename}},{{this.address.streetaddress}},{{this.address.address}},{{this.address.town}},{{this.address.state}},{{this.address.zipcode}},{{this.address.phone}},{{this.address.altnum}}</label>            
-                                        
-                        </div>
-                        {{/each}}
-                        {{!-- <dl>
-                            <dt>1.Home</dt>
-                            <dd>Black hot drink</dd>
-                            <dt><input type="checkbox" id="useaddress" placeholder="Use"><span style="color: #007eff;">
-                                    Use this Address</span></dt><br>
-                            <dt>2.Office</dt>
-                            <dd>White cold drink</dd>
-                            <dt><input type="checkbox" id="useaddress" placeholder="Use"><span style="color: #007eff;">
-                                    Use this Address</span></dt><br>
-                        </dl> --}}
-                    </div>
-
-                </div>
-            </div>
         </div>
 
+    </section>
 
-        {{!-- form starts herre --}}
 
-        
-        <div class="row">
-            <div class="col-md-8 col-sm-12 col-xs-12">
-                <div class="billing-address">
-                    <h5 class="checkout-box-title">NEW ADDRESS</h5>
-                    <div class="checkout-billing-adress-box">
+    <section style="margin-top: 30px;padding-top: 50px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12" style="margin-bottom: 10px ;">
 
-                        <div class="billing-address-input clearfix">
-                            <label>FIRST NAME *</label>
-                            <input id="firstname" name="firstname" type="text">
+                    <div class="billing-address">
 
-                            {{!-- //hidden input --}}
-                            <input type="text" name="userId" id="" value="{{user._id}}" hidden>
+                        <h5 class="checkout-box-title">SAVED ADDRESS</h5>
+                        <a href="/addAddress" style="float: right;" class="btn btn-primary mr-3">Add address</a><br><br>
+
+                        <div class="checkout-billing-adress-box">
+
+
+                            <div class="row">
+                                {{#each address}}
+                                <div class="col-md-3">
+                                    <div class="card m-3 p-3 bg-white"><i class="fa fa-apple"></i>
+                                        <div class="about-product text-center mt-2">
+                                            <div>
+                                                <h4>Saved address</h4>
+                                                <h6 class="mt-0 text-black-50">Address {{add @index '1'}}</h6>
+
+                                            </div>
+                                        </div>
+                                        <div class="stats mt-2">
+                                            <div class="d-flex justify-content-between p-price"><span
+                                                    style="font-weight: bold;">Name</span><span>{{this.address.firstname}}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between p-price"><span
+                                                    style="font-weight: bold;">Address</span><span>{{this.address.streetaddress}}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between p-price"><span
+                                                    style="font-weight: bold;">Town</span><span>{{this.address.town}}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between p-price"><span
+                                                    style="font-weight: bold;">Zipcode</span><span>{{this.address.zipcode}}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between p-price"><span
+                                                    style="font-weight: bold;">State</span><span>{{this.address.state}}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between p-price"><span
+                                                    style="font-weight: bold;">Phone</span><span>{{this.address.phone}}</span>
+                                            </div>
+
+                                        </div>
+                                        <div class="d-flex justify-content-between total font-weight-bold mt-4">
+                                            <button type="button"
+                                                onclick="a('{{this.address.firstname}}','{{this.address.lastname}}','{{this.address.housename}}','{{this.address.streetaddress}}','{{this.address.address}}','{{this.address.town}}','{{this.address.state}}','{{this.address.zipcode}}','{{this.address.phone}}','{{this.address.altnum}}')"
+                                                id="{{this.address._id}}" class="btn btn-primary">Select</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+
+
+
+
+
+
+
 
                         </div>
-                        <div class="billing-address-input clearfix">
-                            <label>LAST NAME *</label>
-                            <input id="lastname" name="lastname" type="text">
-                        </div>
-                        <div class="billing-address-input clearfix">
-                            <label>COMPANY / HOUSE NAME *</label>
-                            <input id="housename" name="housename" type="text">
-                        </div>
-                        <div class="billing-address-input clearfix">
-                            <label>ADDRESS *</label>
-                            <input id="streetaddress" type="text" name="streetaddress" placeholder="Street Address">
-                            <input id="address" type="text" name="address" placeholder="Fashin, suite, unite ect (optinal)">
-                        </div>
-                        <div class="billing-address-input clearfix">
-                            <label>TOWN / CITY *</label>
-                            <input id="town" name="town" type="text">
-                        </div>
-                        <div class="billing-address-input clearfix">
-                            <label>COUNTRY / STATES</label>
-                            <input id="state" name="state" type="text">
-                        </div>
-                        <div class="billing-address-input clearfix">
-                            <label>POSTCODE / ZIP *</label>
-                            <input id="zipcode" name="zipcode" type="number">
-                        </div>
-                        {{!-- <div class="billing-address-input clearfix">
-                            <label>EMAIL ADDRESS *</label>
-                            <input type="text">
-                        </div> --}}
-                        <div class="billing-address-input clearfix" style="margin-bottom:0px">
-                            <label>PHONE *</label>
-                            <input id="phone" name="phone" type="number">
-                        </div>
-                        {{!-- <div class="cbab-create-account">
-                            <input id="regnum" type="checkbox" name="regnum">
-                            <label>Use registered phone number</label>
-                        </div> --}}
-                        <div class="billing-address-input clearfix">
-                            <label>ALTERNATE PHONE *</label>
-                            <input id="altnum" name="altnum" type="number">
-                        </div><br>
-                        {{!-- <div class="cbab-create-account">
-                            <input type="checkbox" name="saveaddress"> 
-                            <label>Save address</label>
-                        </div> --}}
+
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-12 col-xs-12">
-                <div class="promotional-code-box">
-                    <h5 class="checkout-box-title">COUPON CODE</h5>
-                    <div class="pcb-content">
-                        <p>Enter your coupon code if you have one</p>
-                        <div class="pcb-cuppon-input clearfix">
-                            <div id="errorDiv"></div>
-                            <input type="text" name="coupon" id="couponCode" placeholder="Coupon code">
-                            <button class="checkout-page-button hvr-bs" onclick="applyCoupons('{{totalCartPrice}}')">Apply</button>
+
+
+            {{!-- form starts herre --}}
+
+
+            <div class="row">
+                <div class="col-md-8 col-sm-12 col-xs-12">
+                    <div class="billing-address">
+                        <h5 class="checkout-box-title">NEW ADDRESS</h5>
+                        <div class="checkout-billing-adress-box">
+
+                            <div class="billing-address-input clearfix">
+                                <label>FIRST NAME *</label>
+                                <input id="firstname" name="firstname" type="text">
+
+                                {{!-- //hidden input --}}
+                                <input type="text" name="userId" id="" value="{{user._id}}" hidden>
+
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>LAST NAME *</label>
+                                <input id="lastname" name="lastname" type="text">
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>COMPANY / HOUSE NAME *</label>
+                                <input id="housename" name="housename" type="text">
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>ADDRESS *</label>
+                                <input id="streetaddress" type="text" name="streetaddress" placeholder="Street Address">
+                                <input id="address" type="text" name="address"
+                                    placeholder="Fashin, suite, unite ect (optinal)">
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>TOWN / CITY *</label>
+                                <input id="town" name="town" type="text">
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>COUNTRY / STATES</label>
+                                <input id="state" name="state" type="text">
+                            </div>
+                            <div class="billing-address-input clearfix">
+                                <label>POSTCODE / ZIP *</label>
+                                <input id="zipcode" name="zipcode" type="number">
+                            </div>
+                            {{!-- <div class="billing-address-input clearfix">
+                                <label>EMAIL ADDRESS *</label>
+                                <input type="text">
+                            </div> --}}
+                            <div class="billing-address-input clearfix" style="margin-bottom:0px">
+                                <label>PHONE *</label>
+                                <input id="phone" name="phone" type="number">
+                            </div>
+                            {{!-- <div class="cbab-create-account">
+                                <input id="regnum" type="checkbox" name="regnum">
+                                <label>Use registered phone number</label>
+                            </div> --}}
+                            <div class="billing-address-input clearfix">
+                                <label>ALTERNATE PHONE *</label>
+                                <input id="altnum" name="altnum" type="number">
+                            </div><br>
+                            {{!-- <div class="cbab-create-account">
+                                <input type="checkbox" name="saveaddress">
+                                <label>Save address</label>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
-                <div class="your-order-box">
-                    <h5 class="checkout-box-title">YOUR ORDER</h5>
-                    <div class="yob-content">
-                        <ul>
-                            <li class="clearfix">Cart Subtotal <span style="font-weight: bolder;font-size: 20px;">₹
-                                    {{totalCartPrice}}</span></li>
-                                    <li class="order-total clearfix" >discount Applied ₹<span id="discountPrice">000</span></li>
-                            <li class="clearfix">Shipping and Handling <span>Free Shipping</span></li>
-                            <li class="order-total clearfix" >Order Total <span id="totalPrice">₹{{totalCartPrice}}</span></li>
-                            <input type="hidden" name="totalCartPrice" value="{{totalCartPrice}}" id="totalCartPrice">
-                        </ul>
+                <div class="col-md-4 col-sm-12 col-xs-12">
+                    <div class="promotional-code-box">
+                        <h5 class="checkout-box-title">COUPON CODE</h5>
+                        <div class="pcb-content">
+                            <p>Enter your coupon code if you have one</p>
+                            <div class="pcb-cuppon-input clearfix">
+                                <div id="errorDiv"></div>
+                                <input type="text" name="coupon" id="couponCode" placeholder="Coupon code">
+                                <button class="checkout-page-button hvr-bs" type="button"
+                                    onclick="applyCoupons('{{totalCartPrice}}')">Apply</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="promotional-code-box">
-                    <h5 class="checkout-box-title">PAYMENT METHOD</h5>
-                    <div class="pcb-content">
-                        <p>Select your payment method</p>
-                        <div class="pcb-cuppon-input clearfix">
-                            {{!-- changed from payment to payment method --}}
-                            <input type="radio" value="COD" name="paymentMethod">
-                            <label
-                                style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">COD</label>
+                    <div class="your-order-box">
+                        <h5 class="checkout-box-title">YOUR ORDER</h5>
+                        <div class="yob-content">
+                            <ul>
+                                <li class="clearfix">Cart Subtotal <span style="font-weight: bolder;font-size: 20px;">₹
+                                        {{totalCartPrice}}</span></li>
+                                <li class="order-total clearfix">discount Applied ₹<span id="discountPrice">000</span>
+                                </li>
+                                <li class="clearfix">Shipping and Handling <span>Free Shipping</span></li>
+                                <li class="order-total clearfix">Order Total <span
+                                        id="totalPrice">₹{{totalCartPrice}}</span></li>
+                                <input type="hidden" name="totalCartPrice" value="{{totalCartPrice}}"
+                                    id="totalCartPrice">
+                                    <input type="hidden" name="usdToInr" id="usdToInr">
+                            </ul>
                         </div>
-                        <div class="pcb-cuppon-input clearfix">
-                            <input type="radio" value="ONLINE" name="paymentMethod">
-                            <label style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">Online
-                                Payment</label>
+                    </div>
 
-                        </div>
-                        <div class="create-account-checkout-method">
-                            <div class="place-order">
-                                <button class="checkout-page-button hvr-bs">Place order</button>
+                    <div class="promotional-code-box">
+                        <h5 class="checkout-box-title">PAYMENT METHOD</h5>
+                        <div class="pcb-content">
+                            <p>Select your payment method</p>
+                            <div class="pcb-cuppon-input clearfix">
+                                {{!-- changed from payment to payment method --}}
+                                <input type="radio" value="COD" onchange="showPlaceOrderButton()" name="paymentMethod">
+                                <label
+                                    style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">COD</label>
+                            </div>
+                            <div class="pcb-cuppon-input clearfix">
+                                <input type="radio" value="Razorpay" onchange="showPlaceOrderButton()" name="paymentMethod">
+                                <label style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">Razorpay</label>
+
+                            </div>
+                            <div class="pcb-cuppon-input clearfix">
+                                <input type="radio" id="paymentRadio" onchange="hidePlaceOrderButton()" value="paypal" name="paymentMethod">
+                                <label style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">Paypal</label>
+                                
+                            </div>
+
+                            {{!-- div for paypal button --}}
+                             {{!-- paypal button --}}
+                                {{!-- <div id="paypal-button-container"></div> --}}
+                                <div id="paypal-button"></div>
+
+
+
+
+                            <div class="create-account-checkout-method">
+                                <div class="place-order">
+                                    <button id="placeOrderButton" class="checkout-page-button hvr-bs">Place order</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-</section>
+    </section>
 </form>
 <script>
-    function a(firstname,lastname,housename,streetaddress,address,town,state,zipcode,phone,altnum){
-        document.getElementById('firstname').value=firstname
-         document.getElementById('lastname').value=lastname
-          document.getElementById('housename').value=housename
-           document.getElementById('streetaddress').value=streetaddress
-            document.getElementById('address').value=address
-             document.getElementById('town').value=town
-              document.getElementById('state').value=state
-               document.getElementById('zipcode').value=zipcode
-                document.getElementById('phone').value=phone
-                 document.getElementById('altnum').value=altnum
+    function a(firstname, lastname, housename, streetaddress, address, town, state, zipcode, phone, altnum) {
+        document.getElementById('firstname').value = firstname
+        document.getElementById('lastname').value = lastname
+        document.getElementById('housename').value = housename
+        document.getElementById('streetaddress').value = streetaddress
+        document.getElementById('address').value = address
+        document.getElementById('town').value = town
+        document.getElementById('state').value = state
+        document.getElementById('zipcode').value = zipcode
+        document.getElementById('phone').value = phone
+        document.getElementById('altnum').value = altnum
 
     }
 </script>
 
+<script>
+    function hidePlaceOrderButton(){
+       
+    document.getElementById('placeOrderButton').style.display = 'none'
+    document.getElementById('paypal-button').style.display = 'block'
+    let count =1;
+    if(count ===1 ){
+
+        {
+    //something will happen now
+    paypal.Button.render({
+
+        // Configure environment
+
+        env: 'sandbox',
+
+        client: {
+
+            sandbox: 'demo_sandbox_client_id',
+
+            production: 'demo_production_client_id'
+
+        },
+
+        // Customize button (optional)
+
+        locale: 'en_US',
+
+        style: {
+
+            size: 'small',
+
+            color: 'gold',
+
+            shape: 'pill',
+
+        },
+
+
+        // Enable Pay Now checkout flow (optional)
+
+        commit: true,
+
+
+        // Set up a payment
+
+        payment: function(data, actions) {
+
+            $.ajax({
+                url: '/currencycoverterCart/' + document.getElementById('totalCartPrice').value,
+                method: 'post',
+                success: (total) => {
+
+                    document.getElementById('usdToInr').value = total
+                }
+            })
+            price = document.getElementById('usdToInr').value
+
+            return actions.payment.create({
+
+                transactions: [{
+
+                    amount: {
+
+                        total: parseFloat(price).toFixed(2),
+
+                        currency: 'USD'
+
+                    }
+
+                }]
+
+            });
+
+        },
+
+        // Execute the payment
+
+        onAuthorize: function(data, actions) {
+
+            return actions.payment.execute().then(function() {
+
+                // Show a confirmation message to the buyer
+
+                window.alert('Thank you for your purchase!');
+
+            });
+
+        }
+
+    }, '#paypal-button');
+}
+
+        count++;
+    }
+
+
+
+
+
+
+
+
+}
+
+function showPlaceOrderButton(){
+    document.getElementById('placeOrderButton').style.display = 'block'
+    document.getElementById('paypal-button').style.display = 'none'
+}
+
+</script>
+
+
+{{!-- paypal script --}}
+<script src="https://www.paypalobjects.com/api/checkout.js"></script>
 
 {{!-- cart coupon checking --}}
 <script>
-function applyCoupons(cartPrice){
-let coupon = document.getElementById('couponCode').value
-$.ajax({
-    url:'/checkCouponCart/'+coupon+'/'+cartPrice,
-    method:'get',
-    success:(response)=>{
-        if(response.invalid){
-            document.getElementById('discountPrice').innerHTML = 000
-            document.getElementById('totalPrice').innerHTML = cartPrice
-            document.getElementById('totalCartPrice').value =cartPrice
-            document.getElementById('errorDiv').innerHTML=' <span class="text-danger">Enter a valid coupon!!</span>'
-        }else if(response.used){
-            document.getElementById('discountPrice').innerHTML = 000
-            document.getElementById('totalPrice').innerHTML = cartPrice
-            document.getElementById('totalCartPrice').value =cartPrice
-            document.getElementById('errorDiv').innerHTML=' <span class="text-danger">Coupon already claimed!!</span>'
-        }else{
-           document.getElementById('errorDiv').innerHTML =' '
-           document.getElementById("discountPrice").innerHTML=response.discountPrice
-            document.getElementById("totalPrice").innerHTML=response.finalPrice
-            document.getElementById("totalCartPrice").value=response.finalPrice
-        }
-        
-    }
-})
+    function applyCoupons(cartPrice) {
+        let coupon = document.getElementById('couponCode').value
+        $.ajax({
+            url: '/checkCouponCart/' + coupon + '/' + cartPrice,
+            method: 'get',
+            success: (response) => {
+                if (response.invalid) {
+                    document.getElementById('discountPrice').innerHTML = 000
+                    document.getElementById('totalPrice').innerHTML = cartPrice
+                    document.getElementById('totalCartPrice').value = cartPrice
+                    document.getElementById('errorDiv').innerHTML = ' <span class="text-danger">Enter a valid coupon!!</span>'
+                } else if (response.used) {
+                    document.getElementById('discountPrice').innerHTML = 000
+                    document.getElementById('totalPrice').innerHTML = cartPrice
+                    document.getElementById('totalCartPrice').value = cartPrice
+                    document.getElementById('errorDiv').innerHTML = ' <span class="text-danger">Coupon already claimed!!</span>'
+                } else {
+                    document.getElementById('errorDiv').innerHTML = ' '
+                    document.getElementById("discountPrice").innerHTML = response.discountPrice
+                    document.getElementById("totalPrice").innerHTML = response.finalPrice
+                    document.getElementById("totalCartPrice").value = response.finalPrice
+                }
 
-}
+            }
+        })
+
+    }
 </script>
 
 
 <script>
-   
-    function razorpayPayment(order){
+
+    function razorpayPayment(order) {
         var options = {
-    "key": "rzp_test_Fu2xGkKojPgkAm", // Enter the Key ID generated from the Dashboard
-    "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-    "currency": "INR",
-    "name": "Precise",
-    "description": "Test Transaction",
-    "image": "https://example.com/your_logo",
-    "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the previous step
-    "handler": function (response){
-       
-        verifyPayment(response,order)
-    },
-    "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "9999999999"
-    },
-    "notes": {
-        "address": "Razorpay Corporate Office"
-    },
-    "theme": {
-        "color": "#3399cc"
+            "key": "rzp_test_Fu2xGkKojPgkAm", // Enter the Key ID generated from the Dashboard
+            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "Precise",
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the previous step
+            "handler": function (response) {
+
+                verifyPayment(response, order)
+            },
+            "prefill": {
+                "name": "Gaurav Kumar",
+                "email": "gaurav.kumar@example.com",
+                "contact": "9999999999"
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
     }
- };
-    var rzp1 = new Razorpay(options);
-    rzp1.open();
-    }
-    function verifyPayment(payment,order){
+    function verifyPayment(payment, order) {
         $.ajax({
-            url:'/verify-payment',
-            data:{
+            url: '/verify-payment',
+            data: {
                 payment,
                 order
             },
-            method:'post',
-            success:(response)=>{
-                if(response.status){
-                    location.href='/ordersuccess'
-                }else{
+            method: 'post',
+            success: (response) => {
+                if (response.status) {
+                    location.href = '/ordersuccess'
+                } else {
                     alert('payment failed')
                 }
             }
@@ -270,60 +435,145 @@ $.ajax({
 </script>
 {{!-- form validation --}}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
 
 <script>
-    $(document).ready(function(){
+    $(document).ready(function () {
         $('#checkout-form').validate({
-            rules:{
-                firstname:{
-                    required:true
+            rules: {
+                firstname: {
+                    required: true
                 },
-                lastname:{
-                    required:true
+                lastname: {
+                    required: true
                 },
-                housename:{
-                    required:true
+                housename: {
+                    required: true
                 },
-                streetaddress:{
-                    required:true
+                streetaddress: {
+                    required: true
                 },
-                address:{
-                    required:true
+                address: {
+                    required: true
                 },
-                 town:{
-                    required:true
+                town: {
+                    required: true
                 },
-                 state:{
-                    required:true
+                state: {
+                    required: true
                 },
-                 zipcode:{
-                    required:true
+                zipcode: {
+                    required: true
                 },
-                 phone:{
-                    required:true
+                phone: {
+                    required: true
                 },
-                 altnum:{
-                    required:true
+                altnum: {
+                    required: true
                 },
-                paymentMethod:{
-                    required:true
+                paymentMethod: {
+                    required: true
                 }
             },
-            submitHandler:()=>{
-                 $.ajax({
-            url:'/place-order',
-            method:'post',
-            data:$('#checkout-form').serialize(),
-            success:(response)=>{
-               
-                if(response.codSuccess){
-                    location.href='/ordersuccess'
-                }else{
-                    razorpayPayment(response)
+            submitHandler: () => {
+                $.ajax({
+                    url: '/place-order',
+                    method: 'post',
+                    data: $('#checkout-form').serialize(),
+                    success: (response) => {
+
+                        if (response.codSuccess) {
+                            console.log(response)
+                            location.href = '/ordersuccess'
+                        } else if(response.method === 'paypal'){
+                            //something will happen now
+                            paypal.Button.render({
+
+    // Configure environment
+
+    env: 'sandbox',
+
+    client: {
+
+      sandbox: 'demo_sandbox_client_id',
+
+      production: 'demo_production_client_id'
+
+    },
+
+    // Customize button (optional)
+
+    locale: 'en_US',
+
+    style: {
+
+      size: 'small',
+
+      color: 'gold',
+
+      shape: 'pill',
+
+    },
+
+
+    // Enable Pay Now checkout flow (optional)
+
+    commit: true,
+
+
+    // Set up a payment
+
+    payment: function(data, actions) {
+
+        $.ajax({
+                url: '/currencycoverterCart/' + document.getElementById('totalCartPrice').value,
+                method: 'post',
+                success: (total) => {
+                   
+                    document.getElementById('usdToInr').value = total
                 }
-            }
-        })
+            })
+            price = document.getElementById('usdToInr').value
+
+      return actions.payment.create({
+          
+        transactions: [{
+
+          amount: {
+
+            total: parseFloat(price).toFixed(2),
+
+            currency: 'USD'
+
+          }
+
+        }]
+
+      });
+
+    },
+
+    // Execute the payment
+
+    onAuthorize: function(data, actions) {
+
+      return actions.payment.execute().then(function() {
+
+        // Show a confirmation message to the buyer
+
+        window.alert('Thank you for your purchase!');
+
+      });
+
+    }
+
+  }, '#paypal-button');
+                        }
+                        else {
+                            razorpayPayment(response)
+                        }
+                    }
+                })
             }
         })
     })
@@ -331,9 +581,10 @@ $.ajax({
 
 
 <style>
-    .error{
-        color:red
+    .error {
+        color: red !important;
     }
+
     dt {
         color: black;
     }

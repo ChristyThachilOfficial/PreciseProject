@@ -1,0 +1,165 @@
+<section class="mt-5">
+    <div class="container mt-5">
+        <div class="row ">
+            <div class="col-md-2">
+                
+
+            </div>
+            <div class="col-md-8">
+              <table class="table mt-5" id="myTable">
+  <thead>
+    <tr>
+      <th scope="col">No.</th>
+      <th scope="col">Product Name</th>
+      <th scope="col">Offer percentage</th>
+      
+      <th scope="col">End date</th>
+      <th scope="col">Action</th>
+     
+    </tr>
+  </thead>
+  <tbody>
+      {{#each offerProductsData}}
+          
+      
+    <tr>
+      <th scope="row">{{add @index '1'}}</th>
+      <td>{{this.productName}}</td>
+      <td>{{this.percentage}}</td>
+     
+      <td>{{this.endDate}}</td>
+      <td><button class="btn btn-danger" onclick="deleteProductOffer('{{this._id}}','{{this.productName}}')">Delete</button></td>
+
+    </tr>
+   {{/each}}
+  </tbody>
+</table>
+<form action="/admin/addProductOffer" method="post" id="productOfferForm"><br><br>
+                  
+<label for="">PRODUCT</label><br>
+<div class="row">
+    <div class="col-md-3 col-6">
+         <select name="productName" class="form-control text-center" id="uEmail1" aria-describedby="emailHelp">
+        <option value="" selected>Select</option>
+        {{#each products}}
+         <option value="{{this.productname}}">{{this.productname}}</option>
+         {{/each}}
+     
+    </select>
+    </div>
+</div>
+<label for="">OFFER PERCENTAGE</label><br>
+<input name="percentage" style="border-radius: 4px;" type="number"><br>
+<label for="">END DATE</label><br>
+<input type="date" oninput="checkEndDate()" max="{{todayDate}}" name="endDate" id="endDate"><br>
+{{#if productOfferAlreadyExists}}
+<span style="color: red;">This product has another offer...!!</span><br>
+{{/if}}
+<button type="submit" class="btn btn-success">Add offer</button>
+</form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function checkEndDate(){
+        let todaysDate = new Date().toISOString().slice(0,10)
+        document.getElementById('endDate').min = todaysDate
+    }
+</script>
+
+{{!-- data tables --}}
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables.css">
+<link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/css/jquery.dataTables_themeroller.css">
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js" defer></script>
+
+<script>
+  $(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function deleteProductOffer(productOfferId,productName){
+        const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: 'btn btn-success m-2',
+            cancelButton: 'btn btn-danger'
+          },
+          buttonsStyling: false
+        })
+
+        swalWithBootstrapButtons.fire({
+          title: 'Are you sure?',
+          text: "You really want to delete this offer!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, delete it!',
+          cancelButtonText: 'No, cancel!',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+              $.ajax({
+            url:'/admin/deleteProductOffer/'+productOfferId+'/'+productName,
+            method:'get',
+            success:()=>{
+                location.reload();
+            }
+        })
+           
+          } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+          ) {
+            swalWithBootstrapButtons.fire(
+              'Cancelled',
+              'OFFER not deleted :)',
+              'error'
+            )
+          }
+        })
+    }
+</script>
+
+
+
+
+ {{!-- adddddddddddddddmmmmmmmmmmmminnnnnnnnnnn file validation --}}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js" defer></script>
+
+  <script>
+    $(document).ready(function(){
+      $('#productOfferForm').validate({
+        rules:{
+          productName:{
+            required:true
+          },
+          percentage:{
+            required:true,
+            digits:true,
+            maxlength:2
+          },
+          endDate:{
+              required:true
+          }
+        },
+        messages:{
+          percentage:{
+            maxlength:'percentage should be under hundred'
+          },
+          endDate:'please double check your selected Date'
+        }
+      })
+    })
+  </script>
+
+  <style>
+    .error{
+      color: red;
+    }
+  </style>

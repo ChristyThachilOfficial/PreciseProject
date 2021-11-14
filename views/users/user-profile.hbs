@@ -17,7 +17,7 @@
 
 
 
-                    <div>
+                    {{!-- <div>
                         <!-- Modal -->
                           <div class="modal" id="changePhoto" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -29,6 +29,7 @@
                                   </button>
                                 </div>
                                 <div class="modal-body">
+                                     <div id="errMess1" ></div>
                                   <div id="image-box" style="width: 300px; height: 300px; display: none;" > </div>
                                 </div>
                                 <div class="modal-footer">
@@ -38,19 +39,32 @@
                               </div>
                             </div>
                           </div>
-                    </div>
+                    </div> --}}
+
+
+                    
+
         
         <div class="col-md-3 border-right">
             <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" id="imgview1" width="150px" src="/userImages/{{userData._id}}.jpg"><span class="font-weight-bold">{{userData.name}}</span><span class="text-black-50">{{userData.email}}</span><span> </span></div>
-              <div id="errMess1" ></div>
+              <div>
+                   <div id="errMess1" ></div>
+                                  <div id="image-box" style="width: 300px; height: 300px; display: none;" > </div>
+                                   <button type="button" class="btn btn-primary " data-dismiss="modal" style="display: none;" onclick="setTimeout(saveProfile,500)" id="crop-btn">Crop</button>
+              </div>
               <center>
-                  <label for="file1" data-toggle="modal" data-target="#changePhoto" class="btn btn-primary">Change photo</label>
+                  <label for="file1" class="btn btn-primary">Change photo</label>
               <input type="file"  name="image" id="file1" class="form-control" onchange="return fileValidation1()" hidden>
               
               </center>
              <div>
                   <center>
-                      <a href="/addAddress" class="btn btn-primary" >Add address</a>
+                      <a href="/addAddress" style="width: 8rem; background-color: #007bff; !important" class="btn btn-primary" >Add address</a>
+                  </center>
+             </div>
+             <div>
+                  <center>
+                      <a href="/totalOrders" style="width: 8rem; background-color: #007bff; !important" class="btn btn-primary mt-2" >My orders</a>
                   </center>
              </div>
               
@@ -155,6 +169,17 @@
         }
     }
 </script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function saveProfile(){
+       
+        swal.fire('Save profile to make changes')
+    }
+</script>
+
+
 <style>
     body {
     background: rgb(217, 221, 243)
