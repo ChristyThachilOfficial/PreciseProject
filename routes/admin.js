@@ -150,16 +150,18 @@ router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
       let image1 = req.files.image1;
       let image2 = req.files.image2;
       let image3 = req.files.image3;
-       
+      
       if(image1){
         image1.mv(
           "./public/productImages/" + req.params.id + "__1.jpg"
         );
-      }else if(image2){
+      }
+      if(image2){
         image2.mv(
           "./public/productImages/" + req.params.id + "__2.jpg"
         );
-      }else if(image3){
+      }
+      if(image3){
         image3.mv(
           "./public/productImages/" + req.params.id + "__3.jpg"
         );
