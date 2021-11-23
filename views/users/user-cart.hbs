@@ -1,228 +1,233 @@
-
-
-
 <section class="mt-5">
-    <div class="container">
-        {{#if products}}
-        <div class="table-responsive">
-            <table class="table mt-5" id="myTable">
-            <thead>
-
-                <tr>
-
-                    <th scope="col">Item</th>
-                    <th scope="col">Image</th> 
-                    {{!-- <th scope="col">Quantity</th> --}}
-                    <th scope="col">Change Quantity</th>
-                    <th scope="col">Sub total</th>
-                    <th scope="col">Action</th>
-
-                </tr>
-                
-
-                <tbody >
-                    
-                        
-                    
+  <div class="container">
+    {{#if products}}
+    <div class="table-responsive">
 
 
-                     {{#each products}}
 
- 
-                    <tr>
 
-                        
 
-                       
+      {{!-- redesigning the cart --}}
 
-                        <td>{{this.product.productname}}<br/>₹<span>{{this.price}}</span></td>
-                        <td><img src="/productImages/{{this.product._id}}__1.jpg" style="width: 70px; height: 70px;" alt=""></td>
-                        {{!-- <td>{{this.Quantity}}</td> --}}
-                        <td>
-                         
-                            <button class="btn " id="{{this.product._id}}minus" onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}','{{this.product.quantity}}','{{this.product.productname}}',-1)">-</button>
-                          
-                            <span class="btn btn-light" id="{{this.product._id}}">{{this.Quantity}}</span>
-                            
-                            <button class="btn" id="{{this.product._id}}plus"  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}','{{this.product.quantity}}','{{this.product.productname}}',1)">+</button>
-                            
-                        </td>
-                        
-                        <td>₹<span id="{{this.product._id}}1">
-                            {{this.totalprice}}
-                        </span></td>    
+      <div class="container">
+        <div class="row">
 
-                        <td>
-                          <!-- Button trigger modal -->
-                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#{{this.product.productname}}">
-                            Remove
-                          </button>
+          <div class="col-sm-12 col-md-8">
+            {{#each products}}
+            {{!-- card starting --}}
 
-                          <!-- Modal -->
-                          <div class="modal" id="{{this.product.productname}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="exampleModalLabel">Remove from cart</h5>
-                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  Are you sure you want to remove this product from cart?
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" id="{{this.product._id}}modalClose" data-dismiss="modal">Close</button>
-                                  <button type="button" onclick="removeCartProduct('{{this._id}}','{{this.product._id}}')" class="deletebtn btn btn-danger">Remove</button>
-                                </div>
-                              </div>
-                            </div>
+            <div class="card mb-2">
+              <div class="card-media">
+
+                <img class="m-3" style="width: 90px; height: 90px;" src="/productImages/{{this.product._id}}__1.jpg">
+
+                <button class="btn " id="{{this.product._id}}minus"
+                  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}','{{this.product.quantity}}','{{this.product.productname}}',-1)">-</button>
+
+                <span class="btn btn-light" id="{{this.product._id}}">{{this.Quantity}}</span>
+
+                <button class="btn" id="{{this.product._id}}plus"
+                  onclick="changeQuantity('{{this._id }}','{{this.product._id}}','{{this.price}}','{{this.product.quantity}}','{{this.product.productname}}',1)">+</button>
+
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">
+                  <p>{{this.product.productname}}<br />₹<span>{{this.price}}</span></p>
+                </h5>
+                <p class="card-text">
+
+                  <small>
+                    FREE Shipping on eligible orders
+                  </small>
+                </p>
+                <div class="card-footer">
+                  <div class="card-price mb-2">
+                     <small>Sub total</small>
+                    <i> ₹<span id="{{this.product._id}}1">
+                        {{this.totalprice}}
+                      </span></i>
+                   
+                  </div>
+                  <div class="card-btn">
+                    <button type="button" class="btn btn-danger" data-toggle="modal"
+                      data-target="#{{this.product.productname}}">
+                      Remove
+                    </button>
+
+
+                    {{!-- modal --}}
+
+                    <div class="modal" id="{{this.product.productname}}" tabindex="-1" role="dialog"
+                      aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Remove from cart</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
                           </div>
-                        </td>
-                        {{!-- taking adventure --}}
+                          <div class="modal-body">
+                            Are you sure you want to remove this product from cart?
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" id="{{this.product._id}}modalClose"
+                              data-dismiss="modal">Close</button>
+                            <button type="button" onclick="removeCartProduct('{{this._id}}','{{this.product._id}}')"
+                              class="deletebtn btn btn-danger">Remove</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-                        
 
-                       
+                    {{!-- modal --}}
 
-                    </tr>
 
-                     {{/each}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {{/each}}
+            {{!-- card ending --}}
+          </div>
 
-                     
+          {{!-- payment --}}
 
-                </tbody>
+          {{#if products}}
 
-               
 
-            </thead>
 
-        </table>
+
+          {{!-- this is payment card --}}
+          <div class="card  col-md-4 col-sm-12 h-100" >
+            <div class="card-body">
+              <dl class="dlist-align">
+                <dt>Total price:</dt>
+                <dd class="text-right">₹<span id="grandTotal">{{totalCartPrice}}</span></dd>
+              </dl>
+
+              <hr>
+
+
+
+            </div> <!-- card-body.// -->
+
+
+
+            <div>
+              <a href="/checkout" style="background-color: #345B63;" class="btn btn-primary btn-block mb-2 ms-5">Proceed
+                to
+                Checkout </a>
+            </div>
+
+
+          </div>
+
+
+
+
+          {{/if}}
 
         </div>
-        
-        <hr>
-        {{else}}
-
-                     <h2 class="text-center text-danger mt-5">your cart is empty</h2>
-                     
-                     <center>
-                       <img class="m-auto img-fluid" src="/coverImages/emptyCart.jpg" alt="">
-                       <div>
-                         <a href="/" class="btn btn-success " >Continue shopping</a>
-                       </div>
-                
-            </center>
-
-        {{/if}}
-        {{#if products}}
-           
-                
-            
-        
-        {{!-- this is payment card --}}
-        <div class="card mt-5 m-auto" style="width: 100%;">
-		<div class="card-body">
-			<dl class="dlist-align">
-			  <dt>Total price:</dt>
-			  <dd class="text-right">₹<span id="grandTotal">{{totalCartPrice}}</span></dd>
-			</dl>
-			
-			<hr>
-			
-			
-			
-		</div> <!-- card-body.// -->
-    
-    <div class="row">
-      <div class="col-md-6">
-        
       </div>
-      <div class="col-md-3">
 
-      </div>
-      <div class="col-md-3">
-        <a href="/checkout" style="background-color: #345B63;" style="width: 100px; !important" class="btn btn-primary btn-block mb-2 ms-5">Proceed to Checkout </a>
-      </div>
-    </div>
+      {{!-- redesigning the cart --}}
 
-		</div>
-    
-    
-        
 
-        {{/if}}
+
+
+
 
 
     </div>
+
+    <hr>
+    {{else}}
+
+    <h2 class="text-center text-danger mt-5">your cart is empty</h2>
+
+    <center>
+      <img class="m-auto img-fluid" src="/coverImages/emptyCart.jpg" alt="">
+      <div>
+        <a href="/" class="btn btn-success ">Continue shopping</a>
+      </div>
+
+    </center>
+
+    {{/if}}
+
+
+
+  </div>
 </section>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 <script>
-    function changeQuantity(cartId,proId,proPrice,totalProductQuantity,productName,count){
-        
-        let Quantity=parseInt(document.getElementById(proId).innerHTML)
-        count=parseInt(count)
-        let subtotalId = proId + '1'
-        let minusButton = proId + 'minus'
-        let plusButton = proId + 'plus'
+  function changeQuantity(cartId, proId, proPrice, totalProductQuantity, productName, count) {
 
-        if(Quantity == 1 && count == -1){
-          
-        }else{
-         
-          if(Quantity >= totalProductQuantity &&  count == 1){
-            Swal.fire('Stock quantity reached')
-          }else{
-            $.ajax({
-            url:'/changeproductquantity',
-            data:{
-                cart:cartId,
-                product:proId,
-                price:proPrice,
-                count:count,
-                Quantity:Quantity
-                
-            },
-            method:'post',
-            success:(response)=>{
-              console.log(response)
-                if(response.removeProduct){
-                    location.reload()
-                }else{
-                    document.getElementById(proId).innerHTML=Quantity+count
-                    document.getElementById(subtotalId).innerHTML = (Quantity+count) * proPrice
-                    document.getElementById('grandTotal').innerHTML = response.grandTotal
-                }
-               
-            }
-        })
-          }
-          
-        }
-       
+    let Quantity = parseInt(document.getElementById(proId).innerHTML)
+    count = parseInt(count)
+    let subtotalId = proId + '1'
+    let minusButton = proId + 'minus'
+    let plusButton = proId + 'plus'
 
-        
-    }
+    if (Quantity == 1 && count == -1) {
 
-    //remove from cart
-    function removeCartProduct(cartId,proId){
+    } else {
+
+      if (Quantity >= totalProductQuantity && count == 1) {
+        Swal.fire('Stock quantity reached')
+      } else {
         $.ajax({
-            url:'/removeproductcart',
-            data:{
-                cart:cartId,
-                product:proId
-            },
-            method:'post',
-            success:(response)=>{
-                if(response.removedProduct){
-                    
-                location.reload()
-                }
-               
+          url: '/changeproductquantity',
+          data: {
+            cart: cartId,
+            product: proId,
+            price: proPrice,
+            count: count,
+            Quantity: Quantity
+
+          },
+          method: 'post',
+          success: (response) => {
+            console.log(response)
+            if (response.removeProduct) {
+              location.reload()
+            } else {
+              document.getElementById(proId).innerHTML = Quantity + count
+              document.getElementById(subtotalId).innerHTML = (Quantity + count) * proPrice
+              document.getElementById('grandTotal').innerHTML = response.grandTotal
             }
+
+          }
         })
+      }
+
     }
+
+
+
+  }
+
+  //remove from cart
+  function removeCartProduct(cartId, proId) {
+    $.ajax({
+      url: '/removeproductcart',
+      data: {
+        cart: cartId,
+        product: proId
+      },
+      method: 'post',
+      success: (response) => {
+        if (response.removedProduct) {
+
+          location.reload()
+        }
+
+      }
+    })
+  }
 </script>
