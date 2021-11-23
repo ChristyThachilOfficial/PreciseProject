@@ -106,6 +106,21 @@
 </section>
 
 <script>
+var target = document.body;
+var observer = new MutationObserver(function() {
+    $('input[type="text"]').keyup(function(){
+      let table = $('#myTable').DataTable()
+      console.log("dddd",table.fnGetData().length) });  
+});
+
+// configuration of the observer:
+var config = { childList: true, subtree: true};
+
+// pass in the target node, as well as the observer options
+observer.observe(target, config);
+</script>
+
+<script>
  
 
   function checkStartDate(){

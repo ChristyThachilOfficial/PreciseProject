@@ -1,4 +1,4 @@
-<script src="https://www.paypal.com/sdk/js?client-id=AUM8cG2b7wJn_1WRj3en5cpfd0kqWcbsN95p4huRCQxeOuiCpnx0ncMBj_hgJaDTMxZbl9pmdKKP5gB1" defer></script>
+
 <form action="" id="buyNow-checkout-form">
 <section id="page-title" class="page-title">
     <div class="container">
@@ -117,7 +117,7 @@
                         <div class="billing-address-input clearfix">
                             <label>POSTCODE / ZIP *</label>
                             <input id="zipcode" name="zipcode" type="number">
-                        </div>
+                        </div><br>
                         {{!-- <div class="billing-address-input clearfix">
                             <label>EMAIL ADDRESS *</label>
                             <input type="text">
@@ -125,7 +125,7 @@
                         <div class="billing-address-input clearfix" style="margin-bottom:0px">
                             <label>PHONE *</label>
                             <input id="phone" name="phone" type="number">
-                        </div>
+                        </div><br>
                         {{!-- <div class="cbab-create-account">
                             <input id="regnum" type="checkbox" name="regnum">
                             <label>Use registered phone number</label>
@@ -173,29 +173,31 @@
                         <p>Select your payment method</p>
                         <div class="pcb-cuppon-input clearfix">
                             {{!-- changed from payment to payment method --}}
-                            <input type="radio" value="COD" name="paymentMethod">
+                            <input type="radio" id="CODbutton" onclick="showPlaceOrderButton()" value="COD" name="paymentMethod">
                             <label
                                 style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">COD</label>
                         </div>
                         <div class="pcb-cuppon-input clearfix">
-                            <input type="radio" value="Razorpay" name="paymentMethod">
+                            <input type="radio" value="Razorpay" onclick="showPlaceOrderButton()" id="razorpayButton" name="paymentMethod">
                             <label style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">Razorpay</label>
 
                         </div>
 
                         <div class="pcb-cuppon-input clearfix">
-                                <input type="radio" value="paypal" name="paymentMethod">
+                                <input type="radio" id="paypalButton" onclick="avoidRepeatButton()" value="paypal" name="paymentMethod">
                                 <label style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">Paypal</label>
                                 
                             </div>
 
-                            {{!-- div for paypal button --}}
+                             {{!-- div for paypal button --}}
                              {{!-- paypal button --}}
-                                <div id="paypal-button-container"></div>
+                                
+                                <div id="paypal-button"></div>
+                                <div id="usdToInr"></div>
 
                         <div class="create-account-checkout-method">
                             <div class="place-order">
-                                <button class="checkout-page-button hvr-bs">Place order</button>
+                                <button id="placeOrderButton" class="checkout-page-button hvr-bs">Place order</button>
                             </div>
                         </div>
                        
@@ -205,18 +207,36 @@
         </div>
 </section>
 </form>
+
+<script>
+    function showPlaceOrderButton(){
+        document.getElementById('paypal-button').style.display = 'none'
+        document.getElementById('placeOrderButton').style.display = 'block'
+
+    }
+
+    function avoidRepeatButton(){
+        document.getElementById('paypal-button').innerHTML = ' '
+    }
+
+</script>
+
+
+{{!-- paypal script --}}
+<script src="https://www.paypalobjects.com/api/checkout.js"></script>
+
 <script>
     function a(firstname,lastname,housename,streetaddress,address,town,state,zipcode,phone,altnum){
         document.getElementById('firstname').value=firstname
-         document.getElementById('lastname').value=lastname
-          document.getElementById('housename').value=housename
-           document.getElementById('streetaddress').value=streetaddress
-            document.getElementById('address').value=address
-             document.getElementById('town').value=town
-              document.getElementById('state').value=state
-               document.getElementById('zipcode').value=zipcode
-                document.getElementById('phone').value=phone
-                 document.getElementById('altnum').value=altnum
+        document.getElementById('lastname').value=lastname
+        document.getElementById('housename').value=housename
+        document.getElementById('streetaddress').value=streetaddress
+        document.getElementById('address').value=address
+        document.getElementById('town').value=town
+        document.getElementById('state').value=state
+         document.getElementById('zipcode').value=zipcode
+          document.getElementById('phone').value=phone
+           document.getElementById('altnum').value=altnum
 
     }
 </script>
@@ -348,7 +368,154 @@
                 }
             },
             submitHandler:()=>{
-                 $.ajax({
+                if (document.getElementById('CODbutton').checked == true || document.getElementById('razorpayButton').checked == true || document.getElementById('paypalButton').checked == true) {
+                    if (document.getElementById('CODbutton').checked == true) {
+                        
+                        $.ajax({
+                            url: '/buyNowplace-order',
+                            method: 'post',
+                            data: $('#buyNow-checkout-form').serialize(),
+                            success: (response) => {
+
+                                if (response.codSuccess) {
+                                    console.log(response)
+                                    location.href = '/ordersuccess'
+                                } else {
+                                    window.alert('order failed')
+                                }
+                            }
+                        })
+                    } else if (document.getElementById('paypalButton').checked == true) {
+                        document.getElementById('paypal-button').style.display = 'block'
+
+
+                        paypal.Button.render({
+
+                            // Configure environment
+
+                            env: 'sandbox',
+
+                            client: {
+
+                                sandbox: 'demo_sandbox_client_id',
+
+                                production: 'demo_production_client_id'
+
+                            },
+
+                            // Customize button (optional)
+
+                            locale: 'en_US',
+
+                            style: {
+
+                                size: 'small',
+
+                                color: 'gold',
+
+                                shape: 'pill',
+
+                            },
+
+
+                            // Enable Pay Now checkout flow (optional)
+
+                            commit: true,
+
+
+                            // Set up a payment
+
+                            payment: function(data, actions) {
+
+                                $.ajax({
+                                    url: '/currencycoverterCart/' + document.getElementById('totalfinalPrice').value,
+                                    method: 'post',
+                                    success: (total) => {
+
+                                        document.getElementById('usdToInr').value = total
+                                    }
+                                })
+                                price = document.getElementById('usdToInr').value
+
+                                return actions.payment.create({
+
+                                    transactions: [{
+
+                                        amount: {
+
+                                            total: parseFloat(price).toFixed(2),
+
+                                            currency: 'USD'
+
+                                        }
+
+                                    }]
+
+                                });
+
+                            },
+
+                            // Execute the payment
+
+                            onAuthorize: function(data, actions) {
+
+                                return actions.payment.execute().then(function() {
+
+
+                                    $.ajax({
+                                        url: '/buyNowplace-order',
+                                        method: 'post',
+                                        data: $('#buyNow-checkout-form').serialize(),
+                                        success: (response) => {
+
+                                            if (response) {
+                                                console.log(response)
+                                                location.href = '/ordersuccess'
+                                            } else {
+                                                window.alert('order failed')
+                                            }
+                                        }
+                                    })
+
+                                    // Show a confirmation message to the buyer
+
+
+
+                                });
+
+                            }
+
+                        }, '#paypal-button');
+                        document.getElementById('placeOrderButton').style.display = 'none'
+                        
+
+                    }else if(document.getElementById('razorpayButton').checked == true){
+                        
+                        $.ajax({
+                            url: '/buyNowplace-order',
+                            method: 'post',
+                            data: $('#buyNow-checkout-form').serialize(),
+                            success: (response) => {
+                                if (response) {
+                                    razorpayPayment(response)
+                                } else {
+                                    window.alert('order failed')
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+        })
+    })
+</script>
+
+
+
+
+{{!-- <script>
+    //here is the game the real game
+     $.ajax({
             url:'/buyNowplace-order',
             method:'post',
             data:$('#buyNow-checkout-form').serialize(),
@@ -384,10 +551,7 @@
                 }
             }
         })
-            }
-        })
-    })
-</script>
+</script> --}}
 
 
 <style>

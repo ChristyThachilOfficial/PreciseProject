@@ -28,6 +28,16 @@ module.exports={
     deleteProduct:(proId)=>{
         return new Promise(async(resolve,reject)=>{
             db.get().collection(collection.PRODUCT_COLLECTION).deleteOne({_id:objectId(proId)}).then((response)=>{
+                
+                db.get().collection(collection.CART_COLLECTION).update({},
+                    {
+                        $pull:{products:{item:objectId(proId)}}
+                    }
+                )
+                db.get().collection(collection.WISHLIST_COLLECTION).update({},
+                    {
+                        $pull:{wishListProduct:{_id:objectId(proId)}}
+                    })
                resolve(response)
            })
         })
@@ -210,8 +220,8 @@ module.exports={
         {
             $inc:{quantity:-1}
         }
-        ).then((data)=>{
-            resolve(data)
+        ).then(()=>{
+            resolve()
         })
     },
     updateTotalQuantityCart:(product)=>{
@@ -460,6 +470,7 @@ module.exports={
            
            if (brand) {
                let IsBrandOfferExists = await db.get().collection(collection.BRANDOFFER_COLLECTION).findOne({brandName:brandOfferData.brandName})
+               console.log(IsBrandOfferExists)
                if (IsBrandOfferExists === null) {
                 db.get().collection(collection.BRANDOFFER_COLLECTION).insertOne(brandOfferData).then(()=>{
                     resolve(brand)
@@ -481,20 +492,29 @@ module.exports={
     //update product offer price in product collection
     updateProductOfferDetails:(productData)=>{
         
+        
         return new Promise(async(resolve,reject)=>{
             let brandOfferData = await db.get().collection(collection.BRANDOFFER_COLLECTION).findOne({brandName:productData.brand})
             
-            let newOfferPrice = productData.price -  ((productData.price * brandOfferData.percentage) / 100)
             
-            db.get().collection(collection.PRODUCT_COLLECTION).updateOne({_id:objectId(productData._id)},
+            let newOfferPrice = productData.price -  ((productData.price * brandOfferData.percentage) / 100)
+            if(productData.offerPercentage){
+                resolve(false)
+            }else{
+                db.get().collection(collection.PRODUCT_COLLECTION).updateOne({_id:objectId(productData._id)},
                 {
                     $set:{
                         productOfferPrice : parseInt(productData.price),
                         price: parseInt(newOfferPrice),
-                        offerPercentage :parseInt(brandOfferData.percentage)
+                        offerPercentage :parseInt(brandOfferData.percentage),
+                        offerType : 'brandOffer'
                     }
                 })
-            resolve()
+                resolve()
+            }
+
+            
+           
         })
     },
     getAllBrandOffers:()=>{
@@ -505,14 +525,14 @@ module.exports={
         })
     },
     deleteBrandOffer:(brandOfferId,brand)=>{
-        console.log('brandOfferId         brand       ',brandOfferId,brand)
+        
         return new Promise(async(resolve,reject)=>{
-            let offerProducts = await db.get().collection(collection.PRODUCT_COLLECTION).find({brand:brand}).toArray()
-            console.log(offerProducts)
+            let offerProducts = await db.get().collection(collection.PRODUCT_COLLECTION).find({$and:[{brand:brand},{offerType:"brandOffer"}]}).toArray()
             db.get().collection(collection.BRANDOFFER_COLLECTION).deleteOne({_id:objectId(brandOfferId)}).then(()=>{
-                db.get().collection(collection.PRODUCT_COLLECTION).updateMany({brand:brand},
+                db.get().collection(collection.ADVERTISEMENT_COLLECTION).deleteOne({brandName:brand})
+                db.get().collection(collection.PRODUCT_COLLECTION).updateMany({$and:[{brand:brand},{offerType:"brandOffer"}]},
                     {
-                        $unset:{offerPercentage:1}
+                        $unset:{offerPercentage:1,offerType:1}
                     })
                 resolve(offerProducts)
             })
@@ -598,7 +618,6 @@ module.exports={
         })
     },
     deleteProductOffer:(productOfferId,productName)=>{
-        console.log('lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll',productName,productOfferId)
         return new Promise(async(resolve,reject)=>{
             let product =await db.get().collection(collection.PRODUCT_COLLECTION).findOne({productname:productName})
             
@@ -628,6 +647,37 @@ module.exports={
                 resolve (offerExpiredProducts)
             })
         })
+    },
+
+    addAdvertisement:(advertisementDetails)=>{
+        return new Promise(async(resolve,reject)=>{
+            let brandOffer = await db.get().collection(collection.BRANDOFFER_COLLECTION).findOne({brandName :advertisementDetails.brandName})
+            db.get().collection(collection.ADVERTISEMENT_COLLECTION).insertOne({brandName : advertisementDetails .brandName,details :advertisementDetails.adDetails ,percentage :brandOffer.percentage}).then((data)=>{
+                
+                resolve(data.insertedId)
+            })
+
+            
+        })
+    },
+
+    getAllAdvertisement:()=>{
+        return new Promise(async(resolve,reject)=>{
+            await db.get().collection(collection.ADVERTISEMENT_COLLECTION).find().toArray().then((response)=>{
+                resolve(response)
+            })
+
+        })
+    },
+
+    deleteAdvertisement:(AdId)=>{
+        return new Promise((resolve,reject)=>{
+            db.get().collection(collection.ADVERTISEMENT_COLLECTION).deleteOne({_id:objectId(AdId)}).then((response)=>{
+                resolve(response)
+            })
+        })
     }
+
+
 
 }   

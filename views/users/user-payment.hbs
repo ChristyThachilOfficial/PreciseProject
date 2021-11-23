@@ -1,4 +1,4 @@
-{{!-- <script src="https://www.paypal.com/sdk/js?client-id=AUM8cG2b7wJn_1WRj3en5cpfd0kqWcbsN95p4huRCQxeOuiCpnx0ncMBj_hgJaDTMxZbl9pmdKKP5gB1" defer></script> --}}
+
 <form action="" id="checkout-form">
     <section id="page-title" class="page-title">
         <div class="container">
@@ -126,7 +126,7 @@
                             <div class="billing-address-input clearfix">
                                 <label>POSTCODE / ZIP *</label>
                                 <input id="zipcode" name="zipcode" type="number">
-                            </div>
+                            </div><br>
                             {{!-- <div class="billing-address-input clearfix">
                                 <label>EMAIL ADDRESS *</label>
                                 <input type="text">
@@ -134,7 +134,7 @@
                             <div class="billing-address-input clearfix" style="margin-bottom:0px">
                                 <label>PHONE *</label>
                                 <input id="phone" name="phone" type="number">
-                            </div>
+                            </div><br>
                             {{!-- <div class="cbab-create-account">
                                 <input id="regnum" type="checkbox" name="regnum">
                                 <label>Use registered phone number</label>
@@ -187,24 +187,24 @@
                             <p>Select your payment method</p>
                             <div class="pcb-cuppon-input clearfix">
                                 {{!-- changed from payment to payment method --}}
-                                <input type="radio" value="COD" onchange="showPlaceOrderButton()" name="paymentMethod">
+                                <input type="radio" value="COD" id="CODbutton" onclick="showPlaceOrderButton()"  name="paymentMethod">
                                 <label
                                     style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">COD</label>
                             </div>
                             <div class="pcb-cuppon-input clearfix">
-                                <input type="radio" value="Razorpay" onchange="showPlaceOrderButton()" name="paymentMethod">
+                                <input type="radio" value="Razorpay" onclick="showPlaceOrderButton()" id="razorpayButton"  name="paymentMethod">
                                 <label style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">Razorpay</label>
 
                             </div>
                             <div class="pcb-cuppon-input clearfix">
-                                <input type="radio" id="paymentRadio" onchange="hidePlaceOrderButton()" value="paypal" name="paymentMethod">
+                                <input type="radio"  id="paypalButton" onclick="avoidRepeatButton()" value="paypal" name="paymentMethod">
                                 <label style="margin-left: 10px;color: #000000;font-size: 14px;font-weight: 400;">Paypal</label>
                                 
                             </div>
 
                             {{!-- div for paypal button --}}
                              {{!-- paypal button --}}
-                                {{!-- <div id="paypal-button-container"></div> --}}
+                                
                                 <div id="paypal-button"></div>
 
 
@@ -212,7 +212,7 @@
 
                             <div class="create-account-checkout-method">
                                 <div class="place-order">
-                                    <button id="placeOrderButton" class="checkout-page-button hvr-bs">Place order</button>
+                                    <button id="placeOrderButton" type="submit" class="checkout-page-button hvr-bs">Place order</button>
                                 </div>
                             </div>
                         </div>
@@ -221,6 +221,23 @@
             </div>
     </section>
 </form>
+
+
+<script>
+    function showPlaceOrderButton(){
+        document.getElementById('paypal-button').style.display = 'none'
+        document.getElementById('placeOrderButton').style.display = 'block'
+
+    }
+
+    function avoidRepeatButton(){
+        document.getElementById('paypal-button').innerHTML = ' '
+    }
+
+</script>
+
+
+
 <script>
     function a(firstname, lastname, housename, streetaddress, address, town, state, zipcode, phone, altnum) {
         document.getElementById('firstname').value = firstname
@@ -237,117 +254,7 @@
     }
 </script>
 
-<script>
-    function hidePlaceOrderButton(){
-       
-    document.getElementById('placeOrderButton').style.display = 'none'
-    document.getElementById('paypal-button').style.display = 'block'
-    let count =1;
-    if(count ===1 ){
 
-        {
-    //something will happen now
-    paypal.Button.render({
-
-        // Configure environment
-
-        env: 'sandbox',
-
-        client: {
-
-            sandbox: 'demo_sandbox_client_id',
-
-            production: 'demo_production_client_id'
-
-        },
-
-        // Customize button (optional)
-
-        locale: 'en_US',
-
-        style: {
-
-            size: 'small',
-
-            color: 'gold',
-
-            shape: 'pill',
-
-        },
-
-
-        // Enable Pay Now checkout flow (optional)
-
-        commit: true,
-
-
-        // Set up a payment
-
-        payment: function(data, actions) {
-
-            $.ajax({
-                url: '/currencycoverterCart/' + document.getElementById('totalCartPrice').value,
-                method: 'post',
-                success: (total) => {
-
-                    document.getElementById('usdToInr').value = total
-                }
-            })
-            price = document.getElementById('usdToInr').value
-
-            return actions.payment.create({
-
-                transactions: [{
-
-                    amount: {
-
-                        total: parseFloat(price).toFixed(2),
-
-                        currency: 'USD'
-
-                    }
-
-                }]
-
-            });
-
-        },
-
-        // Execute the payment
-
-        onAuthorize: function(data, actions) {
-
-            return actions.payment.execute().then(function() {
-
-                // Show a confirmation message to the buyer
-
-                window.alert('Thank you for your purchase!');
-
-            });
-
-        }
-
-    }, '#paypal-button');
-}
-
-        count++;
-    }
-
-
-
-
-
-
-
-
-}
-
-function showPlaceOrderButton(){
-    document.getElementById('placeOrderButton').style.display = 'block'
-    document.getElementById('paypal-button').style.display = 'none'
-}
-
-</script>
 
 
 {{!-- paypal script --}}
@@ -437,8 +344,8 @@ function showPlaceOrderButton(){
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
 
-<script>
-    $(document).ready(function () {
+<script >
+    $(document).ready(function() {
         $('#checkout-form').validate({
             rules: {
                 firstname: {
@@ -476,108 +383,151 @@ function showPlaceOrderButton(){
                 }
             },
             submitHandler: () => {
-                $.ajax({
-                    url: '/place-order',
-                    method: 'post',
-                    data: $('#checkout-form').serialize(),
-                    success: (response) => {
+                if (document.getElementById('CODbutton').checked == true || document.getElementById('razorpayButton').checked == true || document.getElementById('paypalButton').checked == true) {
+                    if (document.getElementById('CODbutton').checked == true) {
+                        
+                        $.ajax({
+                            url: '/place-order',
+                            method: 'post',
+                            data: $('#checkout-form').serialize(),
+                            success: (response) => {
 
-                        if (response.codSuccess) {
-                            console.log(response)
-                            location.href = '/ordersuccess'
-                        } else if(response.method === 'paypal'){
-                            //something will happen now
-                            paypal.Button.render({
-
-    // Configure environment
-
-    env: 'sandbox',
-
-    client: {
-
-      sandbox: 'demo_sandbox_client_id',
-
-      production: 'demo_production_client_id'
-
-    },
-
-    // Customize button (optional)
-
-    locale: 'en_US',
-
-    style: {
-
-      size: 'small',
-
-      color: 'gold',
-
-      shape: 'pill',
-
-    },
+                                if (response.codSuccess) {
+                                    console.log(response)
+                                    location.href = '/ordersuccess'
+                                } else {
+                                    location.href = '/errorPage'
+                                }
+                            }
+                        })
+                    } else if (document.getElementById('paypalButton').checked == true) {
+                        document.getElementById('paypal-button').style.display = 'block'
 
 
-    // Enable Pay Now checkout flow (optional)
+                        paypal.Button.render({
 
-    commit: true,
+                            // Configure environment
+
+                            env: 'sandbox',
+
+                            client: {
+
+                                sandbox: 'demo_sandbox_client_id',
+
+                                production: 'demo_production_client_id'
+
+                            },
+
+                            // Customize button (optional)
+
+                            locale: 'en_US',
+
+                            style: {
+
+                                size: 'small',
+
+                                color: 'gold',
+
+                                shape: 'pill',
+
+                            },
 
 
-    // Set up a payment
+                            // Enable Pay Now checkout flow (optional)
 
-    payment: function(data, actions) {
+                            commit: true,
 
-        $.ajax({
-                url: '/currencycoverterCart/' + document.getElementById('totalCartPrice').value,
-                method: 'post',
-                success: (total) => {
-                   
-                    document.getElementById('usdToInr').value = total
-                }
-            })
-            price = document.getElementById('usdToInr').value
 
-      return actions.payment.create({
-          
-        transactions: [{
+                            // Set up a payment
 
-          amount: {
+                            payment: function(data, actions) {
 
-            total: parseFloat(price).toFixed(2),
+                                $.ajax({
+                                    url: '/currencycoverterCart/' + document.getElementById('totalCartPrice').value,
+                                    method: 'post',
+                                    success: (total) => {
 
-            currency: 'USD'
+                                        document.getElementById('usdToInr').value = total
+                                    }
+                                })
+                                price = document.getElementById('usdToInr').value
 
-          }
+                                return actions.payment.create({
 
-        }]
+                                    transactions: [{
 
-      });
+                                        amount: {
 
-    },
+                                            total: parseFloat(price).toFixed(2),
 
-    // Execute the payment
+                                            currency: 'USD'
 
-    onAuthorize: function(data, actions) {
+                                        }
 
-      return actions.payment.execute().then(function() {
+                                    }]
 
-        // Show a confirmation message to the buyer
+                                });
 
-        window.alert('Thank you for your purchase!');
+                            },
 
-      });
+                            // Execute the payment
 
-    }
+                            onAuthorize: function(data, actions) {
 
-  }, '#paypal-button');
-                        }
-                        else {
-                            razorpayPayment(response)
-                        }
+                                return actions.payment.execute().then(function() {
+
+
+                                    $.ajax({
+                                        url: '/place-order',
+                                        method: 'post',
+                                        data: $('#checkout-form').serialize(),
+                                        success: (response) => {
+
+                                            if (response) {
+                                                console.log(response)
+                                                location.href = '/ordersuccess'
+                                            } else {
+                                                location.href = '/errorPage'
+                                            }
+                                        }
+                                    })
+
+                                    // Show a confirmation message to the buyer
+
+
+
+                                });
+
+                            }
+
+                        }, '#paypal-button');
+                        
+                        document.getElementById('placeOrderButton').style.display = 'none'
+
+                    }else if(document.getElementById('razorpayButton').checked == true){
+                        
+                        $.ajax({
+                            url: '/place-order',
+                            method: 'post',
+                            data: $('#checkout-form').serialize(),
+                            success: (response) => {
+                                if (response) {
+                                    razorpayPayment(response)
+                                } else {
+                                    location.href = '/errorPage'
+                                }
+                            }
+                        })
                     }
-                })
+                }
+
+
+
+
             }
         })
     })
-</script>
+     </script>
 
 
 <style>

@@ -62,10 +62,7 @@
                     </div>
                     
 
-                    <div class="mb-3 ">
-                      <label for="exampleInputEmail1" class="form-label ">Date</label>
-                      <input type="date" name="date" value="{{product.date}}" class="form-control " id="exampleInputEmail1" aria-describedby="emailHelp">
-                    </div>
+                   
                     <div class="col-12">
                       <div id="image-box" style="width: 300px; height: 300px; display: none;" > </div>
                    
@@ -116,7 +113,7 @@
         var fileInput = document.getElementById('file1');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg)$/i;
+        var allowedExtensions = /(\.jpg|\.webp|\.jpeg)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess1').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
             fileInput.value = '';
@@ -169,7 +166,7 @@
         var fileInput = document.getElementById('file2');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg)$/i;
+        var allowedExtensions = /(\.jpg|\.webp|\.jpeg)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess2').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
             fileInput.value = '';
@@ -221,7 +218,7 @@
         var fileInput = document.getElementById('file3');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg)$/i;
+        var allowedExtensions = /(\.jpg|\.webp|\.jpeg)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess3').innerHTML='<p style="color:red; display:block;">Invalid file type</p>'
             fileInput.value = '';

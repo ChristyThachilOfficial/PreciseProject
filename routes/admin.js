@@ -468,6 +468,32 @@ router.get('/deleteProductOffer/:productOfferId/:productName',adminLoginHelper,(
   })
 })
 
+//advertisement management
+router.get('/advertisementManagement',adminLoginHelper,async(req,res,next)=>{
+  let allBrandOffers = await productHelpers.getAllBrandOffers()
+  let allAds = await productHelpers.getAllAdvertisement()
+  console.log(allAds)
+  
+  res.render('admin/admin-adManangement',{typeOfPersonAdmin:true,admin:true,allBrandOffers,allAds})
+})
+
+
+//post advertisement
+router.post('/addAdvertisement',adminLoginHelper,(req,res,next)=>{
+  productHelpers.addAdvertisement(req.body).then((id)=>{
+    let image = req.files.offerImage
+   
+    image.mv("../ProjectClone22/public/userImages/" + id + ".jpg")
+    res.redirect('/admin/advertisementManagement')
+  })
+})
+
+//delete advertisement
+router.get('/deleteAdvertisement/:AdId',adminLoginHelper,(req,res,next)=>{
+  productHelpers.deleteAdvertisement(req.params.AdId).then((response)=>{
+    res.json(response)
+  })
+})
 
 //admin logout
 router.get('/logout',(req,res,next)=>{

@@ -10,8 +10,8 @@
                     <th scope="col">Date</th>
                     
                      <th scope="col">Address</th>
-                    <th scope="col">Pincode</th>
-                     <th scope="col">Mobile</th>
+                    {{!-- <th scope="col">Pincode</th> --}}
+                     {{!-- <th scope="col">Mobile</th> --}}
                     <th scope="col">Amount</th>
                     <th scope="col">payment</th>
                     <th scope="col">Status</th>
@@ -44,9 +44,9 @@
                            {{this.deliveryDetails.address}}
                         </td>
                         
-                        <td>{{this.deliveryDetails.zipcode}}</td>    
+                        {{!-- <td>{{this.deliveryDetails.zipcode}}</td>     --}}
                         
-                         <td>{{this.deliveryDetails.phone}}</td>    
+                         {{!-- <td>{{this.deliveryDetails.phone}}</td>     --}}
                         <td>
                            
                             {{this.totalAmount}}
@@ -56,8 +56,8 @@
                           <td>{{this.status}}</td>
 
                           <td>
-                              <a href="/vieworderproducts/{{this._id}}" class="btn btn-primary">products</a>
-                              <a href="/invoice/{{this._id}}" class="btn btn-primary ">Invoice</a>
+                              <a href="/vieworderproducts/{{this._id}}" class="btn btn-primary mt-2">products</a>
+                              <a href="/invoice/{{this._id}}" class="btn btn-primary mt-2">Invoice</a>
                           </td>
 
                        

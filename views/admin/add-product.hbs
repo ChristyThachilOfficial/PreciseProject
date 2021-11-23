@@ -129,7 +129,7 @@
         var fileInput = document.getElementById('file1');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg|\.webp)$/i;
+        var allowedExtensions = /(\.jpg|\.webp|\.jpeg)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess1').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
             fileInput.value = '';
@@ -184,7 +184,7 @@
         var fileInput = document.getElementById('file2');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg|\.webp)$/i;
+        var allowedExtensions = /(\.jpg|\.webp|\.jpeg)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess2').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
             fileInput.value = '';
@@ -240,7 +240,7 @@
         var fileInput = document.getElementById('file3');
         
         var filePath = fileInput.value;
-        var allowedExtensions = /(\.jpg|\.webp)$/i;
+        var allowedExtensions = /(\.jpg|\.webp|\.jpeg)$/i;
         if (!allowedExtensions.exec(filePath)) {
             document.getElementById('errMess3').innerHTML='<p style="color:red; display: block;">Invalid file type</p>'
             fileInput.value = '';

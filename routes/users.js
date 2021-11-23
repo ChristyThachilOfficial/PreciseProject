@@ -56,6 +56,8 @@ router.get("/", async function (req, res, next) {
     userHelpers.deleteCoupon(data._id)
   })
 
+
+  let allAds = await productHelpers.getAllAdvertisement()
   if (req.session.loggedIn) {
     let user = req.session.user;
     console.log('where is the user id i want to get that for lobin',req.session.user)
@@ -74,7 +76,8 @@ router.get("/", async function (req, res, next) {
         userrr: req.session.user,
         cart,
         category,
-        wishlistProducts
+        wishlistProducts,
+        allAds
       });
     });
   } else {
@@ -85,7 +88,8 @@ router.get("/", async function (req, res, next) {
         user: false,
         typeOfPersonUser: true,
         productsData,
-        category
+        category,
+        allAds
       });
     });
   }
@@ -155,6 +159,13 @@ router.get("/loginwithotp", (req, res, next) => {
       
     });
     req.session.loginErr = false;
+  }else if(req.session.userblock){
+    res.render("users/user-loginWithNumber", {
+      typeOfPersonUser: true,
+      users: false,
+      userblock:true
+    });
+    req.session.userblock = false
   } else {
     res.render("users/user-loginWithNumber", {
       typeOfPersonUser: true,
@@ -170,10 +181,14 @@ router.post("/loginwithotp", async (req, res, next) => {
   mobile = parseInt(mob);
   let user = await userHelpers.findUser(req.body.countryCode,req.body.mob);
   if (user) {
-    req.session.userMobileNumber = {countryCode : user.countryCode  , number :user.number}
-    let countryCode = req.session.userMobileNumber.countryCode
-    let number = req.session.userMobileNumber.number
-    twilio.verify
+    if(user.block === 'false'){
+      req.session.userblock = true;
+      res.redirect('/loginwithotp')
+    }else if(user.block === 'true'){
+      req.session.userMobileNumber = {countryCode : user.countryCode  , number :user.number}
+     let countryCode = req.session.userMobileNumber.countryCode
+     let number = req.session.userMobileNumber.number
+      twilio.verify
       .services(keys.ServiceID)
       .verifications.create({ to: "+" + mobile, channel: "sms" })
       .then((verification) => {
@@ -185,7 +200,9 @@ router.post("/loginwithotp", async (req, res, next) => {
         });
       })
       .catch((err) => {});
-  } else {
+    }
+    
+  } else{
     req.session.loginErr = true;
     res.redirect("/loginwithotp");
   }
@@ -345,7 +362,7 @@ router.post("/signupotp", (req, res, next) => {
     .then((verification_check) => {
       console.log(verification_check.status);
       if (verification_check.status == "approved") {
-        console.log(userData);
+        
         userHelpers.verifyUser(userData).then((response) => {
           res.redirect("/login");
         });
@@ -354,11 +371,37 @@ router.post("/signupotp", (req, res, next) => {
         res.render("users/user-signupotp", {
           typeOfPersonUser: true,
           otpError,
+          countryCode : req.session.newUser.countryCode,
+          number: req.session.newUser.number
         });
         otpError = false;
       }
     });
 });
+
+
+//resend signup otp
+router.get('/resend_OTP_signup',(req,res,next)=>{
+  let   countryCode = req.session.newUser.countryCode
+  let   number = req.session.newUser.number
+
+  let mobilenum = parseInt(countryCode + number )
+
+
+  twilio.verify
+  .services(keys.ServiceID)
+  .verifications.create({ to: "+" + mobilenum, channel: "sms" })
+  .then((verification) => {
+    console.log(verification.status);
+    res.render("users/user-signupotp", {
+      typeOfPersonUser: true,
+      users: false,
+    });
+  })
+  .catch((err) => {
+    console.log("the error is", err);
+  });
+})
 
 //GET signup page
 router.get("/signup", (req, res, next) => {
@@ -381,7 +424,10 @@ router.get("/forgotpassword", (req, res, next) => {
     if(req.session.userNumberNotFound){
       res.render("users/user-forgotpassword", { typeOfPersonUser: true, userNumberNotFound:true });
       req.session.userNumberNotFound = false
-    }else{
+    }else if(req.session.userblock){
+      res.render("users/user-forgotpassword", { typeOfPersonUser: true, userblock:true });
+      req.session.userblock = false
+    } else{
       res.render("users/user-forgotpassword", { typeOfPersonUser: true });
     }
     
@@ -394,7 +440,10 @@ router.post("/forgotpassword", (req, res, next) => {
     .findNumber(req.body)
     .then((response) => {
       if (response) {
-        console.log('response in the user router',response)
+        if(response.block == 'false'){
+          req.session.userblock = true;
+          res.redirect('/forgotpassword')
+        }else if(response.block == 'true'){
         req.session.userMobileNumber = {countryCode : response.countryCode  , number :response.number}
         let countryCode = req.session.userMobileNumber.countryCode
         let number = req.session.userMobileNumber.number
@@ -410,6 +459,8 @@ router.post("/forgotpassword", (req, res, next) => {
             console.log("Teh err is : ", err);
           });
         res.render("users/user-otpverify", { typeOfPersonUser: true, countryCode , number });
+        }
+        
       }else{
         req.session.userNumberNotFound = true
         res.redirect('/forgotpassword')
@@ -619,6 +670,10 @@ router.post("/place-order",loginHelper, async (req, res, next) => {
     })
     if (req.body["paymentMethod"] === "COD") {
       res.json({ codSuccess: true });
+    }else if(req.body["paymentMethod"] === "paypal"){
+      userHelpers.generatePaypal(orderId,totalPrice).then((response)=>{
+        res.json(response)
+      })
     }
      else{
       userHelpers.generateRazorpay(orderId, totalPrice).then((response) => {
@@ -781,10 +836,14 @@ router.post("/buyNowplace-order", loginHelper,async (req, res, next) => {
      
       if (req.body["paymentMethod"] === "COD") {
         res.json({ codSuccess: true });
-      } else {
+      } else if(req.body["paymentMethod"] === "Razorpay"){
         userHelpers.generateRazorpay(orderId, totalPrice).then((response) => {
           res.json(response);
         });
+      }else{
+        userHelpers.generatePaypal(orderId,totalPrice).then((response)=>{
+          res.json(response)
+        })
       }
     });
     productHelpers.updateTotalQuantity(req.body.proId)
@@ -894,6 +953,7 @@ router.get('/formens',async(req,res,next)=>{
 
 })
 
+
 //shop for women's
 router.get('/forwomens',async(req,res,next)=>{
 
@@ -998,7 +1058,7 @@ router.get('/totalOrders',loginHelper,(req,res,next)=>{
 })
 
 //paypal currency converter cart
-router.post('/currencycoverterCart/:amount',(req,res)=>{
+router.post('/currencycoverterCart/:amount',(req,res)=>{  
   userHelpers.convertAmount(req.params.amount).then((total)=>{
     res.json(total)
   })
@@ -1010,6 +1070,12 @@ router.get('/getSearchProducts/:text',(req,res,next)=>{
     console.log(searchResult)
     res.json(searchResult)
   })
+})
+
+
+//error page
+router.get('/errorPage',(req,res,next)=>{
+  res.render('users/404',{typeOfPersonUser:true})
 })
 
 //logout

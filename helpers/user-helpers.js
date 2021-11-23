@@ -6,11 +6,19 @@ const { response } = require("express");
 const Razorpay = require("razorpay");
 const { resolve } = require("path");
 const axios = require('axios')
+var paypal = require('paypal-rest-sdk')
 const ACCESS_KEY= '0def761e0fef0efed2cecd235b25aa04'
 var instance = new Razorpay({
   key_id: "rzp_test_Fu2xGkKojPgkAm",
   key_secret: "EjgkpT60XJNQQgBvrvqJVWDn",
 });
+
+paypal.configure({
+  'mode': 'sandbox', //sandbox or live
+  'client_id': 'AUM8cG2b7wJn_1WRj3en5cpfd0kqWcbsN95p4huRCQxeOuiCpnx0ncMBj_hgJaDTMxZbl9pmdKKP5gB1',
+  'client_secret': 'EJ5tFWjw35665w8Ejf-mXQhJtZ5kdXiDrgAmE4dQq69fcurFxrVZrU-cHEisIIGWmmvc8AC1meF17c0m'
+});
+
 
 module.exports = {
   doSignup: (userData) => {
@@ -32,13 +40,19 @@ module.exports = {
     });
   },
   findUser: (userCountryCode,userMobile) => {
-    return new Promise((resolve, reject) => {
-      db.get()
+    return new Promise(async(resolve, reject) => {
+       let user =  await
+        db.get()
         .collection(collection.USER_COLLECTIONS)
-        .findOne({ number: userMobile ,countryCode :userCountryCode})
-        .then((response) => {
-          resolve(response);
-        });
+        .findOne({$and : [ {number: userMobile  } , {countryCode :userCountryCode}]})
+        
+       
+        if(user){
+         resolve(user)
+        }else{
+          resolve(false)
+        }
+         
     });
   },
   verifyUser: (userData) => {
@@ -259,7 +273,8 @@ module.exports = {
       userNumber = await db
         .get()
         .collection(collection.USER_COLLECTIONS)
-        .findOne({ countryCode:userNum.countryCode,number: userNum.mob });
+        .findOne({$and :[{countryCode:userNum.countryCode},{number: userNum.mob}]});
+        
         console.log(userNumber)
       if (userNumber) {
         resolve(userNumber);
@@ -520,7 +535,7 @@ module.exports = {
       let orders = await db
         .get()
         .collection(collection.ORDER_COLLECTION)
-        .find({ userId: objectId(userId) }).sort({date:-1})
+        .find({ userId: objectId(userId) }).sort({date:1})
         .toArray();
       resolve(orders);
     });
@@ -572,6 +587,48 @@ module.exports = {
       resolve(orderItems);
     });
   },
+  generatePaypal:(orderId,total)=>{
+    totalPrice = parseFloat(total).toFixed(2)
+    return new Promise((resolve,reject)=>{
+      var create_payment_json = {
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"
+        },
+        "redirect_urls": {
+            "return_url": 'http://localhost:8000/test',
+            "cancel_url": "http://cancel.url"
+        },
+        "transactions": [{
+            "item_list": {
+                "items": [{
+                    "name": orderId,
+                    "sku": "item",
+                    "price": parseInt(totalPrice),
+                    "currency": "USD",
+                    "quantity": 1
+                }]
+            },
+            "amount": {
+                "currency": "USD",
+                "total": parseInt(totalPrice),
+            },
+            "description": "The Payement success"
+        }]
+    };
+    paypal.payment.create(create_payment_json, function (error, payment) {
+        if (error) {
+            console.log('🦈🦈🦈🦈🦈 The error in payement : ', error.response.details)
+            reject(false);
+        } else {
+            console.log(payment)
+            console.log('🦠🦠🦠🦠🦠🦠🦠 : ', payment.transactions[0].item_list.items[0]);
+            resolve(payment)
+        }
+    });
+    })
+  },
+  
   generateRazorpay: (orderId, total) => {
     return new Promise((resolve, reject) => {
       var options = {
@@ -662,6 +719,7 @@ module.exports = {
         .get()
         .collection(collection.ORDER_COLLECTION)
         .find()
+        .sort({_id:-1})
         .toArray();
       resolve(orders);
     });
@@ -1049,7 +1107,7 @@ module.exports = {
     return new Promise(async(resolve,reject)=>{
         amount = parseInt(amount)
         axios.get(`http://apilayer.net/api/live?access_key=${ACCESS_KEY}&currencies=INR`).then(response => {
-          console.log('ddddddddddddddddddddddddddddddddddddddddddddddd',response)
+          
             amount = amount/response.data.quotes.USDINR
             resolve(amount)
         })
@@ -1057,45 +1115,6 @@ module.exports = {
        
     })  
 },
-generatePaypal:(orderId,totalprice)=>{
-  totalPrice = parseFloat(totalPrice).toFixed(2)
-  return new Promise((resolve,reject)=>{
-    var create_payment_json = {
-      "intent": "sale",
-      "payer": {
-          "payment_method": "paypal"
-      },
-      "redirect_urls": {
-          "return_url": 'http://localhost:8000/test',
-          "cancel_url": "http://cancel.url"
-      },
-      "transactions": [{
-          "item_list": {
-              "items": [{
-                  "name": orderId,
-                  "sku": "item",
-                  "price": totalprice,
-                  "currency": "USD",
-                  "quantity": 1
-              }]
-          },
-          "amount": {
-              "currency": "USD",
-              "total": totalprice,
-          },
-          "description": "The Payement success"
-      }]
-  };
-  paypal.payment.create(create_payment_json, function (error, payment) {
-      if (error) {
-          console.log('🦈🦈🦈🦈🦈 The error in payement : ', error.response.details)
-          reject(false);
-      } else {
-          console.log('🦠🦠🦠🦠🦠🦠🦠 : ', payment.transactions[0].item_list.items[0]);
-          resolve(true)
-      }
-  });
-  })
-}
+
 
 };
