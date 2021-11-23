@@ -71,9 +71,9 @@ Handlebars.registerHelper('wishlistADDtocart',function(context,options,price){
     }
   }
   if (inp===true) {
-    var data =`<a href="/cart" class="btn btn-primary mt-2" >View cart</a>`
+    var data =`<a href="/cart" style="width: 101px;" class="btn btn-primary mt-2" >View cart</a>`
   }else{
-    var data=`<a onclick="addToCart('${options}','${price}')" class="btn btn-primary mt-2 text-white"  ">Add to cart</a>`
+    var data=`<a style="width: 101px;" onclick="addToCart('${options}','${price}')" class="btn btn-primary mt-2 text-white"  ">Add to cart</a>`
   }
   return data
 });
