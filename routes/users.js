@@ -60,13 +60,13 @@ router.get("/", async function (req, res, next) {
   let allAds = await productHelpers.getAllAdvertisement()
   if (req.session.loggedIn) {
     let user = req.session.user;
-    console.log('where is the user id i want to get that for lobin',req.session.user)
+    
     let cart = await userHelpers.getCartProduct(req.session.user._id);
     let category=await productHelpers.getAllCategory()
     let cartCount = await userHelpers.getCartCount(req.session.user._id);
     let wishlistProducts = await userHelpers.getWishListProducts(req.session.user._id)
     productHelpers.getallProducts().then((productsData) => {
-      console.log(productsData)
+      
       res.render("users/user-home", {
         users: true,
         user: true,
@@ -150,7 +150,7 @@ router.get("/login", (req, res, next) => {
 
 //login with otp loginwithotp1
 router.get("/loginwithotp", (req, res, next) => {
-  console.log('we have reached our first destiny 🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚🚚')
+  
   if (req.session.loginErr) {
     res.render("users/user-loginWithNumber", {
       typeOfPersonUser: true,
@@ -176,7 +176,7 @@ router.get("/loginwithotp", (req, res, next) => {
 
 //post login otp loginwithotp2 here twilio gets the user number
 router.post("/loginwithotp", async (req, res, next) => {
-  console.log('we have reached to our second destiny 😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎😎')
+  
   mob = req.body.countryCode + req.body.mob;
   mobile = parseInt(mob);
   let user = await userHelpers.findUser(req.body.countryCode,req.body.mob);
@@ -214,7 +214,7 @@ router.post("/loginwithotp", async (req, res, next) => {
 
 //post otp verify loginwithotp3 here the user send his otp 
 router.post("/loginotp", (req, res, next) => {
-  console.log('this is our final destiny....................❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️')
+  
   let otp = req.body.otp;
   let countryCode = req.body.countryCode;
   let number = req.body.num;
@@ -223,7 +223,7 @@ router.post("/loginotp", (req, res, next) => {
     .services(keys.ServiceID)
     .verificationChecks.create({ to: "+" + mobNum, code: otp })
     .then((verification_check) => {
-      console.log(verification_check.status);
+     
       if (verification_check.status == "approved") {
         userHelpers.findUser(countryCode,number).then((response) => {
           req.session.userMobileNumber = false
@@ -232,7 +232,7 @@ router.post("/loginotp", (req, res, next) => {
           res.redirect("/");
         });
       } else {
-        console.log('user daaaaaaaaaaaaaata njn sessionill eduthu njan arrrrrrra mwo',req.session.userMobileNumber)
+        
         let countryCode = req.session.userMobileNumber.countryCode
         let number = req.session.userMobileNumber.number
         otpError = true;
@@ -280,7 +280,7 @@ router.post("/login", async (req, res, next) => {
     if (response.status) {
       req.session.loggedIn = true;
       req.session.user = response.user;
-      console.log("block status", req.session.user.block);
+      
       if (req.session.user.block == "false") {
         req.session.userblock = true;
         res.redirect("/login");
@@ -330,12 +330,12 @@ router.post("/signup", (req, res, next) => {
       res.redirect("/signup");
     } else {
       req.session.newUser = req.body;
-      console.log("req.session.userRegnum", mobilenum);
+      
       twilio.verify
         .services(keys.ServiceID)
         .verifications.create({ to: "+" + mobilenum, channel: "sms" })
         .then((verification) => {
-          console.log(verification.status);
+          
           res.render("users/user-signupotp", {
             typeOfPersonUser: true,
             users: false,
@@ -355,12 +355,12 @@ router.post("/signupotp", (req, res, next) => {
     req.session.newUser.countryCode + req.session.newUser.number
   );
 
-  console.log("userData and otp is :", mobileNum);
+  
   twilio.verify
     .services(keys.ServiceID)
     .verificationChecks.create({ to: "+" + mobileNum, code: req.body.otp })
     .then((verification_check) => {
-      console.log(verification_check.status);
+     
       if (verification_check.status == "approved") {
         
         userHelpers.verifyUser(userData).then((response) => {
@@ -392,7 +392,7 @@ router.get('/resend_OTP_signup',(req,res,next)=>{
   .services(keys.ServiceID)
   .verifications.create({ to: "+" + mobilenum, channel: "sms" })
   .then((verification) => {
-    console.log(verification.status);
+    
     res.render("users/user-signupotp", {
       typeOfPersonUser: true,
       users: false,
@@ -449,8 +449,7 @@ router.post("/forgotpassword", (req, res, next) => {
         let number = req.session.userMobileNumber.number
         let mobile = parseInt( countryCode + number)
         req.session.userRegnum = response;
-        console.log(req.session.userRegnum);
-        console.log(response);
+        
         twilio.verify
           .services(keys.ServiceID)
           .verifications.create({ to: "+" + mobile, channel: "sms" })
@@ -479,7 +478,7 @@ router.post("/otpverify", (req, res) => {
     .services(keys.ServiceID)
     .verificationChecks.create({ to: "+" + mobile, code: req.body.otp })
     .then((verification_check) => {
-      console.log(verification_check.status);
+      
       if (verification_check.status == "approved") {
         res.render("users/user-changepassword", {
           countryCode,
@@ -659,7 +658,7 @@ router.get("/checkout", async (req, res, next) => {
 //post place order
 
 router.post("/place-order",loginHelper, async (req, res, next) => {
-  console.log('the place orderllllllllllllllllllllllllllllll',req.body)
+  
   
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = req.body.totalCartPrice
@@ -707,7 +706,7 @@ router.get("/vieworders", loginHelper, async (req, res, next) => {
   let category=await productHelpers.getAllCategory()
   let orders = await userHelpers.getUserOrders(req.session.user._id);
   let cartCount = await userHelpers.getCartCount(req.session.user._id);
-  console.log(orders)
+  
   res.render("users/user-myorders", {
     typeOfPersonUser: true,
     users: true,
@@ -760,7 +759,7 @@ router.post("/verify-payment", (req, res, next) => {
     .verifyPayment(req.body)
     .then(() => {
       userHelpers.changePaymentStatus(req.body["order[receipt]"]).then(() => {
-        console.log("payment successfull");
+        
         res.json({ status: true });
       });
     })
@@ -795,7 +794,7 @@ router.post("/updateuserdetails", loginHelper, async (req, res, next) => {
     .then((id) => {
       if(req.files){
         let image = req.files.image;
-      console.log("what is this id coming here", id);
+      
       image.mv("../ProjectClone22/public/userImages/" + id + ".jpg");
       res.redirect("/profile");
       }else{
@@ -1051,7 +1050,7 @@ router.get('/deleteWishlistProduct/:productId',loginHelper,(req,res,next)=>{
 //get total orders
 router.get('/totalOrders',loginHelper,(req,res,next)=>{
   productHelpers.getOrderedProductsByStatus().then((orderlist)=>{
-    console.log(orderlist)
+    
     res.render('users/user-totalOrders',{typeOfPersonUser:true,users:true,user:true,orderlist})
   })
  
@@ -1067,7 +1066,7 @@ router.post('/currencycoverterCart/:amount',(req,res)=>{
 //user product search
 router.get('/getSearchProducts/:text',(req,res,next)=>{
   productHelpers.findSearchProducts(req.params.text).then((searchResult)=>{
-    console.log(searchResult)
+    
     res.json(searchResult)
   })
 })

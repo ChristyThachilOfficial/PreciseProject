@@ -198,7 +198,7 @@ router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
 
   //post sales report to get orders between dates
   router.post('/totalSalesBetweenDates',adminLoginHelper,async(req,res,next)=>{
-    console.log(req.body)
+    
     let startDate = req.body.startDate
     let endDate = req.body.endDate
     
@@ -259,7 +259,7 @@ router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
   router.post('/addCoupons',adminLoginHelper,(req,res,next)=>{
     req.body.percentage =parseInt(req.body.percentage)
     userHelpers.addCoupons(req.body).then((response)=>{
-      console.log(response)
+      
      if( response.yesItExists){
        req.session.couponExists = true
        res.redirect('/admin/coupons')
@@ -365,7 +365,7 @@ router.get('/deleteCategory/:id',adminLoginHelper,(req,res,next)=>{
 router.get('/deliveredOrders',adminLoginHelper,(req,res,next)=>{
   productHelpers.getDeliveredOrders().then((totalDeliveredOrder)=>{
     let todayDate = new Date().toISOString().slice(0,10)
-    console.log(totalDeliveredOrder)
+    
     res.render('admin/admin-deliveredSalesReport',{typeOfPersonAdmin:true,admin:true,totalDeliveredOrder,todayDate})
   })
 })
@@ -431,7 +431,7 @@ router.post('/addBrandOffer',adminLoginHelper,(req,res,next)=>{
 
 //delete product offer
 router.get('/deleteBrandOffer/:prodOfferId/:brand',adminLoginHelper,(req,res,next)=>{
-  console.log('req.params.prodOfferId,req.params.brand',req.params.prodOfferId,req.params.brand)
+  
   productHelpers.deleteBrandOffer(req.params.prodOfferId,req.params.brand).then((brandProducts)=>{
     brandProducts.map((data)=>{
       productHelpers.updatePriceToRealPrice(data)
@@ -471,7 +471,7 @@ router.post('/addProductOffer',adminLoginHelper,(req,res,next)=>{
 
 //delete product offer
 router.get('/deleteProductOffer/:productOfferId/:productName',adminLoginHelper,(req,res,next)=>{
-  console.log('what is happening right now ',req.params.productOfferId,req.params.productName)
+  
   productHelpers.deleteProductOffer(req.params.productOfferId,req.params.productName).then(()=>{
     res.json({status:true})
   })
@@ -481,7 +481,7 @@ router.get('/deleteProductOffer/:productOfferId/:productName',adminLoginHelper,(
 router.get('/advertisementManagement',adminLoginHelper,async(req,res,next)=>{
   let allBrandOffers = await productHelpers.getAllBrandOffers()
   let allAds = await productHelpers.getAllAdvertisement()
-  console.log(allAds)
+  
   
   res.render('admin/admin-adManangement',{typeOfPersonAdmin:true,admin:true,allBrandOffers,allAds})
 })

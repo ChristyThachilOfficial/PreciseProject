@@ -470,7 +470,7 @@ module.exports={
            
            if (brand) {
                let IsBrandOfferExists = await db.get().collection(collection.BRANDOFFER_COLLECTION).findOne({brandName:brandOfferData.brandName})
-               console.log(IsBrandOfferExists)
+               
                if (IsBrandOfferExists === null) {
                 db.get().collection(collection.BRANDOFFER_COLLECTION).insertOne(brandOfferData).then(()=>{
                     resolve(brand)

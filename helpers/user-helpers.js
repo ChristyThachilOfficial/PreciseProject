@@ -268,14 +268,14 @@ module.exports = {
     });
   },
   findNumber: (userNum) => {
-    console.log('userrrrrrrrrrrrrrrrrrrrrrnumber is ',userNum)
+    
     return new Promise(async (resolve, reject) => {
       userNumber = await db
         .get()
         .collection(collection.USER_COLLECTIONS)
         .findOne({$and :[{countryCode:userNum.countryCode},{number: userNum.mob}]});
         
-        console.log(userNumber)
+        
       if (userNumber) {
         resolve(userNumber);
       } else {
@@ -618,11 +618,10 @@ module.exports = {
     };
     paypal.payment.create(create_payment_json, function (error, payment) {
         if (error) {
-            console.log('🦈🦈🦈🦈🦈 The error in payement : ', error.response.details)
+            
             reject(false);
         } else {
-            console.log(payment)
-            console.log('🦠🦠🦠🦠🦠🦠🦠 : ', payment.transactions[0].item_list.items[0]);
+            
             resolve(payment)
         }
     });
@@ -875,7 +874,7 @@ module.exports = {
     })
   },
   addCoupons:(couponData)=>{
-    console.log(couponData)
+    
     return new Promise(async(resolve,reject)=>{
       let coupon= await db.get().collection(collection.COUPON_COLLECTION).findOne({coupon:couponData.coupon})
       if(coupon){
@@ -940,7 +939,7 @@ module.exports = {
     return new Promise(async(resolve,reject)=>{
       let coupon = await db.get().collection(collection.COUPON_COLLECTION).findOne({coupon:couponCode})
       if(coupon){
-        console.log(coupon)
+        
         let isCouponUsed = await db.get().collection(collection.ORDER_COLLECTION).findOne({userId:objectId(userId),coupon:coupon.coupon})
         if(isCouponUsed === null){
           let couponSuccess ={}
@@ -1048,11 +1047,11 @@ module.exports = {
           }
         }
       ]).toArray()
-      console.log(wishlistProducts)
+      
       if(wishlistProducts[0]){
         for(key in wishlistProducts){
           let products = await db.get().collection(collection.PRODUCT_COLLECTION).findOne({_id:objectId(wishlistProducts[key]._id)})
-          console.log(products)
+          
           db.get().collection(collection.WISHLIST_COLLECTION).updateOne({wishListProduct:{$elemMatch:{_id:objectId(wishlistProducts[key]._id)}}},
           {
             $set:{
