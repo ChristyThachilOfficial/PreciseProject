@@ -220,9 +220,7 @@ module.exports={
         {
             $inc:{quantity:-1}
         }
-        ).then(()=>{
-            resolve()
-        })
+        )
     },
     updateTotalQuantityCart:(product)=>{
        

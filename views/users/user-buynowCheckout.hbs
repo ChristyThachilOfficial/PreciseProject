@@ -427,15 +427,8 @@
 
                             payment: function(data, actions) {
 
-                                $.ajax({
-                                    url: '/currencycoverterCart/' + document.getElementById('totalfinalPrice').value,
-                                    method: 'post',
-                                    success: (total) => {
-
-                                        document.getElementById('usdToInr').value = total
-                                    }
-                                })
-                                price = document.getElementById('usdToInr').value
+                                
+                                price = (document.getElementById('totalfinalPrice').value)/74
 
                                 return actions.payment.create({
 

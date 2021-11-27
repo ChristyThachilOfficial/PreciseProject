@@ -9,6 +9,7 @@ var session=require('express-session')
 var fileUpload = require('express-fileupload')
 var helper= require('handlebars-helpers')()
 var Handlebars=require('handlebars')
+require('dotenv').config()
 
 
 var usersRouter = require('./routes/users');
