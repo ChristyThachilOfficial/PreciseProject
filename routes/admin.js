@@ -113,9 +113,9 @@ router.post("/addproduct",adminLoginHelper, (req, res, next) => {
     let image2 = req.files.image2;
     let image3 = req.files.image3;
 
-    image1.mv("../ProjectClone22/public/productImages/" + id + "__1.jpg");
-    image2.mv("../ProjectClone22/public/productImages/" + id + "__2.jpg");
-    image3.mv("../ProjectClone22/public/productImages/" + id + "__3.jpg");
+    image1.mv("./public/productImages/" + id + "__1.jpg");
+    image2.mv("./public/productImages/" + id + "__2.jpg");
+    image3.mv("./public/productImages/" + id + "__3.jpg");
 
     res.redirect("/admin/addproduct");
   });

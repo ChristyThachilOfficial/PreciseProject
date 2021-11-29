@@ -63,9 +63,7 @@ module.exports={
                     gender:proDetails.gender,
                     description:proDetails.description,
                     date:proDetails.date,
-                    // image1:proDetails.image1,
-                    // image2:proDetails.image2,
-                    // image3:proDetails.image3
+                    
                 }
             }).then((response)=>{
                 resolve(response)
