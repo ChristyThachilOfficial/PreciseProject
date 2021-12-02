@@ -112,12 +112,13 @@ router.post("/addproduct",adminLoginHelper, (req, res, next) => {
     let image1 = req.files.image1;
     let image2 = req.files.image2;
     let image3 = req.files.image3;
+    console.log('inserted id and product id is same or not',id)
 
     image1.mv("./public/productImages/" + id + "__1.jpg");
     image2.mv("./public/productImages/" + id + "__2.jpg");
     image3.mv("./public/productImages/" + id + "__3.jpg");
 
-    res.redirect("/admin/addproduct");
+    res.redirect("/admin/viewproducts");
   });
 });
 

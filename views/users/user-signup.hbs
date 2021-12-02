@@ -40,11 +40,11 @@
                     <div id="passwordMissmatch"></div>
                     <div class="form-group">
                         <label for="exampleInputPassword1">Password</label>
-                         <input type="password" name="password" class="form-control" id="password" placeholder="Password"  onchange='check_pass();'>
+                         <input type="password" name="password" class="form-control" id="password" placeholder="Password"  >
                     </div>
                     <div class="form-group">
                         <label for="exampleInputPassword1">Confirm password</label>
-                        <input type="password" name="repassword" class="form-control" id="confirm_password" placeholder="Re-type your passord"  onchange='check_pass();'>
+                        <input type="password" name="repassword" class="form-control" id="confirm_password" placeholder="Re-type your passord"  >
                     </div>
                     {{#if signupError}}
                     <div>
@@ -91,29 +91,23 @@
 		},
 		password:{
 			required:true,	
-			minlength:3
+			minlength:3,
+            
 		},
 		repassword:{
 			required:true,	
-			minlength:3
+			minlength:3,
+            equalTo:'#password'
 		}
 
+      },
+      messages:{
+          repassword :"Passwords didn't match"
       }
     })
   })
 </script>
-<script>
-function check_pass() {
-    if (document.getElementById('password').value ==
-            document.getElementById('confirm_password').value) {
-                document.getElementById('passwordMissmatch').innerHTML = ' '
-        document.getElementById('submit').disabled = false;
-    } else {
-        document.getElementById('passwordMissmatch').innerHTML = `<span class="text-danger">Password doesn't match</span>`
-        document.getElementById('submit').disabled = true;
-    }
-}
-</script>
+
 <style>
 	.error{
 		color: red;
