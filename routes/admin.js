@@ -146,7 +146,7 @@ router.get("/editproducts/:id",adminLoginHelper, async (req, res, next) => {
 router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
   
   productHelpers.updateproductDetails(req.params.id, req.body).then(() => {
-    res.redirect("/admin/viewproducts");
+    
     if (req.files.image1 || req.files.image2 || req.files.image3) {
       let image1 = req.files.image1;
       let image2 = req.files.image2;
@@ -171,6 +171,7 @@ router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
      
       
     }
+    res.redirect("/admin/viewproducts");
   });
 }),
   //order management
@@ -493,7 +494,7 @@ router.post('/addAdvertisement',adminLoginHelper,(req,res,next)=>{
   productHelpers.addAdvertisement(req.body).then((id)=>{
     let image = req.files.offerImage
    
-    image.mv("../ProjectClone22/public/userImages/" + id + ".jpg")
+    image.mv("./public/userImages/" + id + ".jpg")
     res.redirect('/admin/advertisementManagement')
   })
 })
