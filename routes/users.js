@@ -727,6 +727,7 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
   let order =await userHelpers.findOrder(orderId)
   if (order.mode ==='cart') {
     let products = await userHelpers.getOrderProducts(orderId);
+    console.log('cart ordereeeeeeeeeed productsssssss',products)
     res.render("users/user-orderproducts", {
       typeOfPersonUser: true,
       users: true,
@@ -740,7 +741,8 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
     });
   }else if (order.mode === 'buynow') {
     let products = await productHelpers.buyNowProduct(orderId)
-    res.render("users/user-orderProducts",{
+    console.log('view orrrrrrrrrrrrrrrrrrdereeeeeeeeeeeeed products',products)
+    res.render("users/user-buyNowOrderedProduct",{
       typeOfPersonUser: true,
       users: true,
       user: true,

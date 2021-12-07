@@ -370,17 +370,31 @@
                     required: true
                 },
                 zipcode: {
-                    required: true
+                    required: true,
+                    digits:true,
+                    minlength:6,
+                    maxlength:6
                 },
                 phone: {
-                    required: true
+                    required: true,
+                    digits: true,
+                    minlength:10,
+                    maxlength: 10
                 },
                 altnum: {
-                    required: true
+                    required: true,
+                    digits: true,
+                    minlength:10,
+                    maxlength: 10
                 },
                 paymentMethod: {
                     required: true
                 }
+            },
+            messages:{
+                zipcode:"enter valid zip code",
+                phone:"enter valid mobile number",
+                altnum:"enter valid mobile number"
             },
             submitHandler: () => {
                 if (document.getElementById('CODbutton').checked == true || document.getElementById('razorpayButton').checked == true || document.getElementById('paypalButton').checked == true) {

@@ -355,17 +355,31 @@
                     required:true
                 },
                  zipcode:{
-                    required:true
+                    required:true,
+                    digits:true,
+                    minlength:6,
+                    maxlength:6
                 },
                  phone:{
-                    required:true
+                    required:true,
+                    digits: true,
+                    minlength:10,
+                    maxlength: 10
                 },
                  altnum:{
-                    required:true
+                    required:true,
+                    digits: true,
+                    minlength:10,
+                    maxlength: 10
                 },
                 paymentMethod:{
                     required:true
                 }
+            },
+            messages:{
+                zipcode:"enter valid zip code",
+                phone:"enter valid mobile number",
+                altnum:"enter valid mobile number"
             },
             submitHandler:()=>{
                 if (document.getElementById('CODbutton').checked == true || document.getElementById('razorpayButton').checked == true || document.getElementById('paypalButton').checked == true) {
@@ -505,46 +519,6 @@
 
 
 
-
-{{!-- <script>
-    //here is the game the real game
-     $.ajax({
-            url:'/buyNowplace-order',
-            method:'post',
-            data:$('#buyNow-checkout-form').serialize(),
-            success:(response)=>{
-               
-                if(response.codSuccess){
-                    location.href='/ordersuccess'
-                } else if(response.method === 'paypal'){
-                            //something will happen now
-                            paypal.Buttons({
-              // Set up the transaction
-              createOrder: function (data, actions) {
-                return actions.order.create({
-                  purchase_units: [{
-                    amount: {
-                      value: response.total
-                    }
-                  }]
-                });
-              },
-              // Finalize the transaction
-              onApprove: function (data, actions) {
-                return actions.order.capture().then(function (details) {
-                  // Show a success message to the buyer
-                  alert('Transaction completed by ' + details.payer.name.given_name + '!');
-                });
-              }
-            }).render('#paypal-button-container');
-
-                        }
-                        else{
-                    razorpayPayment(response)
-                }
-            }
-        })
-</script> --}}
 
 
 <style>

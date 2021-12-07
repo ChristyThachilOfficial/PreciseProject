@@ -1,0 +1,77 @@
+<section>
+    <div class="container mt-5">
+        <center><h1 class="m-auto">MY ORDERS</h1></center>
+        <a href="/" class="btn btn-outline-primary">Continue shopping</a>
+        
+        
+            
+       
+             <div class="row">
+            
+                
+                    
+                
+            
+            <div class="col-md-3 p-3">
+                <div class="card" style="width: 13rem;">
+                    <img class="card-img-top m-auto" src="/productImages/{{products.productId}}__1.jpg" style="width: 150px;height: 200px;" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{products.productname}}</h5>
+                        <p class="card-text">₹<span>{{products.price}}</span></p>
+                        <input type="hidden" name="orderId" value="{{orderId}}" id="">
+                        <p class="card-text">{{products.brand}} </p>
+                        <p class="card-text">{{products.description}} </p>
+                        <p class="card-text">{{products.status}} </p>
+                        {{#eq products.status 'cancelled' }}
+                        <div style="width: 100%; height: 20%; background-color: rgba(219, 90, 90, 0.137);">
+                            <p>This order is cancelled</p>
+                        </div>
+                        {{else}}
+                        
+                        <button type="button" id="cancelOrderButton" style="display: block;" onclick="cancelOrderBuyNow('{{products.productId}}','{{products.status}}','{{orderId}}')" class="btn btn-outline-danger">Cancel order</button>
+                        {{/eq}}
+                    </div>
+                </div>
+            </div>
+            
+            
+        </div>
+
+         
+         
+    </div>
+</section>
+
+<script>
+ function cancelOrderBuyNow(prodId,status,orderId){
+     $.ajax({
+         url:'/cancelOrderBuyNow',
+         data:{
+             prodId:prodId,
+             status:status,
+             orderId:orderId
+         },
+         method:'post',
+         success:()=>{   
+            location.reload()             
+         }
+     })
+ }
+
+
+ function cancelOrderCart(proId,status,orderId){
+    $.ajax({
+        url:'/cancelOrderCart',
+        data:{
+            proId:proId,
+            status:status,
+            orderId:orderId
+        },
+        method:'post',
+        success:()=>{
+            
+            location.reload()
+        }
+    })
+ }
+</script>
