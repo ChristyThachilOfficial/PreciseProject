@@ -8,6 +8,7 @@ const { response } = require("express");
 const { Db } = require("mongodb");
 const { token } = require("morgan");
 const twilio = require("twilio")(keys.accountsSID, keys.authToken);
+const { v4: uuidv4 } = require('uuid');
 
 
 var loginHelper = (req, res, next) => {
@@ -664,24 +665,39 @@ router.post("/place-order",loginHelper, async (req, res, next) => {
   let products = await userHelpers.getCartProductList(req.body.userId);
   let totalPrice = req.body.totalCartPrice
   req.session.cart = true
-  userHelpers.placeOrder(req.body, products, totalPrice).then((orderId) => {
-    products.map((data)=>{
-      productHelpers.updateTotalQuantityCart(data)
-    })
+  
+   
     if (req.body["paymentMethod"] === "COD") {
-      res.json({ codSuccess: true });
-    }else if(req.body["paymentMethod"] === "paypal"){
-      userHelpers.generatePaypal(orderId,totalPrice).then((response)=>{
-        res.json(response)
+      userHelpers.placeOrder(req.body,products,totalPrice).then((orderId)=>{
+        products.map((data)=>{
+          productHelpers.updateTotalQuantityCart(data)
+        })
+        res.json({ codSuccess: true });
       })
+      
+    }else if(req.body["paymentMethod"] === "paypal"){
+      userHelpers.placeOrder(req.body,products,totalPrice).then((orderId)=>{
+        products.map((data)=>{
+          productHelpers.updateTotalQuantityCart(data)
+        })
+        userHelpers.generatePaypal(orderId,totalPrice).then((response)=>{
+          res.json(response)
+        })
+      })
+     
     }
      else{
-      userHelpers.generateRazorpay(orderId, totalPrice).then((response) => {
-        res.json(response);
+      let orderuuId = uuidv4()
+      userHelpers.generateRazorpay(orderuuId, totalPrice).then((response) => {
+        req.session.paymentDetailsCart = req.body
+        req.session.razorpayCartProduct = products
+        req.session.razorpayCarttotalPrice = req.body.totalfinalPrice
+        req.session.CartRazorpay = true
+        res.json({response:response,paymentDetailsCart:req.session.paymentDetailsCart});
       });
     }
     
-  });
+  
 });
 
 //order success page
@@ -727,7 +743,7 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
   let order =await userHelpers.findOrder(orderId)
   if (order.mode ==='cart') {
     let products = await userHelpers.getOrderProducts(orderId);
-    console.log('cart ordereeeeeeeeeed productsssssss',products)
+    console.log('lets seeeeeeeeeee the ordered productsssssssssssssssss',products[0].item)
     res.render("users/user-orderproducts", {
       typeOfPersonUser: true,
       users: true,
@@ -741,7 +757,6 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
     });
   }else if (order.mode === 'buynow') {
     let products = await productHelpers.buyNowProduct(orderId)
-    console.log('view orrrrrrrrrrrrrrrrrrdereeeeeeeeeeeeed products',products)
     res.render("users/user-buyNowOrderedProduct",{
       typeOfPersonUser: true,
       users: true,
@@ -758,18 +773,50 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
 
 //verify router
 router.post("/verify-payment", (req, res, next) => {
-  userHelpers
-    .verifyPayment(req.body)
+  if(req.session.buyNowRazorpay){
+    userHelpers
+    .verifyPayment(req.body,req.session.paymentDetailsBuynow)
     .then(() => {
       userHelpers.changePaymentStatus(req.body["order[receipt]"]).then(() => {
+        userHelpers.buyNowplaceOrder(req.session.paymentDetailsBuynow,req.session.razorpayBuynowProduct,req.session.razorpayBuynowtotalPrice).then(()=>{
+          req.session.paymentDetailsBuynow =false
+          req.session.razorpayBuynowProduct =false
+          req.session.razorpayBuynowtotalPrice = false
+          req.session.buyNowRazorpay = false
+          res.json({ status: true });
+        })
         
-        res.json({ status: true });
       });
     })
     .catch((err) => {
       console.log("error is", err);
       res.json({ status: false });
     });
+  }else{
+    userHelpers
+    .verifyPayment(req.body,req.session.paymentDetailsCart)
+    .then(() => {
+      userHelpers.changePaymentStatus(req.body["order[receipt]"]).then(() => {
+        userHelpers.placeOrder(req.session.paymentDetailsCart,req.session.razorpayCartProduct,req.session.razorpayCarttotalPrice).then(()=>{
+          let products = req.session.razorpayCartProduct
+          products.map((data)=>{
+            productHelpers.updateTotalQuantityCart(data)
+          })
+          req.session.paymentDetailsCart =false
+          req.session.razorpayCartProduct =false
+          req.session.razorpayCarttotalPrice = false
+          req.session.CartRazorpay = false
+          res.json({ status: true });
+        })
+        
+      });
+    })
+    .catch((err) => {
+      console.log("error is", err);
+      res.json({ status: false });
+    });
+  }
+  
 });
 
 //userprofile
@@ -831,23 +878,32 @@ router.get("/buynow/:id", loginHelper, async (req, res, next) => {
 router.post("/buyNowplace-order", loginHelper,async (req, res, next) => {
   let product = await productHelpers.getProduct(req.body.proId);
   let totalPrice = req.body.totalfinalPrice;
-  req.session.cart =false
-  userHelpers
-    .buyNowplaceOrder(req.body, product,totalPrice)
-    .then((orderId) => {
+    req.session.cart =false
+
      
       if (req.body["paymentMethod"] === "COD") {
-        res.json({ codSuccess: true });
+        userHelpers.buyNowplaceOrder(req.body,product,totalPrice).then((orderId)=>{
+          res.json({ codSuccess: true });
+        })
+        
       } else if(req.body["paymentMethod"] === "Razorpay"){
-        userHelpers.generateRazorpay(orderId, totalPrice).then((response) => {
-          res.json(response);
+        let orderuuId = uuidv4()
+        userHelpers.generateRazorpay(orderuuId, totalPrice).then((response) => {
+          req.session.paymentDetailsBuynow = req.body
+          req.session.razorpayBuynowProduct = product
+          req.session.razorpayBuynowtotalPrice = req.body.totalfinalPrice
+          req.session.buyNowRazorpay = true
+          res.json({response:response,paymentDetailsBuynow:req.session.paymentDetailsBuynow});
         });
       }else{
-        userHelpers.generatePaypal(orderId,totalPrice).then((response)=>{
-          res.json(response)
+        userHelpers.buyNowplaceOrder(req.body,product,totalPrice).then((orderId)=>{
+          userHelpers.generatePaypal(orderId,totalPrice).then((response)=>{
+            res.json(response)
+          })
         })
+       
       }
-    });
+    
     productHelpers.updateTotalQuantity(req.body.proId)
 });
 

@@ -7,6 +7,7 @@ const Razorpay = require("razorpay");
 const { resolve } = require("path");
 const axios = require('axios')
 var paypal = require('paypal-rest-sdk')
+const { v4: uuidv4 } = require('uuid');
 const ACCESS_KEY= process.env.CURRENCY_CONVERTER_ACCESS_KEY
 var instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEYID,
@@ -638,12 +639,13 @@ module.exports = {
       instance.orders.create(options, function (err, order) {
         if (err) {
         } else {
+          console.log('orrrrrrrrrrrrrrrrrrrrrrrrrrderrrrrrrrrrrrr',order)
           resolve(order);
         }
       });
     });
   },
-  verifyPayment: (details) => {
+  verifyPayment: (details,deliveryDetails) => {
    
     return new Promise((resolve, reject) => {
       const crypto = require("crypto");
@@ -655,6 +657,7 @@ module.exports = {
       );
       hmac = hmac.digest("hex");
       if (hmac == details["payment[razorpay_signature]"]) {
+
         resolve();
       } else {
         reject();
