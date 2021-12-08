@@ -743,7 +743,6 @@ router.get("/vieworderproducts/:id", loginHelper, async (req, res, next) => {
   let order =await userHelpers.findOrder(orderId)
   if (order.mode ==='cart') {
     let products = await userHelpers.getOrderProducts(orderId);
-    console.log('lets seeeeeeeeeee the ordered productsssssssssssssssss',products[0].item)
     res.render("users/user-orderproducts", {
       typeOfPersonUser: true,
       users: true,
@@ -845,7 +844,7 @@ router.post("/updateuserdetails", loginHelper, async (req, res, next) => {
       if(req.files){
         let image = req.files.image;
       
-      image.mv("../ProjectClone22/public/userImages/" + id + ".jpg");
+      image.mv("./public/userImages/" + id + ".jpg");
       res.redirect("/profile");
       }else{
         res.redirect("/profile");

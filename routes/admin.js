@@ -147,7 +147,9 @@ router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
   
   productHelpers.updateproductDetails(req.params.id, req.body).then(() => {
     
-    if (req.files.image1 || req.files.image2 || req.files.image3) {
+      if(req.files){
+
+      
       let image1 = req.files.image1;
       let image2 = req.files.image2;
       let image3 = req.files.image3;
@@ -167,10 +169,12 @@ router.post("/editproducts/:id",adminLoginHelper, (req, res, next) => {
           "./public/productImages/" + req.params.id + "__3.jpg"
         );
       }
+
+    }
      
      
       
-    }
+    
     res.redirect("/admin/viewproducts");
   });
 }),
